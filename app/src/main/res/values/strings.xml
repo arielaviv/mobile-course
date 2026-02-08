@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lux Field</string>
+
+    <!-- Login -->
+    <string name="login_subtitle">Field Technician</string>
+    <string name="login_phone_label">Phone Number</string>
+    <string name="login_phone_placeholder">+972 50 123 4567</string>
+    <string name="login_code_label">Access Code</string>
+    <string name="login_code_placeholder">Enter code</string>
+    <string name="login_button">Sign In</string>
+
+    <!-- Map -->
+    <string name="map_refresh">Refresh</string>
+    <string name="map_my_location">My Location</string>
+    <string name="map_work_orders_title">Work Orders (%1$d)</string>
+    <string name="map_view_details">View Details</string>
+
+    <!-- Work Order -->
+    <string name="wo_detail_title">Work Order</string>
+    <string name="wo_tier_label">Tier %1$d</string>
+    <string name="wo_tasks_header">Tasks (%1$d)</string>
+    <string name="wo_task_estimate">~%1$d min</string>
+
+    <!-- Task -->
+    <string name="task_detail_title">Task</string>
+    <string name="task_steps_header">Steps (%1$d)</string>
+    <string name="task_start">Start Task</string>
+    <string name="task_complete">Complete Task</string>
+    <string name="task_completed_label">Completed</string>
+    <string name="task_complete_all_steps_hint">Complete all steps to finish this task</string>
+
+    <!-- General -->
+    <string name="back">Back</string>
+    <string name="error_generic">Something went wrong</string>
+    <string name="loading">Loading…</string>
+</resources>
