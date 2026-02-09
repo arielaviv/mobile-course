@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lux Field</string>
+
+    <!-- Login -->
+    <string name="login_subtitle">فني ميداني</string>
+    <string name="login_phone_label">رقم الهاتف</string>
+    <string name="login_phone_placeholder">050-123-4567</string>
+    <string name="login_code_label">رمز الدخول</string>
+    <string name="login_code_placeholder">أدخل الرمز</string>
+    <string name="login_button">تسجيل الدخول</string>
+
+    <!-- Map -->
+    <string name="map_refresh">تحديث</string>
+    <string name="map_my_location">موقعي</string>
+    <string name="map_work_orders_title">أوامر العمل (%1$d)</string>
+    <string name="map_view_details">عرض التفاصيل</string>
+
+    <!-- Work Order -->
+    <string name="wo_detail_title">أمر عمل</string>
+    <string name="wo_tier_label">المستوى %1$d</string>
+    <string name="wo_tasks_header">المهام (%1$d)</string>
+    <string name="wo_task_estimate">~%1$d دقيقة</string>
+
+    <!-- Task -->
+    <string name="task_detail_title">مهمة</string>
+    <string name="task_steps_header">الخطوات (%1$d)</string>
+    <string name="task_start">بدء المهمة</string>
+    <string name="task_complete">إنهاء المهمة</string>
+    <string name="task_completed_label">مكتملة</string>
+    <string name="task_complete_all_steps_hint">أكمل جميع الخطوات لإنهاء هذه المهمة</string>
+
+    <!-- General -->
+    <string name="back">رجوع</string>
+    <string name="error_generic">حدث خطأ ما</string>
+    <string name="loading">جاري التحميل…</string>
+</resources>

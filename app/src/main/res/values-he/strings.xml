@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lux Field</string>
+
+    <!-- Login -->
+    <string name="login_subtitle">טכנאי שטח</string>
+    <string name="login_phone_label">מספר טלפון</string>
+    <string name="login_phone_placeholder">050-123-4567</string>
+    <string name="login_code_label">קוד גישה</string>
+    <string name="login_code_placeholder">הזן קוד</string>
+    <string name="login_button">התחברות</string>
+
+    <!-- Map -->
+    <string name="map_refresh">רענון</string>
+    <string name="map_my_location">המיקום שלי</string>
+    <string name="map_work_orders_title">הזמנות עבודה (%1$d)</string>
+    <string name="map_view_details">הצג פרטים</string>
+
+    <!-- Work Order -->
+    <string name="wo_detail_title">הזמנת עבודה</string>
+    <string name="wo_tier_label">שכבה %1$d</string>
+    <string name="wo_tasks_header">משימות (%1$d)</string>
+    <string name="wo_task_estimate">~%1$d דק׳</string>
+
+    <!-- Task -->
+    <string name="task_detail_title">משימה</string>
+    <string name="task_steps_header">שלבים (%1$d)</string>
+    <string name="task_start">התחל משימה</string>
+    <string name="task_complete">סיים משימה</string>
+    <string name="task_completed_label">הושלמה</string>
+    <string name="task_complete_all_steps_hint">השלם את כל השלבים כדי לסיים את המשימה</string>
+
+    <!-- General -->
+    <string name="back">חזור</string>
+    <string name="error_generic">משהו השתבש</string>
+    <string name="loading">טוען…</string>
+</resources>
