@@ -31,6 +31,28 @@
     <string name="task_completed_label">Completed</string>
     <string name="task_complete_all_steps_hint">Complete all steps to finish this task</string>
 
+    <!-- Camera -->
+    <string name="camera_take_work_photo">Take Work Photo</string>
+    <string name="camera_take_selfie">Take Selfie</string>
+    <string name="camera_capture">Capture</string>
+    <string name="camera_retake">Retake</string>
+    <string name="camera_use_photo">Use Photo</string>
+    <string name="camera_permission_rationale">Camera access is needed to take work photos and selfies for proof of presence</string>
+    <string name="camera_work_photo">Work Photo</string>
+    <string name="camera_selfie">Selfie</string>
+
+    <!-- Photos -->
+    <string name="photo_gallery_title">Photos</string>
+    <string name="photo_analyzing">Analyzing…</string>
+    <string name="photo_count">%1$d photos</string>
+
+    <!-- AI Chat -->
+    <string name="ai_chat_title">AI Assistant</string>
+    <string name="ai_chat_input_hint">Ask a question…</string>
+    <string name="ai_chat_send">Send</string>
+    <string name="ai_chat_thinking">Thinking…</string>
+    <string name="ai_chat_error">Failed to get response</string>
+
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_map_style">Map Style</string>

@@ -30,6 +30,28 @@
     <string name="task_completed_label">הושלמה</string>
     <string name="task_complete_all_steps_hint">השלם את כל השלבים כדי לסיים את המשימה</string>
 
+    <!-- Camera -->
+    <string name="camera_take_work_photo">צלם תמונת עבודה</string>
+    <string name="camera_take_selfie">צלם סלפי</string>
+    <string name="camera_capture">צלם</string>
+    <string name="camera_retake">צלם שוב</string>
+    <string name="camera_use_photo">השתמש בתמונה</string>
+    <string name="camera_permission_rationale">נדרשת גישה למצלמה לצילום תמונות עבודה וסלפי להוכחת נוכחות</string>
+    <string name="camera_work_photo">תמונת עבודה</string>
+    <string name="camera_selfie">סלפי</string>
+
+    <!-- Photos -->
+    <string name="photo_gallery_title">תמונות</string>
+    <string name="photo_analyzing">מנתח…</string>
+    <string name="photo_count">%1$d תמונות</string>
+
+    <!-- AI Chat -->
+    <string name="ai_chat_title">עוזר AI</string>
+    <string name="ai_chat_input_hint">שאל שאלה…</string>
+    <string name="ai_chat_send">שלח</string>
+    <string name="ai_chat_thinking">חושב…</string>
+    <string name="ai_chat_error">שגיאה בקבלת תגובה</string>
+
     <!-- Settings -->
     <string name="settings_title">הגדרות</string>
     <string name="settings_map_style">סגנון מפה</string>

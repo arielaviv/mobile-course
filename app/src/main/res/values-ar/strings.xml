@@ -30,6 +30,28 @@
     <string name="task_completed_label">مكتملة</string>
     <string name="task_complete_all_steps_hint">أكمل جميع الخطوات لإنهاء هذه المهمة</string>
 
+    <!-- Camera -->
+    <string name="camera_take_work_photo">التقاط صورة عمل</string>
+    <string name="camera_take_selfie">التقاط سيلفي</string>
+    <string name="camera_capture">التقاط</string>
+    <string name="camera_retake">إعادة التقاط</string>
+    <string name="camera_use_photo">استخدام الصورة</string>
+    <string name="camera_permission_rationale">مطلوب الوصول للكاميرا لالتقاط صور العمل والسيلفي لإثبات الحضور</string>
+    <string name="camera_work_photo">صورة عمل</string>
+    <string name="camera_selfie">سيلفي</string>
+
+    <!-- Photos -->
+    <string name="photo_gallery_title">الصور</string>
+    <string name="photo_analyzing">جاري التحليل…</string>
+    <string name="photo_count">%1$d صور</string>
+
+    <!-- AI Chat -->
+    <string name="ai_chat_title">مساعد AI</string>
+    <string name="ai_chat_input_hint">اطرح سؤالاً…</string>
+    <string name="ai_chat_send">إرسال</string>
+    <string name="ai_chat_thinking">جاري التفكير…</string>
+    <string name="ai_chat_error">فشل في الحصول على رد</string>
+
     <!-- Settings -->
     <string name="settings_title">الإعدادات</string>
     <string name="settings_map_style">نمط الخريطة</string>
