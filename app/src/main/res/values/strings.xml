@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lux Field</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiYXJpZWxhdml2IiwiYSI6ImNtZTMzMzR1MTAzM3EyanNjbzI0bXVvc2gifQ.PAdN0DsdYRVhKRllRGI_SQ</string>
 
     <!-- Login -->
     <string name="login_subtitle">Field Technician</string>
