@@ -3,7 +3,10 @@ package com.lux.field.di
 import android.content.Context
 import androidx.room.Room
 import com.lux.field.data.local.LuxDatabase
+import com.lux.field.data.local.MIGRATION_1_2
+import com.lux.field.data.local.dao.ChatMessageDao
 import com.lux.field.data.local.dao.TaskDao
+import com.lux.field.data.local.dao.TaskPhotoDao
 import com.lux.field.data.local.dao.WorkOrderDao
 import dagger.Module
 import dagger.Provides
@@ -23,7 +26,9 @@ object DatabaseModule {
             context,
             LuxDatabase::class.java,
             "lux_field.db",
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2)
+            .build()
     }
 
     @Provides
@@ -31,4 +36,10 @@ object DatabaseModule {
 
     @Provides
     fun provideTaskDao(database: LuxDatabase): TaskDao = database.taskDao()
+
+    @Provides
+    fun provideTaskPhotoDao(database: LuxDatabase): TaskPhotoDao = database.taskPhotoDao()
+
+    @Provides
+    fun provideChatMessageDao(database: LuxDatabase): ChatMessageDao = database.chatMessageDao()
 }

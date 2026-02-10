@@ -1,12 +1,19 @@
 package com.lux.field.data.repository
 
+import com.lux.field.data.local.entity.ChatMessageEntity
 import com.lux.field.data.local.entity.TaskEntity
+import com.lux.field.data.local.entity.TaskPhotoEntity
 import com.lux.field.data.local.entity.WorkOrderEntity
 import com.lux.field.data.remote.dto.WorkOrderDetailDto
 import com.lux.field.data.remote.dto.WorkOrderDto
 import com.lux.field.domain.model.CablePullDetail
+import com.lux.field.domain.model.CameraFacing
+import com.lux.field.domain.model.ChatMessage
+import com.lux.field.domain.model.ChatRole
+import com.lux.field.domain.model.PhotoAnalysisStatus
 import com.lux.field.domain.model.SpliceDetail
 import com.lux.field.domain.model.Task
+import com.lux.field.domain.model.TaskPhoto
 import com.lux.field.domain.model.TaskStatus
 import com.lux.field.domain.model.TaskStep
 import com.lux.field.domain.model.WorkOrder
@@ -201,6 +208,58 @@ fun WorkOrderEntity.toDomain(): WorkOrder = WorkOrder(
     tasks = emptyList(),
     createdAt = createdAt,
     updatedAt = updatedAt,
+)
+
+// --- TaskPhoto Entity <-> Domain ---
+
+fun TaskPhotoEntity.toDomain(): TaskPhoto = TaskPhoto(
+    id = id,
+    taskId = taskId,
+    stepId = stepId,
+    workOrderId = workOrderId,
+    filePath = filePath,
+    thumbnailPath = thumbnailPath,
+    cameraFacing = CameraFacing.valueOf(cameraFacing.uppercase()),
+    capturedAt = capturedAt,
+    latitude = latitude,
+    longitude = longitude,
+    analysisStatus = PhotoAnalysisStatus.valueOf(analysisStatus.uppercase()),
+    analysisResult = analysisResult,
+)
+
+fun TaskPhoto.toEntity(): TaskPhotoEntity = TaskPhotoEntity(
+    id = id,
+    taskId = taskId,
+    stepId = stepId,
+    workOrderId = workOrderId,
+    filePath = filePath,
+    thumbnailPath = thumbnailPath,
+    cameraFacing = cameraFacing.name.lowercase(),
+    capturedAt = capturedAt,
+    latitude = latitude,
+    longitude = longitude,
+    analysisStatus = analysisStatus.name.lowercase(),
+    analysisResult = analysisResult,
+)
+
+// --- ChatMessage Entity <-> Domain ---
+
+fun ChatMessageEntity.toDomain(): ChatMessage = ChatMessage(
+    id = id,
+    taskId = taskId,
+    role = ChatRole.valueOf(role.uppercase()),
+    content = content,
+    photoId = photoId,
+    createdAt = createdAt,
+)
+
+fun ChatMessage.toEntity(): ChatMessageEntity = ChatMessageEntity(
+    id = id,
+    taskId = taskId,
+    role = role.name.lowercase(),
+    content = content,
+    photoId = photoId,
+    createdAt = createdAt,
 )
 
 fun TaskEntity.toDomain(): Task {
