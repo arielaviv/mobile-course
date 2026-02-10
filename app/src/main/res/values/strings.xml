@@ -34,6 +34,7 @@
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_map_style">Map Style</string>
+    <string name="settings_logout">Log Out</string>
 
     <!-- General -->
     <string name="back">Back</string>

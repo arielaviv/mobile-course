@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.lux.field.domain.model.WorkOrder
@@ -16,6 +17,7 @@ import com.lux.field.ui.theme.StatusInProgress
 import com.lux.field.ui.theme.StatusPending
 import com.lux.field.ui.theme.StatusScheduled
 import com.mapbox.geojson.Point
+import com.mapbox.maps.EdgeInsets
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
@@ -43,6 +45,30 @@ fun WorkOrderMapContent(
         setCameraOptions {
             center(Point.fromLngLat(34.7725, 32.0750))
             zoom(13.0)
+        }
+    }
+
+    LaunchedEffect(workOrders) {
+        if (workOrders.size >= 2) {
+            val lats = workOrders.map { it.location.latitude }
+            val lngs = workOrders.map { it.location.longitude }
+            val sw = Point.fromLngLat(lngs.min(), lats.min())
+            val ne = Point.fromLngLat(lngs.max(), lats.max())
+            viewportState.setCameraOptions {
+                center(
+                    Point.fromLngLat(
+                        (sw.longitude() + ne.longitude()) / 2,
+                        (sw.latitude() + ne.latitude()) / 2,
+                    )
+                )
+                zoom(12.5)
+            }
+        } else if (workOrders.size == 1) {
+            val wo = workOrders.first()
+            viewportState.setCameraOptions {
+                center(Point.fromLngLat(wo.location.longitude, wo.location.latitude))
+                zoom(14.0)
+            }
         }
     }
 

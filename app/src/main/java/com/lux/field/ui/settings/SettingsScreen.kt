@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Scaffold
@@ -35,6 +38,7 @@ import com.lux.field.data.repository.MapStyle
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    onLogout: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val currentStyle by viewModel.mapStyle.collectAsStateWithLifecycle()
@@ -98,6 +102,27 @@ fun SettingsScreen(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = {
+                    viewModel.logout()
+                    onLogout()
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                ),
+            ) {
+                Text(stringResource(R.string.settings_logout))
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

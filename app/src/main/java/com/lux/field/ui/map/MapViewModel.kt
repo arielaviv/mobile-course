@@ -21,6 +21,7 @@ data class MapUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val userName: String = "",
+    val loggedOut: Boolean = false,
 )
 
 @HiltViewModel
@@ -65,5 +66,10 @@ class MapViewModel @Inject constructor(
 
     fun selectWorkOrder(workOrder: WorkOrder?) {
         _uiState.update { it.copy(selectedWorkOrder = workOrder) }
+    }
+
+    fun logout() {
+        authRepository.logout()
+        _uiState.update { it.copy(loggedOut = true) }
     }
 }

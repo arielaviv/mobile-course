@@ -33,6 +33,7 @@
     <!-- Settings -->
     <string name="settings_title">הגדרות</string>
     <string name="settings_map_style">סגנון מפה</string>
+    <string name="settings_logout">התנתק</string>
 
     <!-- General -->
     <string name="back">חזור</string>
