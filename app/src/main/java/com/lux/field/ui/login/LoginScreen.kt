@@ -29,6 +29,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.imePadding
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lux.field.R
@@ -56,7 +57,8 @@ fun LoginScreen(
                 brush = Brush.verticalGradient(
                     colors = listOf(LuxBgTop, LuxBgMid, LuxBgBottom),
                 )
-            ),
+            )
+            .imePadding(),
         contentAlignment = Alignment.Center,
     ) {
         Column(
@@ -75,12 +77,13 @@ fun LoginScreen(
                 color = Zinc100,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
                 text = stringResource(R.string.login_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Zinc400,
+                letterSpacing = 2.sp,
             )
 
             Spacer(modifier = Modifier.height(48.dp))
