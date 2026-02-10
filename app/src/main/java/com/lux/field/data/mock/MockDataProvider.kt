@@ -40,6 +40,43 @@ class MockDataProvider @Inject constructor() {
         // no-op for mock — status is updated locally via Room
     }
 
+    fun getMockChatResponse(userMessage: String): String {
+        val lower = userMessage.lowercase()
+        return when {
+            "splice" in lower || "fusion" in lower ->
+                "For fusion splicing, ensure the fiber ends are clean-cleaved at 90°. " +
+                    "Target splice loss should be under 0.1 dB. Use the heat shrink protector after each splice."
+            "otdr" in lower || "test" in lower ->
+                "Run the OTDR from the ONT end. Look for splice events — each should show less than 0.1 dB loss. " +
+                    "Check for any unexpected reflections that could indicate a bad connector."
+            "cable" in lower || "pull" in lower ->
+                "When pulling cable, apply steady tension and don't exceed the cable's rated bend radius. " +
+                    "Use lubricant if the conduit run is longer than 30m."
+            "ont" in lower || "install" in lower ->
+                "Mount the ONT at eye level near a power outlet. Connect the fiber patch cord carefully — " +
+                    "the optical connector is fragile. Check the PON and LOS LEDs after powering on."
+            "safety" in lower || "danger" in lower ->
+                "Always wear safety glasses when working with fiber — glass shards are nearly invisible. " +
+                    "Never look into the end of a lit fiber. Use the fiber waste container."
+            "help" in lower ->
+                "I can help with fiber splicing techniques, cable pulling tips, ONT installation, " +
+                    "OTDR testing procedures, and safety guidelines. What do you need?"
+            else ->
+                "I understand your question. Based on the current task, make sure to follow the steps in order " +
+                    "and document any issues you encounter. Let me know if you need specific guidance."
+        }
+    }
+
+    fun getMockPhotoAnalysis(cameraFacing: String): String =
+        if (cameraFacing == "back") {
+            "Photo analysis: The work area looks clean and properly organized. " +
+                "I can see the fiber cable is routed correctly with appropriate bend radius. " +
+                "The connections appear secure. Good work quality."
+        } else {
+            "Proof of presence confirmed. Technician is visible at the job site. " +
+                "Timestamp and location verified."
+        }
+
     private fun createDropInstallWO(): WorkOrder = WorkOrder(
         id = "wo-drop-101",
         type = WorkOrderType.DROP_INSTALL,
