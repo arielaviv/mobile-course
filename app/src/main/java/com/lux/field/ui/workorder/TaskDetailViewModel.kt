@@ -3,7 +3,13 @@ package com.lux.field.ui.workorder
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lux.field.data.repository.ChatRepository
+import com.lux.field.data.repository.PhotoRepository
+import com.lux.field.domain.model.CameraFacing
+import com.lux.field.domain.model.ChatMessage
+import com.lux.field.domain.model.PhotoAnalysisStatus
 import com.lux.field.domain.model.Task
+import com.lux.field.domain.model.TaskPhoto
 import com.lux.field.domain.model.TaskStatus
 import com.lux.field.domain.usecase.UpdateTaskStatusUseCase
 import com.lux.field.data.repository.TaskRepository
@@ -20,6 +26,10 @@ data class TaskDetailUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val statusUpdateSuccess: Boolean = false,
+    val photos: List<TaskPhoto> = emptyList(),
+    val chatMessages: List<ChatMessage> = emptyList(),
+    val isChatOpen: Boolean = false,
+    val isChatLoading: Boolean = false,
 )
 
 @HiltViewModel
@@ -27,16 +37,20 @@ class TaskDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val taskRepository: TaskRepository,
     private val updateTaskStatusUseCase: UpdateTaskStatusUseCase,
+    private val photoRepository: PhotoRepository,
+    private val chatRepository: ChatRepository,
 ) : ViewModel() {
 
-    private val workOrderId: String = savedStateHandle["workOrderId"] ?: ""
-    private val taskId: String = savedStateHandle["taskId"] ?: ""
+    val workOrderId: String = savedStateHandle["workOrderId"] ?: ""
+    val taskId: String = savedStateHandle["taskId"] ?: ""
 
     private val _uiState = MutableStateFlow(TaskDetailUiState())
     val uiState: StateFlow<TaskDetailUiState> = _uiState.asStateFlow()
 
     init {
         loadTask()
+        observePhotos()
+        observeChatMessages()
     }
 
     private fun loadTask() {
@@ -51,6 +65,22 @@ class TaskDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, error = e.message) }
                 },
             )
+        }
+    }
+
+    private fun observePhotos() {
+        viewModelScope.launch {
+            photoRepository.observePhotos(taskId).collect { photos ->
+                _uiState.update { it.copy(photos = photos) }
+            }
+        }
+    }
+
+    private fun observeChatMessages() {
+        viewModelScope.launch {
+            chatRepository.observeMessages(taskId).collect { messages ->
+                _uiState.update { it.copy(chatMessages = messages) }
+            }
         }
     }
 
@@ -88,4 +118,69 @@ class TaskDetailViewModel @Inject constructor(
             )
         }
     }
+
+    fun openChat() {
+        _uiState.update { it.copy(isChatOpen = true) }
+    }
+
+    fun closeChat() {
+        _uiState.update { it.copy(isChatOpen = false) }
+    }
+
+    fun sendChatMessage(text: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isChatLoading = true) }
+            val result = chatRepository.sendMessage(
+                taskId = taskId,
+                userText = text,
+                task = _uiState.value.task,
+            )
+            result.fold(
+                onSuccess = {
+                    _uiState.update { it.copy(isChatLoading = false) }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(isChatLoading = false, error = e.message) }
+                },
+            )
+        }
+    }
+
+    fun onPhotoSaved(photoId: String) {
+        requestPhotoAnalysis(photoId)
+    }
+
+    private fun requestPhotoAnalysis(photoId: String) {
+        viewModelScope.launch {
+            val photo = photoRepository.getPhoto(photoId) ?: return@launch
+            photoRepository.updateAnalysis(photoId, PhotoAnalysisStatus.PENDING, null)
+
+            val result = chatRepository.analyzePhoto(
+                taskId = taskId,
+                photoFilePath = photo.filePath,
+                photoId = photoId,
+                cameraFacing = photo.cameraFacing.name.lowercase(),
+                task = _uiState.value.task,
+            )
+
+            result.fold(
+                onSuccess = { message ->
+                    photoRepository.updateAnalysis(
+                        photoId,
+                        PhotoAnalysisStatus.COMPLETED,
+                        message.content,
+                    )
+                },
+                onFailure = {
+                    photoRepository.updateAnalysis(photoId, PhotoAnalysisStatus.FAILED, null)
+                },
+            )
+        }
+    }
+
+    val workPhotoCount: Int
+        get() = _uiState.value.photos.count { it.cameraFacing == CameraFacing.BACK }
+
+    val selfieCount: Int
+        get() = _uiState.value.photos.count { it.cameraFacing == CameraFacing.FRONT }
 }

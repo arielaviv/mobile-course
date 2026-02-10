@@ -1,6 +1,7 @@
 package com.lux.field.ui.workorder
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
@@ -21,6 +23,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -38,10 +41,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lux.field.R
+import com.lux.field.domain.model.CameraFacing
 import com.lux.field.domain.model.Task
+import com.lux.field.domain.model.TaskPhoto
 import com.lux.field.domain.model.TaskStatus
 import com.lux.field.domain.model.TaskStep
+import com.lux.field.domain.model.ChatMessage
 import com.lux.field.ui.map.components.TaskStatusChip
+import com.lux.field.ui.workorder.components.AiChatSheet
+import com.lux.field.ui.workorder.components.CameraActionButtons
+import com.lux.field.ui.workorder.components.PhotoGalleryStrip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +58,7 @@ fun TaskDetailScreen(
     workOrderId: String,
     taskId: String,
     onBack: () -> Unit,
+    onNavigateToCamera: (workOrderId: String, taskId: String, cameraFacing: String) -> Unit,
     viewModel: TaskDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -72,6 +82,18 @@ fun TaskDetailScreen(
                 ),
             )
         },
+        floatingActionButton = {
+            if (uiState.task?.status == TaskStatus.IN_PROGRESS) {
+                FloatingActionButton(
+                    onClick = viewModel::openChat,
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = stringResource(R.string.ai_chat_title),
+                    )
+                }
+            }
+        },
     ) { paddingValues ->
         if (uiState.isLoading && uiState.task == null) {
             LinearProgressIndicator(
@@ -83,22 +105,46 @@ fun TaskDetailScreen(
         } else if (uiState.task != null) {
             TaskContent(
                 task = uiState.task!!,
+                photos = uiState.photos,
                 onToggleStep = viewModel::toggleStepCompletion,
                 onStartTask = viewModel::startTask,
                 onCompleteTask = viewModel::completeTask,
+                onTakeWorkPhoto = {
+                    onNavigateToCamera(workOrderId, taskId, CameraFacing.BACK.name.lowercase())
+                },
+                onTakeSelfie = {
+                    onNavigateToCamera(workOrderId, taskId, CameraFacing.FRONT.name.lowercase())
+                },
+                workPhotoCount = uiState.photos.count { it.cameraFacing == CameraFacing.BACK },
+                selfieCount = uiState.photos.count { it.cameraFacing == CameraFacing.FRONT },
                 error = uiState.error,
                 modifier = Modifier.padding(paddingValues),
             )
         }
+    }
+
+    // AI Chat Bottom Sheet
+    if (uiState.isChatOpen) {
+        AiChatSheet(
+            messages = uiState.chatMessages,
+            isLoading = uiState.isChatLoading,
+            onSendMessage = viewModel::sendChatMessage,
+            onDismiss = viewModel::closeChat,
+        )
     }
 }
 
 @Composable
 private fun TaskContent(
     task: Task,
+    photos: List<TaskPhoto>,
     onToggleStep: (String, Boolean) -> Unit,
     onStartTask: () -> Unit,
     onCompleteTask: () -> Unit,
+    onTakeWorkPhoto: () -> Unit,
+    onTakeSelfie: () -> Unit,
+    workPhotoCount: Int,
+    selfieCount: Int,
     error: String?,
     modifier: Modifier = Modifier,
 ) {
@@ -115,6 +161,25 @@ private fun TaskContent(
         item {
             Spacer(modifier = Modifier.height(4.dp))
             TaskHeader(task = task, progress = progress, completedSteps = completedSteps)
+        }
+
+        // Camera action buttons (when task is in progress)
+        if (task.status == TaskStatus.IN_PROGRESS) {
+            item {
+                CameraActionButtons(
+                    workPhotoCount = workPhotoCount,
+                    selfieCount = selfieCount,
+                    onTakeWorkPhoto = onTakeWorkPhoto,
+                    onTakeSelfie = onTakeSelfie,
+                )
+            }
+        }
+
+        // Photo gallery strip (when photos exist)
+        if (photos.isNotEmpty()) {
+            item {
+                PhotoGalleryStrip(photos = photos)
+            }
         }
 
         item {
