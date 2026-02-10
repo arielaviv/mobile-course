@@ -11,8 +11,8 @@ retrofit = "2.11.0"
 okhttp = "4.12.0"
 kotlinxSerializationJson = "1.7.3"
 retrofitSerializationConverter = "1.0.0"
-mapbox = "11.9.0"
-mapboxCompose = "11.9.0"
+mapbox = "11.18.1"
+mapboxCompose = "11.18.1"
 coil = "2.7.0"
 coroutines = "1.9.0"
 securityCrypto = "1.1.0-alpha06"
@@ -62,7 +62,7 @@ retrofit-serialization-converter = { group = "com.jakewharton.retrofit", name = 
 
 # Mapbox
 mapbox-maps = { group = "com.mapbox.maps", name = "android", version.ref = "mapbox" }
-mapbox-maps-compose = { group = "com.mapbox.maps", name = "extension-compose", version.ref = "mapboxCompose" }
+mapbox-maps-compose = { group = "com.mapbox.extension", name = "maps-compose", version.ref = "mapboxCompose" }
 
 # Image Loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }

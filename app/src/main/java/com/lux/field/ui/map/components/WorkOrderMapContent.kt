@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.lux.field.domain.model.WorkOrder
 import com.lux.field.domain.model.WorkOrderStatus
 import com.lux.field.ui.theme.StatusBlocked
@@ -49,15 +50,15 @@ fun WorkOrderMapContent(
         workOrders.forEach { wo ->
             val point = Point.fromLngLat(wo.location.longitude, wo.location.latitude)
             val isSelected = selectedWorkOrder?.id == wo.id
-            val color = wo.status.toMarkerColor()
+            val markerColor = wo.status.toMarkerColor()
 
             CircleAnnotation(
                 point = point,
             ) {
                 circleRadius = if (isSelected) 14.0 else 10.0
-                circleColor = color
+                circleColor = markerColor
                 circleStrokeWidth = if (isSelected) 3.0 else 1.5
-                circleStrokeColor = "#FFFFFF"
+                circleStrokeColor = Color.White
                 interactionsState.onClicked {
                     onMarkerClick(wo)
                     true
@@ -67,19 +68,12 @@ fun WorkOrderMapContent(
     }
 }
 
-private fun WorkOrderStatus.toMarkerColor(): String = when (this) {
-    WorkOrderStatus.DRAFT -> colorToHex(StatusDraft)
-    WorkOrderStatus.PENDING -> colorToHex(StatusPending)
-    WorkOrderStatus.SCHEDULED -> colorToHex(StatusScheduled)
-    WorkOrderStatus.IN_PROGRESS -> colorToHex(StatusInProgress)
-    WorkOrderStatus.COMPLETED -> colorToHex(StatusCompleted)
-    WorkOrderStatus.FAILED -> colorToHex(StatusFailed)
-    WorkOrderStatus.CANCELLED -> colorToHex(StatusBlocked)
-}
-
-private fun colorToHex(color: androidx.compose.ui.graphics.Color): String {
-    val red = (color.red * 255).toInt()
-    val green = (color.green * 255).toInt()
-    val blue = (color.blue * 255).toInt()
-    return String.format("#%02X%02X%02X", red, green, blue)
+private fun WorkOrderStatus.toMarkerColor(): Color = when (this) {
+    WorkOrderStatus.DRAFT -> StatusDraft
+    WorkOrderStatus.PENDING -> StatusPending
+    WorkOrderStatus.SCHEDULED -> StatusScheduled
+    WorkOrderStatus.IN_PROGRESS -> StatusInProgress
+    WorkOrderStatus.COMPLETED -> StatusCompleted
+    WorkOrderStatus.FAILED -> StatusFailed
+    WorkOrderStatus.CANCELLED -> StatusBlocked
 }
