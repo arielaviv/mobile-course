@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -32,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lux.field.BuildConfig
 import com.lux.field.R
+import com.lux.field.data.repository.PreferencesRepository
 import com.lux.field.ui.map.components.WorkOrderBottomSheet
 import com.lux.field.ui.map.components.WorkOrderMapContent
 import kotlinx.coroutines.launch
@@ -40,9 +42,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapScreen(
     onWorkOrderClick: (String) -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: MapViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val mapStyle by viewModel.mapStyle.collectAsStateWithLifecycle()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
@@ -65,6 +69,12 @@ fun MapScreen(
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = stringResource(R.string.map_refresh),
+                        )
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.settings_title),
                         )
                     }
                 },
@@ -94,6 +104,7 @@ fun MapScreen(
                 workOrders = uiState.workOrders,
                 selectedWorkOrder = uiState.selectedWorkOrder,
                 mapboxToken = BuildConfig.MAPBOX_PUBLIC_TOKEN,
+                styleUri = mapStyle.styleUri,
                 onMarkerClick = { wo ->
                     viewModel.selectWorkOrder(wo)
                     showBottomSheet = true

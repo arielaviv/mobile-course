@@ -30,6 +30,10 @@
     <string name="task_completed_label">مكتملة</string>
     <string name="task_complete_all_steps_hint">أكمل جميع الخطوات لإنهاء هذه المهمة</string>
 
+    <!-- Settings -->
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_map_style">نمط الخريطة</string>
+
     <!-- General -->
     <string name="back">رجوع</string>
     <string name="error_generic">حدث خطأ ما</string>

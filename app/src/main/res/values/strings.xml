@@ -31,6 +31,10 @@
     <string name="task_completed_label">Completed</string>
     <string name="task_complete_all_steps_hint">Complete all steps to finish this task</string>
 
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_map_style">Map Style</string>
+
     <!-- General -->
     <string name="back">Back</string>
     <string name="error_generic">Something went wrong</string>

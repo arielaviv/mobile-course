@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.lux.field.ui.login.LoginScreen
 import com.lux.field.ui.map.MapScreen
+import com.lux.field.ui.settings.SettingsScreen
 import com.lux.field.ui.workorder.TaskDetailScreen
 import com.lux.field.ui.workorder.WorkOrderDetailScreen
 
@@ -33,7 +34,16 @@ fun LuxNavGraph() {
             MapScreen(
                 onWorkOrderClick = { workOrderId ->
                     navController.navigate(Screen.WorkOrderDetail.createRoute(workOrderId))
-                }
+                },
+                onSettingsClick = {
+                    navController.navigate(Screen.Settings.route)
+                },
+            )
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(
+                onBack = { navController.popBackStack() },
             )
         }
 

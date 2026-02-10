@@ -30,6 +30,10 @@
     <string name="task_completed_label">הושלמה</string>
     <string name="task_complete_all_steps_hint">השלם את כל השלבים כדי לסיים את המשימה</string>
 
+    <!-- Settings -->
+    <string name="settings_title">הגדרות</string>
+    <string name="settings_map_style">סגנון מפה</string>
+
     <!-- General -->
     <string name="back">חזור</string>
     <string name="error_generic">משהו השתבש</string>

@@ -16,15 +16,18 @@ import com.lux.field.ui.theme.StatusInProgress
 import com.lux.field.ui.theme.StatusPending
 import com.lux.field.ui.theme.StatusScheduled
 import com.mapbox.geojson.Point
+import com.mapbox.maps.Style
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
 import com.mapbox.maps.extension.compose.annotation.generated.CircleAnnotation
+import com.mapbox.maps.extension.compose.style.MapStyle
 
 @Composable
 fun WorkOrderMapContent(
     workOrders: List<WorkOrder>,
     selectedWorkOrder: WorkOrder?,
     mapboxToken: String,
+    styleUri: String?,
     onMarkerClick: (WorkOrder) -> Unit,
 ) {
     if (mapboxToken.isBlank()) {
@@ -46,6 +49,7 @@ fun WorkOrderMapContent(
     MapboxMap(
         modifier = Modifier.fillMaxSize(),
         mapViewportState = viewportState,
+        style = { MapStyle(style = styleUri ?: Style.STANDARD) },
     ) {
         workOrders.forEach { wo ->
             val point = Point.fromLngLat(wo.location.longitude, wo.location.latitude)
