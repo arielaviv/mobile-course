@@ -33,6 +33,11 @@ android {
             "MAPBOX_PUBLIC_TOKEN",
             "\"${localProperties.getProperty("MAPBOX_PUBLIC_TOKEN", "")}\""
         )
+        buildConfigField(
+            "String",
+            "CLAUDE_API_KEY",
+            "\"${localProperties.getProperty("CLAUDE_API_KEY", "")}\""
+        )
     }
 
     buildTypes {
@@ -120,6 +125,15 @@ dependencies {
 
     // Security
     implementation(libs.security.crypto)
+
+    // CameraX
+    implementation(libs.camerax.core)
+    implementation(libs.camerax.camera2)
+    implementation(libs.camerax.lifecycle)
+    implementation(libs.camerax.view)
+
+    // Accompanist
+    implementation(libs.accompanist.permissions)
 
     // Testing
     testImplementation(libs.junit5)
