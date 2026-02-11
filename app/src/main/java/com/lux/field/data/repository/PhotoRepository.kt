@@ -3,7 +3,10 @@ package com.lux.field.data.repository
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.lux.field.BuildConfig
 import com.lux.field.data.local.dao.TaskPhotoDao
+import com.lux.field.data.sync.OfflineSyncManager
+import com.lux.field.data.sync.PhotoUploadPayload
 import com.lux.field.domain.model.CameraFacing
 import com.lux.field.domain.model.PhotoAnalysisStatus
 import com.lux.field.domain.model.TaskPhoto
@@ -12,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
@@ -22,6 +27,8 @@ import javax.inject.Singleton
 class PhotoRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val taskPhotoDao: TaskPhotoDao,
+    private val offlineSyncManager: OfflineSyncManager,
+    private val json: Json,
 ) {
 
     private val photosDir: File
@@ -70,6 +77,25 @@ class PhotoRepository @Inject constructor(
         )
 
         taskPhotoDao.insert(photo.toEntity())
+
+        // Queue photo upload to server
+        if (!BuildConfig.USE_MOCK_API) {
+            val payload = PhotoUploadPayload(
+                photoId = photoId,
+                taskId = taskId,
+                workOrderId = workOrderId,
+                filePath = destFile.absolutePath,
+                cameraFacing = cameraFacing.name.lowercase(),
+                capturedAt = photo.capturedAt,
+                latitude = latitude,
+                longitude = longitude,
+            )
+            offlineSyncManager.enqueue(
+                type = OfflineSyncManager.TYPE_PHOTO_UPLOAD,
+                payloadJson = json.encodeToString(payload),
+            )
+        }
+
         photo
     }
 

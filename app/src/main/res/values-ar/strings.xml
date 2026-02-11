@@ -93,6 +93,28 @@
     <string name="settings_map_default">الافتراضي</string>
     <string name="settings_map_lux_dark">Lux داكن</string>
 
+    <!-- Location -->
+    <string name="location_channel_name">مشاركة الموقع</string>
+    <string name="location_channel_description">يظهر عندما تتم مشاركة موقعك مع الفريق</string>
+    <string name="location_notification_text">مشاركة الموقع نشطة</string>
+    <string name="location_permission_rationale">مطلوب الوصول للموقع لعرض موقعك على الخريطة ووضع علامات GPS على الصور</string>
+    <string name="location_background_rationale">اسمح بالوصول للموقع طوال الوقت حتى يظل موقعك مرئياً للفريق حتى عندما يكون التطبيق في الخلفية</string>
+
+    <!-- Sync -->
+    <string name="sync_pending">%1$d معلّق</string>
+    <string name="sync_offline">غير متصل</string>
+
+    <!-- Navigation -->
+    <string name="nav_navigate">تنقل</string>
+    <string name="nav_start">ابدأ</string>
+    <string name="nav_stop">إيقاف التنقل</string>
+    <string name="nav_arrived">لقد وصلت</string>
+    <string name="nav_eta">الوصول المتوقع</string>
+    <string name="nav_route_loading">جاري البحث عن المسار…</string>
+    <string name="nav_route_error">تعذر العثور على مسار</string>
+    <string name="nav_rerouting">إعادة حساب المسار…</string>
+    <string name="nav_no_location">الموقع غير متاح</string>
+
     <!-- General -->
     <string name="back">رجوع</string>
     <string name="error_generic">حدث خطأ ما</string>

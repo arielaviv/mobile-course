@@ -94,6 +94,28 @@
     <string name="settings_map_default">Default</string>
     <string name="settings_map_lux_dark">Lux Dark</string>
 
+    <!-- Location -->
+    <string name="location_channel_name">Location Sharing</string>
+    <string name="location_channel_description">Shows when your location is being shared with the team</string>
+    <string name="location_notification_text">Location sharing active</string>
+    <string name="location_permission_rationale">Location access is needed to show your position on the map and tag photos with GPS coordinates</string>
+    <string name="location_background_rationale">Allow location access all the time so your position stays visible to the team even when the app is in the background</string>
+
+    <!-- Sync -->
+    <string name="sync_pending">%1$d pending</string>
+    <string name="sync_offline">Offline</string>
+
+    <!-- Navigation -->
+    <string name="nav_navigate">Navigate</string>
+    <string name="nav_start">Start</string>
+    <string name="nav_stop">Stop Navigation</string>
+    <string name="nav_arrived">You have arrived</string>
+    <string name="nav_eta">ETA</string>
+    <string name="nav_route_loading">Finding route…</string>
+    <string name="nav_route_error">Could not find a route</string>
+    <string name="nav_rerouting">Rerouting…</string>
+    <string name="nav_no_location">Location unavailable</string>
+
     <!-- General -->
     <string name="back">Back</string>
     <string name="error_generic">Something went wrong</string>

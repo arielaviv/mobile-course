@@ -3,8 +3,10 @@ package com.lux.field.ui.map
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lux.field.data.repository.AuthRepository
+import com.lux.field.data.repository.LocationRepository
 import com.lux.field.data.repository.MapStyle
 import com.lux.field.data.repository.PreferencesRepository
+import com.lux.field.domain.model.LocationPoint
 import com.lux.field.domain.model.WorkOrder
 import com.lux.field.domain.usecase.GetAssignedWorkOrdersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,11 +31,13 @@ class MapViewModel @Inject constructor(
     private val getAssignedWorkOrdersUseCase: GetAssignedWorkOrdersUseCase,
     private val authRepository: AuthRepository,
     private val preferencesRepository: PreferencesRepository,
+    private val locationRepository: LocationRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
     val mapStyle: StateFlow<MapStyle> = preferencesRepository.mapStyle
+    val userLocation: StateFlow<LocationPoint?> = locationRepository.latestLocation
 
     init {
         _uiState.update { it.copy(userName = authRepository.getUserName()) }

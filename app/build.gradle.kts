@@ -121,6 +121,10 @@ dependencies {
     // Mapbox
     implementation(libs.mapbox.maps)
     implementation(libs.mapbox.maps.compose)
+    implementation(libs.mapbox.navigation)
+    implementation(libs.mapbox.navigation.ui.maps)
+    implementation(libs.mapbox.navigation.tripdata)
+    implementation(libs.mapbox.navigation.voice)
 
     // Image Loading
     implementation(libs.coil.compose)
@@ -139,6 +143,9 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.permissions)
+
+    // Google Play Services
+    implementation(libs.play.services.location)
 
     // Testing
     testImplementation(libs.junit5)

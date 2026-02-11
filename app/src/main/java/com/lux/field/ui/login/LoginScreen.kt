@@ -44,7 +44,6 @@ import com.lux.field.R
 import com.lux.field.ui.theme.LuxBgBottom
 import com.lux.field.ui.theme.LuxBgMid
 import com.lux.field.ui.theme.LuxBgTop
-import com.lux.field.ui.theme.WhiteAlpha10
 import com.lux.field.ui.theme.Zinc100
 import com.lux.field.ui.theme.Zinc400
 import com.lux.field.ui.theme.Zinc700

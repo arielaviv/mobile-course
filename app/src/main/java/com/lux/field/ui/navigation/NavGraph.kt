@@ -16,6 +16,7 @@ import androidx.navigation.navArgument
 import com.lux.field.ui.camera.CameraScreen
 import com.lux.field.ui.login.LoginScreen
 import com.lux.field.ui.map.MapScreen
+import com.lux.field.ui.navigation.NavigationScreen
 import com.lux.field.ui.settings.SettingsScreen
 import com.lux.field.ui.workorder.TaskDetailScreen
 import com.lux.field.ui.workorder.TaskDetailViewModel
@@ -70,6 +71,9 @@ fun LuxNavGraph() {
                 onWorkOrderClick = { workOrderId ->
                     navController.navigate(Screen.WorkOrderDetail.createRoute(workOrderId))
                 },
+                onNavigateToWorkOrder = { workOrderId, lat, lng ->
+                    navController.navigate(Screen.Navigation.createRoute(workOrderId, lat, lng))
+                },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
                 },
@@ -96,6 +100,9 @@ fun LuxNavGraph() {
                 workOrderId = workOrderId,
                 onTaskClick = { taskId ->
                     navController.navigate(Screen.TaskDetail.createRoute(workOrderId, taskId))
+                },
+                onNavigateClick = { woId, lat, lng ->
+                    navController.navigate(Screen.Navigation.createRoute(woId, lat, lng))
                 },
                 onBack = { navController.popBackStack() },
             )
@@ -154,6 +161,26 @@ fun LuxNavGraph() {
                     navController.popBackStack()
                 },
                 onBack = { navController.popBackStack() },
+            )
+        }
+
+        composable(
+            route = Screen.Navigation.route,
+            arguments = listOf(
+                navArgument("workOrderId") { type = NavType.StringType },
+                navArgument("destLat") { type = NavType.StringType },
+                navArgument("destLng") { type = NavType.StringType },
+            ),
+        ) { backStackEntry ->
+            val workOrderId = backStackEntry.arguments?.getString("workOrderId") ?: return@composable
+            val destLat = backStackEntry.arguments?.getString("destLat")?.toDoubleOrNull() ?: return@composable
+            val destLng = backStackEntry.arguments?.getString("destLng")?.toDoubleOrNull() ?: return@composable
+            NavigationScreen(
+                workOrderId = workOrderId,
+                destLat = destLat,
+                destLng = destLng,
+                onBack = { navController.popBackStack() },
+                onArrived = { navController.popBackStack() },
             )
         }
     }

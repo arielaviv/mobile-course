@@ -13,11 +13,13 @@ kotlinxSerializationJson = "1.7.3"
 retrofitSerializationConverter = "1.0.0"
 mapbox = "11.18.1"
 mapboxCompose = "11.18.1"
+mapboxNavigation = "3.18.1"
 coil = "2.7.0"
 coroutines = "1.9.0"
 securityCrypto = "1.1.0-alpha06"
 camerax = "1.4.1"
 accompanistPermissions = "0.36.0"
+playServicesLocation = "21.3.0"
 coreKtx = "1.15.0"
 lifecycleRuntime = "2.8.7"
 activityCompose = "1.9.3"
@@ -65,6 +67,10 @@ retrofit-serialization-converter = { group = "com.jakewharton.retrofit", name = 
 # Mapbox
 mapbox-maps = { group = "com.mapbox.maps", name = "android", version.ref = "mapbox" }
 mapbox-maps-compose = { group = "com.mapbox.extension", name = "maps-compose", version.ref = "mapboxCompose" }
+mapbox-navigation = { group = "com.mapbox.navigationcore", name = "android", version.ref = "mapboxNavigation" }
+mapbox-navigation-ui-maps = { group = "com.mapbox.navigationcore", name = "ui-maps", version.ref = "mapboxNavigation" }
+mapbox-navigation-tripdata = { group = "com.mapbox.navigationcore", name = "tripdata", version.ref = "mapboxNavigation" }
+mapbox-navigation-voice = { group = "com.mapbox.navigationcore", name = "voice", version.ref = "mapboxNavigation" }
 
 # Image Loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
@@ -83,6 +89,9 @@ camerax-view = { group = "androidx.camera", name = "camera-view", version.ref = 
 
 # Accompanist
 accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
+
+# Google Play Services
+play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 
 # Testing
 junit5 = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junit5" }

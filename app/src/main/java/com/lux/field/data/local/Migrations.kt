@@ -43,3 +43,25 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_chat_messages_taskId` ON `chat_messages` (`taskId`)")
     }
 }
+
+val MIGRATION_2_3 = object : Migration(2, 3) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `location_points` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `latitude` REAL NOT NULL,
+                `longitude` REAL NOT NULL,
+                `accuracy` REAL NOT NULL,
+                `speed` REAL NOT NULL,
+                `bearing` REAL NOT NULL,
+                `altitude` REAL NOT NULL,
+                `timestamp` INTEGER NOT NULL,
+                `isSynced` INTEGER NOT NULL DEFAULT 0
+            )
+            """.trimIndent()
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_location_points_timestamp` ON `location_points` (`timestamp`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_location_points_isSynced` ON `location_points` (`isSynced`)")
+    }
+}

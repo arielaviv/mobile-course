@@ -21,6 +21,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Navigation
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
@@ -56,6 +59,7 @@ import com.lux.field.ui.map.components.TaskStatusChip
 fun WorkOrderDetailScreen(
     workOrderId: String,
     onTaskClick: (String) -> Unit,
+    onNavigateClick: (String, Double, Double) -> Unit,
     onBack: () -> Unit,
     viewModel: WorkOrderDetailViewModel = hiltViewModel(),
 ) {
@@ -93,6 +97,10 @@ fun WorkOrderDetailScreen(
                 workOrder = uiState.workOrder!!,
                 tasks = uiState.tasks,
                 onTaskClick = onTaskClick,
+                onNavigateClick = {
+                    val wo = uiState.workOrder!!
+                    onNavigateClick(wo.id, wo.location.latitude, wo.location.longitude)
+                },
                 modifier = Modifier.padding(paddingValues),
             )
         } else if (uiState.error != null) {
@@ -110,6 +118,7 @@ private fun WorkOrderContent(
     workOrder: WorkOrder,
     tasks: List<Task>,
     onTaskClick: (String) -> Unit,
+    onNavigateClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val completedTasks = tasks.count { it.status == TaskStatus.COMPLETED }
@@ -124,7 +133,7 @@ private fun WorkOrderContent(
     ) {
         item {
             Spacer(modifier = Modifier.height(4.dp))
-            WorkOrderHeader(workOrder = workOrder, progress = progress, completedTasks = completedTasks, totalTasks = totalTasks)
+            WorkOrderHeader(workOrder = workOrder, progress = progress, completedTasks = completedTasks, totalTasks = totalTasks, onNavigateClick = onNavigateClick)
         }
 
         item {
@@ -154,6 +163,7 @@ private fun WorkOrderHeader(
     progress: Float,
     completedTasks: Int,
     totalTasks: Int,
+    onNavigateClick: () -> Unit,
 ) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
@@ -228,6 +238,26 @@ private fun WorkOrderHeader(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = onNavigateClick,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                ),
+            ) {
+                Icon(
+                    Icons.Default.Navigation,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(18.dp)
+                        .padding(end = 4.dp),
+                )
+                Text(stringResource(R.string.nav_navigate))
             }
         }
     }

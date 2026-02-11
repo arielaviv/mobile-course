@@ -1,5 +1,6 @@
 package com.lux.field.ui.workorder
 
+import android.content.Context
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import com.lux.field.data.remote.ElevenLabsApiService
 import com.lux.field.data.repository.ChatRepository
 import com.lux.field.data.repository.PhotoRepository
 import com.lux.field.data.repository.PreferencesRepository
+import com.lux.field.service.LocationTrackingService
 import com.lux.field.domain.model.CameraFacing
 import com.lux.field.domain.model.ChatMessage
 import com.lux.field.domain.model.ChatRole
@@ -22,6 +24,7 @@ import com.lux.field.domain.voice.SpeechRecognizerWrapper
 import com.lux.field.domain.voice.SpeechState
 import com.lux.field.ui.workorder.components.TaskChatContext
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -54,6 +57,7 @@ class TaskDetailViewModel @Inject constructor(
     private val audioPlayerManager: AudioPlayerManager,
     private val elevenLabsApiService: ElevenLabsApiService,
     private val preferencesRepository: PreferencesRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     val workOrderId: String = savedStateHandle["workOrderId"] ?: ""
@@ -143,10 +147,12 @@ class TaskDetailViewModel @Inject constructor(
     }
 
     fun startTask() {
+        LocationTrackingService.boostInterval(context)
         updateStatus(TaskStatus.IN_PROGRESS)
     }
 
     fun completeTask() {
+        LocationTrackingService.normalInterval(context)
         updateStatus(TaskStatus.COMPLETED)
     }
 

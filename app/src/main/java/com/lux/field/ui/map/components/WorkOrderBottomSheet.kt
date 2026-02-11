@@ -10,14 +10,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,6 +40,7 @@ fun WorkOrderBottomSheet(
     selectedWorkOrder: WorkOrder?,
     onWorkOrderSelect: (WorkOrder) -> Unit,
     onViewDetails: (WorkOrder) -> Unit,
+    onNavigateClick: (WorkOrder) -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -64,6 +70,7 @@ fun WorkOrderBottomSheet(
             SelectedWorkOrderCard(
                 workOrder = selectedWorkOrder,
                 onViewDetails = { onViewDetails(selectedWorkOrder) },
+                onNavigateClick = { onNavigateClick(selectedWorkOrder) },
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -86,6 +93,7 @@ fun WorkOrderBottomSheet(
 private fun SelectedWorkOrderCard(
     workOrder: WorkOrder,
     onViewDetails: () -> Unit,
+    onNavigateClick: () -> Unit,
 ) {
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
@@ -125,12 +133,30 @@ private fun SelectedWorkOrderCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Button(
-                onClick = onViewDetails,
-                shape = RoundedCornerShape(12.dp),
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Text(stringResource(R.string.map_view_details))
+                OutlinedButton(
+                    onClick = onNavigateClick,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Icon(
+                        Icons.Default.Navigation,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp).padding(end = 4.dp),
+                    )
+                    Text(stringResource(R.string.nav_navigate))
+                }
+
+                Button(
+                    onClick = onViewDetails,
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Text(stringResource(R.string.map_view_details))
+                }
             }
         }
     }

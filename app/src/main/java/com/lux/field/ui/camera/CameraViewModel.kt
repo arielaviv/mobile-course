@@ -5,6 +5,7 @@ import androidx.camera.core.ImageCaptureException
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lux.field.data.repository.LocationRepository
 import com.lux.field.data.repository.PhotoRepository
 import com.lux.field.domain.model.CameraFacing
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,6 +30,7 @@ data class CameraUiState(
 class CameraViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val photoRepository: PhotoRepository,
+    private val locationRepository: LocationRepository,
 ) : ViewModel() {
 
     val workOrderId: String = savedStateHandle["workOrderId"] ?: ""
@@ -64,14 +66,15 @@ class CameraViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
+                val currentLocation = locationRepository.latestLocation.value
                 val photo = photoRepository.savePhoto(
                     sourceFile = file,
                     taskId = taskId,
                     stepId = stepId,
                     workOrderId = workOrderId,
                     cameraFacing = _uiState.value.cameraFacing,
-                    latitude = null,
-                    longitude = null,
+                    latitude = currentLocation?.latitude,
+                    longitude = currentLocation?.longitude,
                 )
                 file.delete()
                 _uiState.update { it.copy(savedPhotoId = photo.id, isSaving = false) }

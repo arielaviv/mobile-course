@@ -93,6 +93,28 @@
     <string name="settings_map_default">ברירת מחדל</string>
     <string name="settings_map_lux_dark">Lux כהה</string>
 
+    <!-- Location -->
+    <string name="location_channel_name">שיתוף מיקום</string>
+    <string name="location_channel_description">מוצג כאשר המיקום שלך משותף עם הצוות</string>
+    <string name="location_notification_text">שיתוף מיקום פעיל</string>
+    <string name="location_permission_rationale">נדרשת גישה למיקום כדי להציג את המיקום שלך על המפה ולתייג תמונות עם קואורדינטות GPS</string>
+    <string name="location_background_rationale">אפשר גישה למיקום כל הזמן כדי שהמיקום שלך יישאר גלוי לצוות גם כשהאפליקציה ברקע</string>
+
+    <!-- Sync -->
+    <string name="sync_pending">%1$d ממתינים</string>
+    <string name="sync_offline">לא מחובר</string>
+
+    <!-- Navigation -->
+    <string name="nav_navigate">נווט</string>
+    <string name="nav_start">התחל</string>
+    <string name="nav_stop">עצור ניווט</string>
+    <string name="nav_arrived">הגעת ליעד</string>
+    <string name="nav_eta">זמן הגעה</string>
+    <string name="nav_route_loading">מחפש מסלול…</string>
+    <string name="nav_route_error">לא ניתן למצוא מסלול</string>
+    <string name="nav_rerouting">מחשב מסלול מחדש…</string>
+    <string name="nav_no_location">מיקום לא זמין</string>
+
     <!-- General -->
     <string name="back">חזור</string>
     <string name="error_generic">משהו השתבש</string>

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.lux.field.domain.model.LocationPoint
 import com.lux.field.domain.model.WorkOrder
 import com.lux.field.domain.model.WorkOrderStatus
 import com.lux.field.ui.theme.StatusBlocked
@@ -30,6 +31,9 @@ fun WorkOrderMapContent(
     selectedWorkOrder: WorkOrder?,
     mapboxToken: String,
     styleUri: String?,
+    userLocation: LocationPoint? = null,
+    centerOnUser: Boolean = false,
+    onCenterOnUserConsumed: () -> Unit = {},
     onMarkerClick: (WorkOrder) -> Unit,
 ) {
     if (mapboxToken.isBlank()) {
@@ -45,6 +49,16 @@ fun WorkOrderMapContent(
         setCameraOptions {
             center(Point.fromLngLat(34.7725, 32.0750))
             zoom(13.0)
+        }
+    }
+
+    LaunchedEffect(centerOnUser) {
+        if (centerOnUser && userLocation != null) {
+            viewportState.setCameraOptions {
+                center(Point.fromLngLat(userLocation.longitude, userLocation.latitude))
+                zoom(15.0)
+            }
+            onCenterOnUserConsumed()
         }
     }
 
@@ -77,6 +91,18 @@ fun WorkOrderMapContent(
         mapViewportState = viewportState,
         style = { MapStyle(style = styleUri ?: Style.STANDARD) },
     ) {
+        // User location blue dot
+        if (userLocation != null) {
+            CircleAnnotation(
+                point = Point.fromLngLat(userLocation.longitude, userLocation.latitude),
+            ) {
+                circleRadius = 8.0
+                circleColor = Color(0xFF4285F4)
+                circleStrokeWidth = 2.5
+                circleStrokeColor = Color.White
+            }
+        }
+
         workOrders.forEach { wo ->
             val point = Point.fromLngLat(wo.location.longitude, wo.location.latitude)
             val isSelected = selectedWorkOrder?.id == wo.id
