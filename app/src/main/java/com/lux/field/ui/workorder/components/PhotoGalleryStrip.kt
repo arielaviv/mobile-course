@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -29,6 +32,8 @@ import com.lux.field.R
 import com.lux.field.domain.model.CameraFacing
 import com.lux.field.domain.model.PhotoAnalysisStatus
 import com.lux.field.domain.model.TaskPhoto
+import com.lux.field.ui.theme.StatusCompleted
+import com.lux.field.ui.theme.StatusFailed
 import java.io.File
 
 @Composable
@@ -61,15 +66,15 @@ private fun PhotoThumbnail(
 ) {
     Box(
         modifier = modifier
-            .padding(end = 8.dp)
-            .size(72.dp)
+            .padding(end = 10.dp)
+            .size(80.dp)
             .clip(RoundedCornerShape(8.dp)),
     ) {
         AsyncImage(
             model = File(photo.thumbnailPath ?: photo.filePath),
             contentDescription = null,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(72.dp),
+            modifier = Modifier.size(80.dp),
         )
 
         // Camera type icon overlay
@@ -89,20 +94,57 @@ private fun PhotoThumbnail(
                 .padding(1.dp),
         )
 
-        // Analysis spinner
-        if (photo.analysisStatus == PhotoAnalysisStatus.PENDING) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
-                    .padding(4.dp),
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = Color.White,
-                    strokeWidth = 2.dp,
-                )
+        // Analysis status overlay
+        when (photo.analysisStatus) {
+            PhotoAnalysisStatus.PENDING -> {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .background(Color.Black.copy(alpha = 0.5f), RoundedCornerShape(4.dp))
+                        .padding(4.dp),
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp,
+                    )
+                }
             }
+            PhotoAnalysisStatus.COMPLETED -> {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(3.dp)
+                        .size(16.dp)
+                        .background(StatusCompleted, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(10.dp),
+                    )
+                }
+            }
+            PhotoAnalysisStatus.FAILED -> {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(3.dp)
+                        .size(16.dp)
+                        .background(StatusFailed, CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(10.dp),
+                    )
+                }
+            }
+            else -> {}
         }
     }
 }

@@ -15,12 +15,31 @@
     <string name="map_my_location">המיקום שלי</string>
     <string name="map_work_orders_title">הזמנות עבודה (%1$d)</string>
     <string name="map_view_details">הצג פרטים</string>
+    <string name="map_empty_title">אין הזמנות עבודה</string>
+    <string name="map_empty_subtitle">אין הזמנות עבודה שהוקצו לך כרגע</string>
+
+    <!-- Status labels -->
+    <string name="status_draft">טיוטה</string>
+    <string name="status_pending">ממתין</string>
+    <string name="status_scheduled">מתוזמן</string>
+    <string name="status_in_progress">בביצוע</string>
+    <string name="status_completed">הושלם</string>
+    <string name="status_failed">נכשל</string>
+    <string name="status_cancelled">בוטל</string>
+    <string name="status_blocked">חסום</string>
+    <string name="status_escalated">הוסלם</string>
+    <string name="status_coa_pending">ממתין לאישור</string>
+    <string name="status_coa_approved">אושר</string>
+    <string name="status_coa_rejected">נדחה</string>
+    <string name="status_skipped">דולג</string>
 
     <!-- Work Order -->
     <string name="wo_detail_title">הזמנת עבודה</string>
     <string name="wo_tier_label">שכבה %1$d</string>
     <string name="wo_tasks_header">משימות (%1$d)</string>
     <string name="wo_task_estimate">~%1$d דק׳</string>
+    <string name="wo_empty_title">אין משימות</string>
+    <string name="wo_empty_subtitle">להזמנת עבודה זו אין משימות עדיין</string>
 
     <!-- Task -->
     <string name="task_detail_title">משימה</string>
@@ -44,6 +63,8 @@
     <string name="photo_gallery_title">תמונות</string>
     <string name="photo_analyzing">מנתח…</string>
     <string name="photo_count">%1$d תמונות</string>
+    <string name="photo_empty_title">אין תמונות</string>
+    <string name="photo_empty_subtitle">צלם תמונות לתיעוד העבודה</string>
 
     <!-- AI Chat -->
     <string name="ai_chat_title">עוזר AI</string>
@@ -51,11 +72,26 @@
     <string name="ai_chat_send">שלח</string>
     <string name="ai_chat_thinking">חושב…</string>
     <string name="ai_chat_error">שגיאה בקבלת תגובה</string>
+    <string name="ai_chat_empty">שאל אותי כל דבר על המשימה הזו</string>
+
+    <!-- Voice -->
+    <string name="voice_mic">קלט קולי</string>
+    <string name="voice_speak">הקרא בקול</string>
+    <string name="voice_listening">מקשיב…</string>
+    <string name="voice_auto_speak">הקראה אוטומטית</string>
+    <string name="voice_permission_rationale">נדרשת גישה למיקרופון לקלט קולי</string>
+
+    <!-- Chat Camera -->
+    <string name="chat_work_photo">צילום עבודה</string>
+    <string name="chat_selfie">סלפי</string>
+    <string name="chat_camera_menu_title">צלם תמונה</string>
 
     <!-- Settings -->
     <string name="settings_title">הגדרות</string>
     <string name="settings_map_style">סגנון מפה</string>
     <string name="settings_logout">התנתק</string>
+    <string name="settings_map_default">ברירת מחדל</string>
+    <string name="settings_map_lux_dark">Lux כהה</string>
 
     <!-- General -->
     <string name="back">חזור</string>

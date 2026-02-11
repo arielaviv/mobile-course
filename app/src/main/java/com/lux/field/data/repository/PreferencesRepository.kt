@@ -24,9 +24,17 @@ class PreferencesRepository @Inject constructor(
     private val _mapStyle = MutableStateFlow(loadMapStyle())
     val mapStyle: StateFlow<MapStyle> = _mapStyle.asStateFlow()
 
+    private val _autoSpeak = MutableStateFlow(prefs.getBoolean(KEY_AUTO_SPEAK, false))
+    val autoSpeak: StateFlow<Boolean> = _autoSpeak.asStateFlow()
+
     fun setMapStyle(style: MapStyle) {
         prefs.edit().putString(KEY_MAP_STYLE, style.name).apply()
         _mapStyle.value = style
+    }
+
+    fun setAutoSpeak(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_AUTO_SPEAK, enabled).apply()
+        _autoSpeak.value = enabled
     }
 
     private fun loadMapStyle(): MapStyle {
@@ -36,5 +44,6 @@ class PreferencesRepository @Inject constructor(
 
     companion object {
         private const val KEY_MAP_STYLE = "map_style"
+        private const val KEY_AUTO_SPEAK = "auto_speak"
     }
 }

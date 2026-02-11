@@ -33,3 +33,4 @@ val StatusEscalated = Color(0xFFF97316) // orange-500
 
 // Accent
 val WhiteAlpha30 = Color(0x4DFFFFFF)
+val WhiteAlpha10 = Color(0x1AFFFFFF)

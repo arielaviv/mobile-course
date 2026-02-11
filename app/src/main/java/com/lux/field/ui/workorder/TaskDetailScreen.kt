@@ -1,5 +1,8 @@
 package com.lux.field.ui.workorder
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,13 +12,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
@@ -35,24 +42,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.lux.field.R
 import com.lux.field.domain.model.CameraFacing
 import com.lux.field.domain.model.Task
 import com.lux.field.domain.model.TaskPhoto
 import com.lux.field.domain.model.TaskStatus
 import com.lux.field.domain.model.TaskStep
-import com.lux.field.domain.model.ChatMessage
+import com.lux.field.ui.components.AnimatedLinearProgress
 import com.lux.field.ui.map.components.TaskStatusChip
 import com.lux.field.ui.workorder.components.AiChatSheet
 import com.lux.field.ui.workorder.components.CameraActionButtons
 import com.lux.field.ui.workorder.components.PhotoGalleryStrip
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun TaskDetailScreen(
     workOrderId: String,
@@ -62,6 +75,10 @@ fun TaskDetailScreen(
     viewModel: TaskDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val speechState by viewModel.speechState.collectAsStateWithLifecycle()
+    val playbackState by viewModel.playbackState.collectAsStateWithLifecycle()
+
+    val micPermissionState = rememberPermissionState(android.Manifest.permission.RECORD_AUDIO)
 
     Scaffold(
         topBar = {
@@ -128,7 +145,26 @@ fun TaskDetailScreen(
         AiChatSheet(
             messages = uiState.chatMessages,
             isLoading = uiState.isChatLoading,
+            taskContext = uiState.taskChatContext,
+            speechState = speechState,
+            playbackState = playbackState,
+            autoSpeak = uiState.autoSpeak,
+            photoPathMap = uiState.photoPathMap,
             onSendMessage = viewModel::sendChatMessage,
+            onStartListening = {
+                if (micPermissionState.status.isGranted) {
+                    viewModel.startListening()
+                } else {
+                    micPermissionState.launchPermissionRequest()
+                }
+            },
+            onStopListening = viewModel::stopListening,
+            onSpeakMessage = viewModel::speakMessage,
+            onStopPlayback = viewModel::stopPlayback,
+            onToggleAutoSpeak = viewModel::toggleAutoSpeak,
+            onNavigateToCamera = { facing ->
+                onNavigateToCamera(workOrderId, taskId, facing)
+            },
             onDismiss = viewModel::closeChat,
         )
     }
@@ -232,6 +268,7 @@ private fun TaskHeader(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
         ),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -271,13 +308,27 @@ private fun TaskHeader(
                     colors = CardDefaults.elevatedCardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                     ),
+                    shape = RoundedCornerShape(12.dp),
                 ) {
-                    Text(
-                        text = task.voiceGuidance,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(12.dp),
-                    )
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = task.voiceGuidance,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .padding(end = 24.dp),
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp)
+                                .size(16.dp),
+                        )
+                    }
                 }
             }
 
@@ -287,13 +338,9 @@ private fun TaskHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                LinearProgressIndicator(
-                    progress = { progress },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(6.dp),
-                    color = MaterialTheme.colorScheme.tertiary,
-                    trackColor = MaterialTheme.colorScheme.surfaceContainerLow,
+                AnimatedLinearProgress(
+                    progress = progress,
+                    modifier = Modifier.weight(1f),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -313,21 +360,27 @@ private fun StepItem(
     enabled: Boolean,
     onToggle: (Boolean) -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
+
     ElevatedCard(
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
+        shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 12.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
                 checked = step.isCompleted,
-                onCheckedChange = { onToggle(it) },
+                onCheckedChange = { checked ->
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onToggle(checked)
+                },
                 enabled = enabled,
                 colors = CheckboxDefaults.colors(
                     checkedColor = MaterialTheme.colorScheme.tertiary,
@@ -346,11 +399,17 @@ private fun StepItem(
                     },
                     textDecoration = if (step.isCompleted) TextDecoration.LineThrough else null,
                 )
-                Text(
-                    text = step.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
+                AnimatedVisibility(
+                    visible = !step.isCompleted,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    Text(
+                        text = step.description,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }
@@ -363,6 +422,8 @@ private fun TaskActions(
     onStartTask: () -> Unit,
     onCompleteTask: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -370,19 +431,42 @@ private fun TaskActions(
         when (status) {
             TaskStatus.PENDING -> {
                 Button(
-                    onClick = onStartTask,
-                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onStartTask()
+                    },
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                 ) {
                     Text(stringResource(R.string.task_start))
                 }
             }
             TaskStatus.IN_PROGRESS -> {
                 Button(
-                    onClick = onCompleteTask,
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onCompleteTask()
+                    },
                     enabled = allStepsCompleted,
-                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = if (allStepsCompleted) {
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary,
+                            contentColor = MaterialTheme.colorScheme.onTertiary,
+                        )
+                    } else {
+                        ButtonDefaults.buttonColors()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                 ) {
-                    Text(stringResource(R.string.task_complete))
+                    Text(
+                        text = stringResource(R.string.task_complete),
+                        fontWeight = if (allStepsCompleted) FontWeight.Bold else FontWeight.Normal,
+                    )
                 }
                 if (!allStepsCompleted) {
                     Text(
@@ -397,7 +481,10 @@ private fun TaskActions(
                 FilledTonalButton(
                     onClick = {},
                     enabled = false,
-                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(52.dp),
                 ) {
                     Text(stringResource(R.string.task_completed_label))
                 }

@@ -1,5 +1,10 @@
 package com.lux.field.ui.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -16,6 +21,8 @@ import com.lux.field.ui.workorder.TaskDetailScreen
 import com.lux.field.ui.workorder.TaskDetailViewModel
 import com.lux.field.ui.workorder.WorkOrderDetailScreen
 
+private const val NAV_ANIM_DURATION = 300
+
 @Composable
 fun LuxNavGraph() {
     val navController = rememberNavController()
@@ -23,6 +30,30 @@ fun LuxNavGraph() {
     NavHost(
         navController = navController,
         startDestination = Screen.Login.route,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+            ) + fadeIn(animationSpec = tween(NAV_ANIM_DURATION))
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+            ) + fadeOut(animationSpec = tween(NAV_ANIM_DURATION))
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+            ) + fadeIn(animationSpec = tween(NAV_ANIM_DURATION))
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                animationSpec = tween(NAV_ANIM_DURATION, easing = FastOutSlowInEasing),
+            ) + fadeOut(animationSpec = tween(NAV_ANIM_DURATION))
+        },
     ) {
         composable(Screen.Login.route) {
             LoginScreen(

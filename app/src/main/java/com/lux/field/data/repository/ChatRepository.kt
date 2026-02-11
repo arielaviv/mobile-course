@@ -100,16 +100,16 @@ class ChatRepository @Inject constructor(
                         ),
                         ClaudeContentBlock.Text(
                             text = if (cameraFacing == "back") {
-                                "Analyze this work photo. What do you see? Is the work quality acceptable?"
+                                PromptBuilder.buildWorkPhotoPrompt(task)
                             } else {
-                                "This is a proof-of-presence selfie from the job site. Confirm you can see the technician."
+                                PromptBuilder.buildPresencePhotoPrompt()
                             },
                         ),
                     ),
                 )
 
                 val request = ClaudeMessagesRequest(
-                    system = buildSystemPrompt(task),
+                    system = PromptBuilder.buildSystemPrompt(task),
                     messages = messages,
                 )
 
@@ -147,7 +147,7 @@ class ChatRepository @Inject constructor(
             val messages = buildApiMessages(history)
 
             val request = ClaudeMessagesRequest(
-                system = buildSystemPrompt(task),
+                system = PromptBuilder.buildSystemPrompt(task),
                 messages = messages,
             )
 
@@ -175,23 +175,22 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    private fun buildSystemPrompt(task: Task?): String {
-        val taskContext = task?.let {
-            """
-            Current task: ${it.label}
-            Description: ${it.description}
-            Type: ${it.type}
-            Steps: ${it.steps.joinToString("; ") { s -> "${s.label} (${if (s.isCompleted) "done" else "pending"})" }}
-            """.trimIndent()
-        } ?: ""
-
-        return """
-            You are a helpful field technician assistant for Lux Field, a fiber optic installation app.
-            You help technicians with their current task by answering questions about fiber optic installation,
-            splicing, cable pulling, testing procedures, and safety.
-            Keep answers concise and practical — the technician is in the field.
-            $taskContext
-        """.trimIndent()
+    suspend fun insertPhotoMessage(
+        taskId: String,
+        photoId: String,
+        cameraFacing: String,
+    ): ChatMessage {
+        val content = if (cameraFacing == "back") "Work photo" else "Selfie"
+        val message = ChatMessage(
+            id = UUID.randomUUID().toString(),
+            taskId = taskId,
+            role = ChatRole.USER,
+            content = content,
+            photoId = photoId,
+            createdAt = System.currentTimeMillis(),
+        )
+        chatMessageDao.insert(message.toEntity())
+        return message
     }
 
     private fun buildApiMessages(history: List<ChatMessage>): List<ClaudeMessageDto> =

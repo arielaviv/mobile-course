@@ -10,9 +10,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -36,8 +44,10 @@ import com.lux.field.R
 import com.lux.field.ui.theme.LuxBgBottom
 import com.lux.field.ui.theme.LuxBgMid
 import com.lux.field.ui.theme.LuxBgTop
+import com.lux.field.ui.theme.WhiteAlpha10
 import com.lux.field.ui.theme.Zinc100
 import com.lux.field.ui.theme.Zinc400
+import com.lux.field.ui.theme.Zinc700
 
 @Composable
 fun LoginScreen(
@@ -69,15 +79,24 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Text(
-                text = stringResource(R.string.app_name),
+                text = stringResource(R.string.app_name).uppercase(),
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 4.sp,
+                    letterSpacing = 6.sp,
                 ),
                 color = Zinc100,
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Accent divider
+            HorizontalDivider(
+                modifier = Modifier.width(48.dp),
+                thickness = 1.dp,
+                color = Zinc700,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = stringResource(R.string.login_subtitle),
@@ -86,15 +105,23 @@ fun LoginScreen(
                 letterSpacing = 2.sp,
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(56.dp))
 
             OutlinedTextField(
                 value = uiState.phone,
                 onValueChange = viewModel::onPhoneChanged,
                 label = { Text(stringResource(R.string.login_phone_label)) },
                 placeholder = { Text(stringResource(R.string.login_phone_placeholder)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = null,
+                        tint = Zinc400,
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Zinc100,
@@ -114,8 +141,16 @@ fun LoginScreen(
                 onValueChange = viewModel::onCodeChanged,
                 label = { Text(stringResource(R.string.login_code_label)) },
                 placeholder = { Text(stringResource(R.string.login_code_placeholder)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Lock,
+                        contentDescription = null,
+                        tint = Zinc400,
+                    )
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Zinc100,
@@ -144,9 +179,10 @@ fun LoginScreen(
             Button(
                 onClick = viewModel::login,
                 enabled = !uiState.isLoading && uiState.phone.isNotBlank() && uiState.code.isNotBlank(),
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
+                    .height(56.dp),
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(

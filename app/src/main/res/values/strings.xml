@@ -16,12 +16,31 @@
     <string name="map_my_location">My Location</string>
     <string name="map_work_orders_title">Work Orders (%1$d)</string>
     <string name="map_view_details">View Details</string>
+    <string name="map_empty_title">No work orders</string>
+    <string name="map_empty_subtitle">No work orders assigned to you right now</string>
+
+    <!-- Status labels -->
+    <string name="status_draft">Draft</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_scheduled">Scheduled</string>
+    <string name="status_in_progress">In Progress</string>
+    <string name="status_completed">Completed</string>
+    <string name="status_failed">Failed</string>
+    <string name="status_cancelled">Cancelled</string>
+    <string name="status_blocked">Blocked</string>
+    <string name="status_escalated">Escalated</string>
+    <string name="status_coa_pending">COA Pending</string>
+    <string name="status_coa_approved">COA Approved</string>
+    <string name="status_coa_rejected">COA Rejected</string>
+    <string name="status_skipped">Skipped</string>
 
     <!-- Work Order -->
     <string name="wo_detail_title">Work Order</string>
     <string name="wo_tier_label">Tier %1$d</string>
     <string name="wo_tasks_header">Tasks (%1$d)</string>
     <string name="wo_task_estimate">~%1$d min</string>
+    <string name="wo_empty_title">No tasks</string>
+    <string name="wo_empty_subtitle">This work order has no tasks yet</string>
 
     <!-- Task -->
     <string name="task_detail_title">Task</string>
@@ -45,6 +64,8 @@
     <string name="photo_gallery_title">Photos</string>
     <string name="photo_analyzing">Analyzing…</string>
     <string name="photo_count">%1$d photos</string>
+    <string name="photo_empty_title">No photos</string>
+    <string name="photo_empty_subtitle">Take photos to document your work</string>
 
     <!-- AI Chat -->
     <string name="ai_chat_title">AI Assistant</string>
@@ -52,11 +73,26 @@
     <string name="ai_chat_send">Send</string>
     <string name="ai_chat_thinking">Thinking…</string>
     <string name="ai_chat_error">Failed to get response</string>
+    <string name="ai_chat_empty">Ask me anything about this task</string>
+
+    <!-- Voice -->
+    <string name="voice_mic">Voice input</string>
+    <string name="voice_speak">Read aloud</string>
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_auto_speak">Auto-read</string>
+    <string name="voice_permission_rationale">Microphone access needed for voice input</string>
+
+    <!-- Chat Camera -->
+    <string name="chat_work_photo">Work photo</string>
+    <string name="chat_selfie">Selfie</string>
+    <string name="chat_camera_menu_title">Take photo</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
     <string name="settings_map_style">Map Style</string>
     <string name="settings_logout">Log Out</string>
+    <string name="settings_map_default">Default</string>
+    <string name="settings_map_lux_dark">Lux Dark</string>
 
     <!-- General -->
     <string name="back">Back</string>

@@ -7,8 +7,11 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +23,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FlashOff
 import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
@@ -35,15 +40,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -55,6 +64,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import com.lux.field.R
 import com.lux.field.domain.model.CameraFacing
+import kotlinx.coroutines.delay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -120,12 +130,21 @@ private fun CameraPreviewContent(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val imageCapture = remember { ImageCapture.Builder().build() }
+    val haptic = LocalHapticFeedback.current
 
     val lensFacing = if (cameraFacing == CameraFacing.FRONT) {
         CameraSelector.LENS_FACING_FRONT
     } else {
         CameraSelector.LENS_FACING_BACK
     }
+
+    // Shutter flash state
+    var showFlash by remember { mutableStateOf(false) }
+    val flashAlpha by animateFloatAsState(
+        targetValue = if (showFlash) 1f else 0f,
+        animationSpec = tween(durationMillis = 100),
+        label = "shutterFlash",
+    )
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
@@ -161,6 +180,15 @@ private fun CameraPreviewContent(
             },
             modifier = Modifier.fillMaxSize(),
         )
+
+        // Shutter flash overlay
+        if (flashAlpha > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White.copy(alpha = flashAlpha)),
+            )
+        }
 
         // Top bar with close and flash
         Row(
@@ -218,14 +246,29 @@ private fun CameraPreviewContent(
             )
         }
 
-        // Capture button
+        // Capture button with outer ring
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 48.dp),
+            contentAlignment = Alignment.Center,
         ) {
+            // Outer ring
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .border(
+                        width = 2.dp,
+                        color = Color.White.copy(alpha = 0.3f),
+                        shape = CircleShape,
+                    ),
+            )
+
             FilledIconButton(
                 onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    showFlash = true
+
                     val file = File(context.cacheDir, "capture_${System.currentTimeMillis()}.jpg")
                     val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
                     imageCapture.flashMode = if (isFlashOn) {
@@ -262,6 +305,14 @@ private fun CameraPreviewContent(
             }
         }
     }
+
+    // Reset flash after short delay
+    LaunchedEffect(showFlash) {
+        if (showFlash) {
+            delay(100)
+            showFlash = false
+        }
+    }
 }
 
 @Composable
@@ -279,13 +330,16 @@ private fun PhotoReviewContent(
         Box(
             modifier = Modifier
                 .weight(1f)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(8.dp),
         ) {
             Image(
                 painter = rememberAsyncImagePainter(photoFile),
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(8.dp)),
             )
 
             if (isSelfie) {
@@ -322,6 +376,10 @@ private fun PhotoReviewContent(
                 OutlinedButton(
                     onClick = onRetake,
                     modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White,
+                    ),
                 ) {
                     Text(stringResource(R.string.camera_retake))
                 }
@@ -329,6 +387,7 @@ private fun PhotoReviewContent(
                 Button(
                     onClick = onUsePhoto,
                     modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(12.dp),
                 ) {
                     Text(stringResource(R.string.camera_use_photo))
                 }

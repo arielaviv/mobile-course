@@ -15,12 +15,31 @@
     <string name="map_my_location">موقعي</string>
     <string name="map_work_orders_title">أوامر العمل (%1$d)</string>
     <string name="map_view_details">عرض التفاصيل</string>
+    <string name="map_empty_title">لا توجد أوامر عمل</string>
+    <string name="map_empty_subtitle">لا توجد أوامر عمل مخصصة لك حالياً</string>
+
+    <!-- Status labels -->
+    <string name="status_draft">مسودة</string>
+    <string name="status_pending">قيد الانتظار</string>
+    <string name="status_scheduled">مجدول</string>
+    <string name="status_in_progress">قيد التنفيذ</string>
+    <string name="status_completed">مكتمل</string>
+    <string name="status_failed">فشل</string>
+    <string name="status_cancelled">ملغى</string>
+    <string name="status_blocked">محظور</string>
+    <string name="status_escalated">تم التصعيد</string>
+    <string name="status_coa_pending">بانتظار الموافقة</string>
+    <string name="status_coa_approved">تمت الموافقة</string>
+    <string name="status_coa_rejected">مرفوض</string>
+    <string name="status_skipped">تم التخطي</string>
 
     <!-- Work Order -->
     <string name="wo_detail_title">أمر عمل</string>
     <string name="wo_tier_label">المستوى %1$d</string>
     <string name="wo_tasks_header">المهام (%1$d)</string>
     <string name="wo_task_estimate">~%1$d دقيقة</string>
+    <string name="wo_empty_title">لا توجد مهام</string>
+    <string name="wo_empty_subtitle">لا توجد مهام لأمر العمل هذا بعد</string>
 
     <!-- Task -->
     <string name="task_detail_title">مهمة</string>
@@ -44,6 +63,8 @@
     <string name="photo_gallery_title">الصور</string>
     <string name="photo_analyzing">جاري التحليل…</string>
     <string name="photo_count">%1$d صور</string>
+    <string name="photo_empty_title">لا توجد صور</string>
+    <string name="photo_empty_subtitle">التقط صوراً لتوثيق عملك</string>
 
     <!-- AI Chat -->
     <string name="ai_chat_title">مساعد AI</string>
@@ -51,11 +72,26 @@
     <string name="ai_chat_send">إرسال</string>
     <string name="ai_chat_thinking">جاري التفكير…</string>
     <string name="ai_chat_error">فشل في الحصول على رد</string>
+    <string name="ai_chat_empty">اسألني أي شيء عن هذه المهمة</string>
+
+    <!-- Voice -->
+    <string name="voice_mic">إدخال صوتي</string>
+    <string name="voice_speak">قراءة بصوت عالٍ</string>
+    <string name="voice_listening">جاري الاستماع…</string>
+    <string name="voice_auto_speak">قراءة تلقائية</string>
+    <string name="voice_permission_rationale">مطلوب الوصول للميكروفون للإدخال الصوتي</string>
+
+    <!-- Chat Camera -->
+    <string name="chat_work_photo">صورة عمل</string>
+    <string name="chat_selfie">صورة شخصية</string>
+    <string name="chat_camera_menu_title">التقط صورة</string>
 
     <!-- Settings -->
     <string name="settings_title">الإعدادات</string>
     <string name="settings_map_style">نمط الخريطة</string>
     <string name="settings_logout">تسجيل الخروج</string>
+    <string name="settings_map_default">الافتراضي</string>
+    <string name="settings_map_lux_dark">Lux داكن</string>
 
     <!-- General -->
     <string name="back">رجوع</string>

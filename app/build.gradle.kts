@@ -36,14 +36,19 @@ android {
         buildConfigField(
             "String",
             "CLAUDE_API_KEY",
-            "\"${localProperties.getProperty("CLAUDE_API_KEY", "")}\""
+            "\"${localProperties.getProperty("ANTHROPIC_API_KEY", "")}\""
+        )
+        buildConfigField(
+            "String",
+            "ELEVENLABS_API_KEY",
+            "\"${localProperties.getProperty("ELEVENLABS_API_KEY", "")}\""
         )
     }
 
     buildTypes {
         debug {
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000\"")
-            buildConfigField("boolean", "USE_MOCK_API", "true")
+            buildConfigField("boolean", "USE_MOCK_API", "false")
         }
         release {
             isMinifyEnabled = true

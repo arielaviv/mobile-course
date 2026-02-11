@@ -69,12 +69,24 @@ class MockDataProvider @Inject constructor() {
 
     fun getMockPhotoAnalysis(cameraFacing: String): String =
         if (cameraFacing == "back") {
-            "Photo analysis: The work area looks clean and properly organized. " +
-                "I can see the fiber cable is routed correctly with appropriate bend radius. " +
-                "The connections appear secure. Good work quality."
+            """
+            |**Overall: Pass**
+            |
+            |• Fiber bend radius — GOOD: cable routed with gentle curves, no kinks visible
+            |• Cable routing — GOOD: neat and organized along mounting surface
+            |• Connection security — GOOD: connectors fully seated
+            |• Labeling — CONCERN: cable label partially obscured, re-position for readability
+            |• Work area — GOOD: clean, no loose fiber shards visible
+            |
+            |No safety hazards detected.
+            """.trimMargin().trim()
         } else {
-            "Proof of presence confirmed. Technician is visible at the job site. " +
-                "Timestamp and location verified."
+            """
+            |• **Technician visible**: Yes
+            |• **Environment**: indoor utility room, cable trays visible in background
+            |• **PPE check**: safety glasses worn; no hard hat (indoor site — acceptable)
+            |• **On-site confidence**: HIGH
+            """.trimMargin().trim()
         }
 
     private fun createDropInstallWO(): WorkOrder = WorkOrder(
