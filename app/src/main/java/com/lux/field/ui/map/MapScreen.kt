@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lux.field.BuildConfig
 import com.lux.field.R
 import com.lux.field.ui.components.EmptyState
+import com.lux.field.ui.map.components.OsmMapContent
 import com.lux.field.ui.map.components.WorkOrderBottomSheet
 import com.lux.field.ui.map.components.WorkOrderMapContent
 import kotlinx.coroutines.launch
@@ -125,22 +126,37 @@ fun MapScreen(
             }
         },
     ) { paddingValues ->
+        val hasMapToken = BuildConfig.MAPBOX_PUBLIC_TOKEN.isNotBlank()
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            WorkOrderMapContent(
-                workOrders = uiState.workOrders,
-                selectedWorkOrder = uiState.selectedWorkOrder,
-                mapboxToken = BuildConfig.MAPBOX_PUBLIC_TOKEN,
-                styleUri = mapStyle.styleUri,
-                onMarkerClick = { wo ->
-                    viewModel.selectWorkOrder(wo)
-                    showBottomSheet = true
-                    scope.launch { sheetState.show() }
-                },
-            )
+            if (hasMapToken) {
+                WorkOrderMapContent(
+                    workOrders = uiState.workOrders,
+                    selectedWorkOrder = uiState.selectedWorkOrder,
+                    mapboxToken = BuildConfig.MAPBOX_PUBLIC_TOKEN,
+                    styleUri = mapStyle.styleUri,
+                    onMarkerClick = { wo ->
+                        viewModel.selectWorkOrder(wo)
+                        showBottomSheet = true
+                        scope.launch { sheetState.show() }
+                    },
+                )
+            } else {
+                OsmMapContent(
+                    workOrders = uiState.workOrders,
+                    selectedWorkOrder = uiState.selectedWorkOrder,
+                    onMarkerClick = { wo ->
+                        viewModel.selectWorkOrder(wo)
+                        showBottomSheet = true
+                        scope.launch { sheetState.show() }
+                    },
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
 
             if (uiState.isLoading) {
                 LinearProgressIndicator(
@@ -149,7 +165,6 @@ fun MapScreen(
                 )
             }
 
-            // Empty state overlay
             if (uiState.workOrders.isEmpty() && !uiState.isLoading) {
                 EmptyState(
                     icon = Icons.Default.WorkOutline,

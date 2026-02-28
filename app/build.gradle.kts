@@ -48,7 +48,7 @@ android {
     buildTypes {
         debug {
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000\"")
-            buildConfigField("boolean", "USE_MOCK_API", "false")
+            buildConfigField("boolean", "USE_MOCK_API", "true")
         }
         release {
             isMinifyEnabled = true
@@ -139,6 +139,9 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.permissions)
+
+    // OpenStreetMap (free map fallback when Mapbox token unavailable)
+    implementation(libs.osmdroid)
 
     // Testing
     testImplementation(libs.junit5)
