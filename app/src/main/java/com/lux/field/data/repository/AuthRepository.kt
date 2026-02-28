@@ -41,6 +41,34 @@ class AuthRepository @Inject constructor(
         }
     }
 
+    suspend fun register(name: String, phone: String): Result<String> {
+        return try {
+            if (BuildConfig.USE_MOCK_API) {
+                val code = mockDataProvider.register(name, phone)
+                Result.success(code)
+            } else {
+                Result.failure(UnsupportedOperationException("Registration not available in production yet"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun verifyRegistration(phone: String, code: String): Result<CrewMember> {
+        return try {
+            if (BuildConfig.USE_MOCK_API) {
+                val user = mockDataProvider.verifyRegistration(phone, code)
+                tokenProvider.saveTokens("mock_token_${System.currentTimeMillis()}", "mock_refresh")
+                tokenProvider.saveUserInfo(user.id, user.name, user.crewId)
+                Result.success(user)
+            } else {
+                Result.failure(UnsupportedOperationException("Registration not available in production yet"))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun isLoggedIn(): Boolean = tokenProvider.isLoggedIn()
 
     fun getUserName(): String = tokenProvider.getUserName()

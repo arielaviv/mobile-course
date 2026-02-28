@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lux Field</string>
-    <string name="mapbox_access_token">pk.eyJ1IjoiYXJpZWxhdml2IiwiYSI6ImNtZTMzMzR1MTAzM3EyanNjbzI0bXVvc2gifQ.PAdN0DsdYRVhKRllRGI_SQ</string>
 
     <!-- Login -->
     <string name="login_subtitle">Field Technician</string>
@@ -10,6 +9,18 @@
     <string name="login_code_label">Access Code</string>
     <string name="login_code_placeholder">Enter code</string>
     <string name="login_button">Sign In</string>
+    <string name="login_create_account">Don\'t have an account? Create one</string>
+
+    <!-- Registration -->
+    <string name="register_title">Create Account</string>
+    <string name="register_subtitle">Join your crew</string>
+    <string name="register_name_label">Full Name</string>
+    <string name="register_name_placeholder">Enter your name</string>
+    <string name="register_code_label">Verification Code</string>
+    <string name="register_code_placeholder">Enter code</string>
+    <string name="register_send_code">Send Verification Code</string>
+    <string name="register_verify">Verify &amp; Sign In</string>
+    <string name="register_mock_code_hint">Mock code: %1$s</string>
 
     <!-- Map -->
     <string name="map_refresh">Refresh</string>

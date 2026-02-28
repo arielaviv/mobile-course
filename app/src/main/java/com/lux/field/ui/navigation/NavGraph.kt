@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.lux.field.ui.camera.CameraScreen
 import com.lux.field.ui.login.LoginScreen
+import com.lux.field.ui.login.RegisterScreen
 import com.lux.field.ui.map.MapScreen
 import com.lux.field.ui.settings.SettingsScreen
 import com.lux.field.ui.workorder.TaskDetailScreen
@@ -61,7 +62,21 @@ fun LuxNavGraph() {
                     navController.navigate(Screen.Map.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
-                }
+                },
+                onRegisterClick = {
+                    navController.navigate(Screen.Register.route)
+                },
+            )
+        }
+
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                onRegistrationSuccess = {
+                    navController.navigate(Screen.Map.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                },
+                onBack = { navController.popBackStack() },
             )
         }
 
