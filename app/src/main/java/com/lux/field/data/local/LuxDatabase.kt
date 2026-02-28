@@ -3,10 +3,12 @@ package com.lux.field.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.lux.field.data.local.dao.ChatMessageDao
+import com.lux.field.data.local.dao.DistributionPointDao
 import com.lux.field.data.local.dao.TaskDao
 import com.lux.field.data.local.dao.TaskPhotoDao
 import com.lux.field.data.local.dao.WorkOrderDao
 import com.lux.field.data.local.entity.ChatMessageEntity
+import com.lux.field.data.local.entity.DistributionPointEntity
 import com.lux.field.data.local.entity.SyncQueueEntity
 import com.lux.field.data.local.entity.TaskEntity
 import com.lux.field.data.local.entity.TaskPhotoEntity
@@ -19,8 +21,9 @@ import com.lux.field.data.local.entity.WorkOrderEntity
         SyncQueueEntity::class,
         TaskPhotoEntity::class,
         ChatMessageEntity::class,
+        DistributionPointEntity::class,
     ],
-    version = 2,
+    version = 3,
     exportSchema = true,
 )
 abstract class LuxDatabase : RoomDatabase() {
@@ -28,4 +31,5 @@ abstract class LuxDatabase : RoomDatabase() {
     abstract fun taskDao(): TaskDao
     abstract fun taskPhotoDao(): TaskPhotoDao
     abstract fun chatMessageDao(): ChatMessageDao
+    abstract fun distributionPointDao(): DistributionPointDao
 }

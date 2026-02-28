@@ -105,6 +105,19 @@
     <string name="settings_map_default">Default</string>
     <string name="settings_map_lux_dark">Lux Dark</string>
 
+    <!-- Add Distribution Point -->
+    <string name="add_dp_title">Add Point</string>
+    <string name="add_dp_fetching_location">Getting location…</string>
+    <string name="add_dp_photo">Point photo</string>
+    <string name="add_dp_take_photo">Take Photo</string>
+    <string name="add_dp_retake_photo">Retake Photo</string>
+    <string name="add_dp_type_label">Type</string>
+    <string name="add_dp_label_field">Label</string>
+    <string name="add_dp_label_placeholder">e.g. DP-R14, JB-7</string>
+    <string name="add_dp_notes_field">Notes</string>
+    <string name="add_dp_notes_placeholder">Optional notes about this point</string>
+    <string name="add_dp_save">Save Point</string>
+
     <!-- General -->
     <string name="back">Back</string>
     <string name="error_generic">Something went wrong</string>

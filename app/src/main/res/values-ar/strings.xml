@@ -105,6 +105,19 @@
     <string name="settings_map_default">الافتراضي</string>
     <string name="settings_map_lux_dark">Lux داكن</string>
 
+    <!-- Add Distribution Point -->
+    <string name="add_dp_title">إضافة نقطة</string>
+    <string name="add_dp_fetching_location">جاري تحديد الموقع…</string>
+    <string name="add_dp_photo">صورة النقطة</string>
+    <string name="add_dp_take_photo">التقاط صورة</string>
+    <string name="add_dp_retake_photo">إعادة التقاط</string>
+    <string name="add_dp_type_label">النوع</string>
+    <string name="add_dp_label_field">التسمية</string>
+    <string name="add_dp_label_placeholder">مثال: DP-R14, JB-7</string>
+    <string name="add_dp_notes_field">ملاحظات</string>
+    <string name="add_dp_notes_placeholder">ملاحظات اختيارية حول هذه النقطة</string>
+    <string name="add_dp_save">حفظ النقطة</string>
+
     <!-- General -->
     <string name="back">رجوع</string>
     <string name="error_generic">حدث خطأ ما</string>

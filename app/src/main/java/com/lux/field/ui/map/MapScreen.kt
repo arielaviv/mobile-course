@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WorkOutline
@@ -53,6 +53,7 @@ import kotlinx.coroutines.launch
 fun MapScreen(
     onWorkOrderClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
+    onAddDpClick: () -> Unit,
     viewModel: MapViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -117,12 +118,12 @@ fun MapScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* my location — future GPS integration */ },
+                onClick = onAddDpClick,
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.padding(bottom = 16.dp),
             ) {
-                Icon(Icons.Default.MyLocation, contentDescription = stringResource(R.string.map_my_location))
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_dp_title))
             }
         },
     ) { paddingValues ->
@@ -148,6 +149,7 @@ fun MapScreen(
             } else {
                 OsmMapContent(
                     workOrders = uiState.workOrders,
+                    distributionPoints = uiState.distributionPoints,
                     selectedWorkOrder = uiState.selectedWorkOrder,
                     onMarkerClick = { wo ->
                         viewModel.selectWorkOrder(wo)

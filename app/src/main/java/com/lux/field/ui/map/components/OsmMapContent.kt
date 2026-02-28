@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.OvalShape
+import android.graphics.drawable.shapes.RectShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.lux.field.domain.model.DistributionPoint
 import com.lux.field.domain.model.WorkOrder
 import com.lux.field.domain.model.WorkOrderStatus
 import com.lux.field.ui.theme.StatusBlocked
@@ -34,6 +36,7 @@ import org.osmdroid.views.overlay.Marker
 @Composable
 fun OsmMapContent(
     workOrders: List<WorkOrder>,
+    distributionPoints: List<DistributionPoint> = emptyList(),
     selectedWorkOrder: WorkOrder?,
     onMarkerClick: (WorkOrder) -> Unit,
     modifier: Modifier = Modifier,
@@ -54,7 +57,7 @@ fun OsmMapContent(
         }
     }
 
-    LaunchedEffect(workOrders, selectedWorkOrder) {
+    LaunchedEffect(workOrders, distributionPoints, selectedWorkOrder) {
         mapView.overlays.clear()
 
         workOrders.forEach { wo ->
@@ -75,14 +78,25 @@ fun OsmMapContent(
             mapView.overlays.add(marker)
         }
 
-        if (workOrders.size >= 2) {
-            val lats = workOrders.map { it.location.latitude }
-            val lngs = workOrders.map { it.location.longitude }
+        distributionPoints.forEach { dp ->
+            val marker = Marker(mapView).apply {
+                position = GeoPoint(dp.latitude, dp.longitude)
+                title = "${dp.type.name}: ${dp.label}"
+                snippet = dp.notes.ifBlank { null }
+                icon = createSquareMarkerDrawable(color = DpMarkerColor)
+                setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            }
+            mapView.overlays.add(marker)
+        }
+
+        val allLats = workOrders.map { it.location.latitude } + distributionPoints.map { it.latitude }
+        val allLngs = workOrders.map { it.location.longitude } + distributionPoints.map { it.longitude }
+        if (allLats.size >= 2) {
             val box = BoundingBox(
-                lats.max() + 0.005,
-                lngs.max() + 0.005,
-                lats.min() - 0.005,
-                lngs.min() - 0.005,
+                allLats.max() + 0.005,
+                allLngs.max() + 0.005,
+                allLats.min() - 0.005,
+                allLngs.min() - 0.005,
             )
             mapView.post { mapView.zoomToBoundingBox(box, true, 100) }
         }
@@ -124,6 +138,38 @@ private fun createMarkerDrawable(color: Color, isSelected: Boolean): Drawable {
             val cy = bounds.exactCenterY()
             val radius = (bounds.width() / 2f) - (strokeWidth / 2f)
             canvas.drawCircle(cx, cy, radius, paint)
+        }
+    }.apply {
+        intrinsicWidth = size
+        intrinsicHeight = size
+    }
+
+    return LayerDrawable(arrayOf(fill, stroke)).apply {
+        setBounds(0, 0, size, size)
+    }
+}
+
+private val DpMarkerColor = Color(0xFF3B82F6) // blue-500
+
+private fun createSquareMarkerDrawable(color: Color): Drawable {
+    val size = 32
+    val strokeWidth = 3
+
+    val fill = ShapeDrawable(RectShape()).apply {
+        intrinsicWidth = size
+        intrinsicHeight = size
+        paint.color = color.toArgb()
+        paint.style = Paint.Style.FILL
+        paint.isAntiAlias = true
+    }
+
+    val stroke = object : ShapeDrawable(RectShape()) {
+        override fun draw(canvas: Canvas) {
+            paint.color = 0xFFFFFFFF.toInt()
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = strokeWidth.toFloat()
+            paint.isAntiAlias = true
+            canvas.drawRect(bounds, paint)
         }
     }.apply {
         intrinsicWidth = size

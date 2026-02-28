@@ -14,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.lux.field.ui.camera.CameraScreen
+import com.lux.field.ui.dp.AddDpScreen
 import com.lux.field.ui.login.LoginScreen
 import com.lux.field.ui.login.RegisterScreen
 import com.lux.field.ui.map.MapScreen
@@ -80,6 +81,13 @@ fun LuxNavGraph() {
             )
         }
 
+        composable(Screen.AddDp.route) {
+            AddDpScreen(
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() },
+            )
+        }
+
         composable(Screen.Map.route) {
             MapScreen(
                 onWorkOrderClick = { workOrderId ->
@@ -87,6 +95,9 @@ fun LuxNavGraph() {
                 },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
+                },
+                onAddDpClick = {
+                    navController.navigate(Screen.AddDp.route)
                 },
             )
         }
