@@ -20,6 +20,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -52,6 +53,7 @@ import com.lux.field.ui.theme.Zinc700
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
+    onRegisterClick: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -196,6 +198,16 @@ fun LoginScreen(
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextButton(onClick = onRegisterClick) {
+                Text(
+                    text = stringResource(R.string.login_create_account),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Zinc400,
+                )
             }
         }
     }

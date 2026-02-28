@@ -17,15 +17,83 @@ import javax.inject.Singleton
 @Singleton
 class MockDataProvider @Inject constructor() {
 
-    private val mockUser = CrewMember(
-        id = "crew-001",
-        name = "David Cohen",
-        phone = "+972501234567",
-        role = "lead_tech",
-        crewId = "alpha-crew-1",
+    private data class MockCredentials(
+        val user: CrewMember,
+        val code: String,
     )
 
-    fun mockLogin(phone: String, code: String): CrewMember = mockUser
+    private val presetUsers = mutableListOf(
+        MockCredentials(
+            user = CrewMember(
+                id = "crew-001",
+                name = "David Cohen",
+                phone = "0501234567",
+                role = "lead_tech",
+                crewId = "alpha-crew-1",
+            ),
+            code = "1234",
+        ),
+        MockCredentials(
+            user = CrewMember(
+                id = "crew-002",
+                name = "Nir Aroeti",
+                phone = "0527654321",
+                role = "technician",
+                crewId = "alpha-crew-1",
+            ),
+            code = "5678",
+        ),
+        MockCredentials(
+            user = CrewMember(
+                id = "crew-003",
+                name = "Ariel Aviv",
+                phone = "0539876543",
+                role = "technician",
+                crewId = "alpha-crew-1",
+            ),
+            code = "9999",
+        ),
+    )
+
+    private val registeredUsers = mutableListOf<MockCredentials>()
+    private val allUsers get() = presetUsers + registeredUsers
+
+    private val pendingRegistrations = mutableMapOf<String, CrewMember>()
+
+    fun mockLogin(phone: String, code: String): CrewMember {
+        val normalizedPhone = phone.replace("[^0-9]".toRegex(), "")
+        val match = allUsers.find {
+            it.user.phone.replace("[^0-9]".toRegex(), "") == normalizedPhone && it.code == code
+        } ?: throw IllegalArgumentException("Invalid phone number or code")
+        return match.user
+    }
+
+    fun register(name: String, phone: String): String {
+        val normalizedPhone = phone.replace("[^0-9]".toRegex(), "")
+        val exists = allUsers.any {
+            it.user.phone.replace("[^0-9]".toRegex(), "") == normalizedPhone
+        }
+        if (exists) throw IllegalArgumentException("Phone number already registered")
+
+        val newUser = CrewMember(
+            id = "crew-${System.currentTimeMillis()}",
+            name = name,
+            phone = normalizedPhone,
+            role = "technician",
+            crewId = "alpha-crew-1",
+        )
+        pendingRegistrations[normalizedPhone] = newUser
+        return "0000"
+    }
+
+    fun verifyRegistration(phone: String, code: String): CrewMember {
+        val normalizedPhone = phone.replace("[^0-9]".toRegex(), "")
+        if (code != "0000") throw IllegalArgumentException("Invalid verification code")
+        val user = pendingRegistrations.remove(normalizedPhone)
+            ?: throw IllegalArgumentException("No pending registration for this phone")
+        registeredUsers.add(MockCredentials(user = user, code = "0000"))
+        return user
+    }
 
     fun getWorkOrders(): List<WorkOrder> = listOf(
         createDropInstallWO(),
