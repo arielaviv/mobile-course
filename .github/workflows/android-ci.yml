@@ -39,7 +39,10 @@ jobs:
       - name: Run Android Lint
         run: ./gradlew lint --no-daemon
 
-      - name: Run ktlint
+      - name: Auto-format with ktlint
+        run: ./gradlew ktlintFormat --no-daemon
+
+      - name: Run ktlint check
         run: ./gradlew ktlintCheck --no-daemon
 
       - name: Upload lint report
