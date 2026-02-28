@@ -10,6 +10,7 @@ sealed class Screen(val route: String) {
         fun createRoute(workOrderId: String, taskId: String): String = "task/$workOrderId/$taskId"
     }
     data object Register : Screen("register")
+    data object AddDp : Screen("add-dp")
     data object Settings : Screen("settings")
     data object Camera : Screen("camera/{workOrderId}/{taskId}/{stepId}/{cameraFacing}") {
         fun createRoute(

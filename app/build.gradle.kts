@@ -128,6 +128,7 @@ dependencies {
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Security
     implementation(libs.security.crypto)
@@ -143,6 +144,9 @@ dependencies {
 
     // OpenStreetMap (free map fallback when Mapbox token unavailable)
     implementation(libs.osmdroid)
+
+    // Location
+    implementation(libs.play.services.location)
 
     // Testing
     testImplementation(libs.junit5)

@@ -105,6 +105,19 @@
     <string name="settings_map_default">ברירת מחדל</string>
     <string name="settings_map_lux_dark">Lux כהה</string>
 
+    <!-- Add Distribution Point -->
+    <string name="add_dp_title">הוסף נקודה</string>
+    <string name="add_dp_fetching_location">מאתר מיקום…</string>
+    <string name="add_dp_photo">תמונת נקודה</string>
+    <string name="add_dp_take_photo">צלם תמונה</string>
+    <string name="add_dp_retake_photo">צלם שוב</string>
+    <string name="add_dp_type_label">סוג</string>
+    <string name="add_dp_label_field">תווית</string>
+    <string name="add_dp_label_placeholder">לדוגמה: DP-R14, JB-7</string>
+    <string name="add_dp_notes_field">הערות</string>
+    <string name="add_dp_notes_placeholder">הערות אופציונליות על נקודה זו</string>
+    <string name="add_dp_save">שמור נקודה</string>
+
     <!-- General -->
     <string name="back">חזור</string>
     <string name="error_generic">משהו השתבש</string>
