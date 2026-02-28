@@ -11,10 +11,11 @@ plugins {
     alias(libs.plugins.ktlint)
 }
 
-val localProperties = Properties().apply {
-    val file = rootProject.file("local.properties")
-    if (file.exists()) load(file.inputStream())
-}
+val localProperties =
+    Properties().apply {
+        val file = rootProject.file("local.properties")
+        if (file.exists()) load(file.inputStream())
+    }
 
 android {
     namespace = "com.lux.field"
@@ -32,17 +33,17 @@ android {
         buildConfigField(
             "String",
             "MAPBOX_PUBLIC_TOKEN",
-            "\"${localProperties.getProperty("MAPBOX_PUBLIC_TOKEN", "")}\""
+            "\"${localProperties.getProperty("MAPBOX_PUBLIC_TOKEN", "")}\"",
         )
         buildConfigField(
             "String",
             "CLAUDE_API_KEY",
-            "\"${localProperties.getProperty("ANTHROPIC_API_KEY", "")}\""
+            "\"${localProperties.getProperty("ANTHROPIC_API_KEY", "")}\"",
         )
         buildConfigField(
             "String",
             "ELEVENLABS_API_KEY",
-            "\"${localProperties.getProperty("ELEVENLABS_API_KEY", "")}\""
+            "\"${localProperties.getProperty("ELEVENLABS_API_KEY", "")}\"",
         )
     }
 
@@ -56,7 +57,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             buildConfigField("String", "API_BASE_URL", "\"https://lux.app\"")
             buildConfigField("boolean", "USE_MOCK_API", "false")
