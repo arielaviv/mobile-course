@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.google.services)
 }
 
 val localProperties =
@@ -148,6 +149,12 @@ dependencies {
 
     // Location
     implementation(libs.play.services.location)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 
     // Testing
     testImplementation(libs.junit5)
