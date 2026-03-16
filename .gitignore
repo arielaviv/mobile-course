@@ -19,7 +19,6 @@ local.properties
 # Secrets
 *.jks
 *.keystore
-google-services.json
 
 # Local config
 .claude/
