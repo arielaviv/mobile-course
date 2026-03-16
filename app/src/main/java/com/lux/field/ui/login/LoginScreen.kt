@@ -8,24 +8,24 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,17 +35,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.layout.imePadding
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.lux.field.R
 import com.lux.field.ui.theme.LuxBgBottom
 import com.lux.field.ui.theme.LuxBgMid
 import com.lux.field.ui.theme.LuxBgTop
-import com.lux.field.ui.theme.WhiteAlpha10
 import com.lux.field.ui.theme.Zinc100
 import com.lux.field.ui.theme.Zinc400
 import com.lux.field.ui.theme.Zinc700
@@ -62,13 +61,23 @@ fun LoginScreen(
         if (uiState.isLoggedIn) onLoginSuccess()
     }
 
+    val fieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = Zinc100,
+        unfocusedBorderColor = Zinc400,
+        focusedLabelColor = Zinc100,
+        unfocusedLabelColor = Zinc400,
+        cursorColor = Zinc100,
+        focusedTextColor = Zinc100,
+        unfocusedTextColor = Zinc100,
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(LuxBgTop, LuxBgMid, LuxBgBottom),
-                )
+                ),
             )
             .imePadding(),
         contentAlignment = Alignment.Center,
@@ -91,7 +100,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Accent divider
             HorizontalDivider(
                 modifier = Modifier.width(48.dp),
                 thickness = 1.dp,
@@ -110,59 +118,36 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(56.dp))
 
             OutlinedTextField(
-                value = uiState.phone,
-                onValueChange = viewModel::onPhoneChanged,
-                label = { Text(stringResource(R.string.login_phone_label)) },
-                placeholder = { Text(stringResource(R.string.login_phone_placeholder)) },
+                value = uiState.email,
+                onValueChange = viewModel::onEmailChanged,
+                label = { Text(stringResource(R.string.login_email_label)) },
+                placeholder = { Text(stringResource(R.string.login_email_placeholder)) },
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Phone,
-                        contentDescription = null,
-                        tint = Zinc400,
-                    )
+                    Icon(Icons.Default.Email, contentDescription = null, tint = Zinc400)
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Zinc100,
-                    unfocusedBorderColor = Zinc400,
-                    focusedLabelColor = Zinc100,
-                    unfocusedLabelColor = Zinc400,
-                    cursorColor = Zinc100,
-                    focusedTextColor = Zinc100,
-                    unfocusedTextColor = Zinc100,
-                ),
+                colors = fieldColors,
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             OutlinedTextField(
-                value = uiState.code,
-                onValueChange = viewModel::onCodeChanged,
-                label = { Text(stringResource(R.string.login_code_label)) },
-                placeholder = { Text(stringResource(R.string.login_code_placeholder)) },
+                value = uiState.password,
+                onValueChange = viewModel::onPasswordChanged,
+                label = { Text(stringResource(R.string.login_password_label)) },
+                placeholder = { Text(stringResource(R.string.login_password_placeholder)) },
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = null,
-                        tint = Zinc400,
-                    )
+                    Icon(Icons.Default.Lock, contentDescription = null, tint = Zinc400)
                 },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Zinc100,
-                    unfocusedBorderColor = Zinc400,
-                    focusedLabelColor = Zinc100,
-                    unfocusedLabelColor = Zinc400,
-                    cursorColor = Zinc100,
-                    focusedTextColor = Zinc100,
-                    unfocusedTextColor = Zinc100,
-                ),
+                colors = fieldColors,
             )
 
             if (uiState.error != null) {
@@ -180,7 +165,9 @@ fun LoginScreen(
 
             Button(
                 onClick = viewModel::login,
-                enabled = !uiState.isLoading && uiState.phone.isNotBlank() && uiState.code.isNotBlank(),
+                enabled = !uiState.isLoading &&
+                    uiState.email.isNotBlank() &&
+                    uiState.password.isNotBlank(),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()

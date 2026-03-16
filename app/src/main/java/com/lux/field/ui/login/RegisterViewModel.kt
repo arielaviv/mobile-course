@@ -13,13 +13,11 @@ import javax.inject.Inject
 
 data class RegisterUiState(
     val name: String = "",
-    val phone: String = "",
-    val code: String = "",
+    val email: String = "",
+    val password: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isCodeSent: Boolean = false,
     val isRegistered: Boolean = false,
-    val mockCode: String? = null,
 )
 
 @HiltViewModel
@@ -34,46 +32,21 @@ class RegisterViewModel @Inject constructor(
         _uiState.update { it.copy(name = name, error = null) }
     }
 
-    fun onPhoneChanged(phone: String) {
-        _uiState.update { it.copy(phone = phone, error = null) }
+    fun onEmailChanged(email: String) {
+        _uiState.update { it.copy(email = email, error = null) }
     }
 
-    fun onCodeChanged(code: String) {
-        _uiState.update { it.copy(code = code, error = null) }
+    fun onPasswordChanged(password: String) {
+        _uiState.update { it.copy(password = password, error = null) }
     }
 
-    fun requestCode() {
+    fun register() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             val result = authRepository.register(
                 name = _uiState.value.name.trim(),
-                phone = _uiState.value.phone.trim(),
-            )
-            result.fold(
-                onSuccess = { code ->
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            isCodeSent = true,
-                            mockCode = code,
-                        )
-                    }
-                },
-                onFailure = { e ->
-                    _uiState.update {
-                        it.copy(isLoading = false, error = e.message ?: "Registration failed")
-                    }
-                },
-            )
-        }
-    }
-
-    fun verify() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            val result = authRepository.verifyRegistration(
-                phone = _uiState.value.phone.trim(),
-                code = _uiState.value.code.trim(),
+                email = _uiState.value.email.trim(),
+                password = _uiState.value.password,
             )
             result.fold(
                 onSuccess = {
@@ -81,7 +54,7 @@ class RegisterViewModel @Inject constructor(
                 },
                 onFailure = { e ->
                     _uiState.update {
-                        it.copy(isLoading = false, error = e.message ?: "Verification failed")
+                        it.copy(isLoading = false, error = e.message ?: "Registration failed")
                     }
                 },
             )

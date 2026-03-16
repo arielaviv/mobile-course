@@ -1,79 +1,79 @@
 package com.lux.field.data.repository
 
-import com.lux.field.BuildConfig
-import com.lux.field.data.mock.MockDataProvider
-import com.lux.field.data.remote.LuxApi
-import com.lux.field.data.remote.dto.LoginRequest
-import com.lux.field.domain.model.CrewMember
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.UserProfileChangeRequest
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class AuthRepository @Inject constructor(
-    private val api: LuxApi,
     private val tokenProvider: TokenProvider,
-    private val mockDataProvider: MockDataProvider,
 ) {
-    suspend fun login(phone: String, code: String): Result<CrewMember> {
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    suspend fun login(email: String, password: String): Result<Unit> {
         return try {
-            if (BuildConfig.USE_MOCK_API) {
-                val mockUser = mockDataProvider.mockLogin(phone, code)
-                tokenProvider.saveTokens("mock_token_${System.currentTimeMillis()}", "mock_refresh")
-                tokenProvider.saveUserInfo(mockUser.id, mockUser.name, mockUser.crewId)
-                Result.success(mockUser)
-            } else {
-                val response = api.login(LoginRequest(phone, code))
-                tokenProvider.saveTokens(response.token, response.refreshToken)
-                val user = response.user
-                tokenProvider.saveUserInfo(user.id, user.name, user.crewId)
-                Result.success(
-                    CrewMember(
-                        id = user.id,
-                        name = user.name,
-                        phone = user.phone,
-                        role = user.role,
-                        crewId = user.crewId,
-                    )
-                )
-            }
+            auth.signInWithEmailAndPassword(email, password).await()
+            val user = auth.currentUser ?: return Result.failure(Exception("Login failed"))
+            tokenProvider.saveTokens(
+                user.uid,
+                user.getIdToken(false).await()?.token ?: "",
+            )
+            tokenProvider.saveUserInfo(
+                user.uid,
+                user.displayName ?: "",
+                "",
+            )
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun register(name: String, phone: String): Result<String> {
+    suspend fun register(name: String, email: String, password: String): Result<Unit> {
         return try {
-            if (BuildConfig.USE_MOCK_API) {
-                val code = mockDataProvider.register(name, phone)
-                Result.success(code)
-            } else {
-                Result.failure(UnsupportedOperationException("Registration not available in production yet"))
-            }
+            auth.createUserWithEmailAndPassword(email, password).await()
+            val user = auth.currentUser ?: return Result.failure(Exception("Registration failed"))
+
+            user.updateProfile(
+                UserProfileChangeRequest.Builder()
+                    .setDisplayName(name)
+                    .build(),
+            ).await()
+
+            firestore.collection("users").document(user.uid).set(
+                mapOf(
+                    "name" to name,
+                    "email" to email,
+                    "profileImageUrl" to "",
+                    "createdAt" to System.currentTimeMillis(),
+                ),
+            ).await()
+
+            tokenProvider.saveTokens(
+                user.uid,
+                user.getIdToken(false).await()?.token ?: "",
+            )
+            tokenProvider.saveUserInfo(user.uid, name, "")
+            Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
 
-    suspend fun verifyRegistration(phone: String, code: String): Result<CrewMember> {
-        return try {
-            if (BuildConfig.USE_MOCK_API) {
-                val user = mockDataProvider.verifyRegistration(phone, code)
-                tokenProvider.saveTokens("mock_token_${System.currentTimeMillis()}", "mock_refresh")
-                tokenProvider.saveUserInfo(user.id, user.name, user.crewId)
-                Result.success(user)
-            } else {
-                Result.failure(UnsupportedOperationException("Registration not available in production yet"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
+    fun isLoggedIn(): Boolean = auth.currentUser != null
 
-    fun isLoggedIn(): Boolean = tokenProvider.isLoggedIn()
+    fun getUserName(): String = auth.currentUser?.displayName ?: tokenProvider.getUserName()
 
-    fun getUserName(): String = tokenProvider.getUserName()
+    fun getUserId(): String = auth.currentUser?.uid ?: tokenProvider.getUserId()
+
+    fun getUserEmail(): String = auth.currentUser?.email ?: ""
 
     fun logout() {
+        auth.signOut()
         tokenProvider.clear()
     }
 }

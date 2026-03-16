@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class LoginUiState(
-    val phone: String = "",
-    val code: String = "",
+    val email: String = "",
+    val password: String = "",
     val isLoading: Boolean = false,
     val error: String? = null,
     val isLoggedIn: Boolean = false,
@@ -35,27 +35,29 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onPhoneChanged(phone: String) {
-        _uiState.update { it.copy(phone = phone, error = null) }
+    fun onEmailChanged(email: String) {
+        _uiState.update { it.copy(email = email, error = null) }
     }
 
-    fun onCodeChanged(code: String) {
-        _uiState.update { it.copy(code = code, error = null) }
+    fun onPasswordChanged(password: String) {
+        _uiState.update { it.copy(password = password, error = null) }
     }
 
     fun login() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             val result = loginUseCase(
-                phone = _uiState.value.phone.trim(),
-                code = _uiState.value.code.trim(),
+                email = _uiState.value.email.trim(),
+                password = _uiState.value.password,
             )
             result.fold(
                 onSuccess = {
                     _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }
                 },
                 onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false, error = e.message ?: "Login failed") }
+                    _uiState.update {
+                        it.copy(isLoading = false, error = e.message ?: "Login failed")
+                    }
                 },
             )
         }
