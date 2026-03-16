@@ -140,6 +140,7 @@ dependencies {
     implementation(libs.camerax.camera2)
     implementation(libs.camerax.lifecycle)
     implementation(libs.camerax.view)
+    implementation("com.google.guava:guava:32.1.3-android")
 
     // Accompanist
     implementation(libs.accompanist.permissions)
