@@ -21,6 +21,8 @@
             android:layout_height="80dp"
             android:scaleType="centerCrop"
             android:background="@color/zinc_700"
+            android:clipToOutline="true"
+            android:outlineProvider="roundedCorners"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -44,9 +46,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="4dp"
-            android:background="@color/zinc_700"
-            android:paddingHorizontal="6dp"
-            android:paddingVertical="2dp"
+            android:background="@drawable/bg_type_badge"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="3dp"
             android:textColor="@color/zinc_100"
             android:textSize="11sp"
             app:layout_constraintStart_toEndOf="@id/ivPhoto"
@@ -84,7 +86,7 @@
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/my_dps_edit"
-            android:src="@android:drawable/ic_menu_edit"
+            android:src="@drawable/ic_edit_pencil"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/btnDelete" />
@@ -95,7 +97,7 @@
             android:layout_height="36dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/my_dps_delete"
-            android:src="@android:drawable/ic_menu_delete"
+            android:src="@drawable/ic_delete"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
