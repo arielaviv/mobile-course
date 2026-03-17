@@ -19,11 +19,11 @@ val localProperties =
     }
 
 android {
-    namespace = "com.lux.field"
+    namespace = "com.field.survey"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.lux.field"
+        applicationId = "com.field.survey"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
@@ -60,7 +60,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            buildConfigField("String", "API_BASE_URL", "\"https://lux.app\"")
+            buildConfigField("String", "API_BASE_URL", "\"https://fieldsurvey.app\"")
             buildConfigField("boolean", "USE_MOCK_API", "false")
         }
     }

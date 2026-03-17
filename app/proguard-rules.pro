@@ -1,7 +1,7 @@
 # Retrofit
 -keepattributes Signature
 -keepattributes *Annotation*
--keep class com.lux.field.data.remote.dto.** { *; }
+-keep class com.field.survey.data.remote.dto.** { *; }
 
 # Kotlinx Serialization
 -keepattributes *Annotation*, InnerClasses
@@ -12,11 +12,11 @@
 -keepclasseswithmembers class kotlinx.serialization.json.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
--keep,includedescriptorclasses class com.lux.field.**$$serializer { *; }
--keepclassmembers class com.lux.field.** {
+-keep,includedescriptorclasses class com.field.survey.**$$serializer { *; }
+-keepclassmembers class com.field.survey.** {
     *** Companion;
 }
--keepclasseswithmembers class com.lux.field.** {
+-keepclasseswithmembers class com.field.survey.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

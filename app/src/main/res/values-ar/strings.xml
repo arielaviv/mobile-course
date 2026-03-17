@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Lux Field</string>
+    <string name="app_name">Field Survey</string>
 
     <!-- Login -->
     <string name="login_subtitle">فني ميداني</string>
@@ -99,7 +99,7 @@
     <string name="settings_map_style">نمط الخريطة</string>
     <string name="settings_logout">تسجيل الخروج</string>
     <string name="settings_map_default">الافتراضي</string>
-    <string name="settings_map_lux_dark">Lux داكن</string>
+    <string name="settings_map_dark">داكن</string>
 
     <!-- Add Distribution Point -->
     <string name="add_dp_title">إضافة نقطة</string>

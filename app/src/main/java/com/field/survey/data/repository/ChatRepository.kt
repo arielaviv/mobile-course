@@ -1,0 +1,209 @@
+package com.field.survey.data.repository
+
+import android.util.Base64
+import com.field.survey.BuildConfig
+import com.field.survey.data.local.dao.ChatMessageDao
+import com.field.survey.data.mock.MockDataProvider
+import com.field.survey.data.remote.ClaudeApiService
+import com.field.survey.data.remote.dto.ClaudeContentBlock
+import com.field.survey.data.remote.dto.ClaudeMessageDto
+import com.field.survey.data.remote.dto.ClaudeMessagesRequest
+import com.field.survey.data.remote.dto.ImageSource
+import com.field.survey.domain.model.ChatMessage
+import com.field.survey.domain.model.ChatRole
+import com.field.survey.domain.model.Task
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class ChatRepository @Inject constructor(
+    private val chatMessageDao: ChatMessageDao,
+    private val claudeApiService: ClaudeApiService,
+    private val mockDataProvider: MockDataProvider,
+) {
+
+    fun observeMessages(taskId: String): Flow<List<ChatMessage>> =
+        chatMessageDao.observeByTask(taskId).map { entities ->
+            entities.map { it.toDomain() }
+        }
+
+    suspend fun sendMessage(
+        taskId: String,
+        userText: String,
+        task: Task?,
+    ): Result<ChatMessage> {
+        val userMessage = ChatMessage(
+            id = UUID.randomUUID().toString(),
+            taskId = taskId,
+            role = ChatRole.USER,
+            content = userText,
+            photoId = null,
+            createdAt = System.currentTimeMillis(),
+        )
+        chatMessageDao.insert(userMessage.toEntity())
+
+        return if (BuildConfig.USE_MOCK_API) {
+            val mockReply = mockDataProvider.getMockChatResponse(userText)
+            val assistantMessage = ChatMessage(
+                id = UUID.randomUUID().toString(),
+                taskId = taskId,
+                role = ChatRole.ASSISTANT,
+                content = mockReply,
+                photoId = null,
+                createdAt = System.currentTimeMillis(),
+            )
+            chatMessageDao.insert(assistantMessage.toEntity())
+            Result.success(assistantMessage)
+        } else {
+            sendToClaudeApi(taskId, task)
+        }
+    }
+
+    suspend fun analyzePhoto(
+        taskId: String,
+        photoFilePath: String,
+        photoId: String,
+        cameraFacing: String,
+        task: Task?,
+    ): Result<ChatMessage> {
+        if (BuildConfig.USE_MOCK_API) {
+            val mockAnalysis = mockDataProvider.getMockPhotoAnalysis(cameraFacing)
+            val message = ChatMessage(
+                id = UUID.randomUUID().toString(),
+                taskId = taskId,
+                role = ChatRole.ASSISTANT,
+                content = mockAnalysis,
+                photoId = photoId,
+                createdAt = System.currentTimeMillis(),
+            )
+            chatMessageDao.insert(message.toEntity())
+            return Result.success(message)
+        }
+
+        return withContext(Dispatchers.IO) {
+            try {
+                val imageBytes = File(photoFilePath).readBytes()
+                val base64Image = Base64.encodeToString(imageBytes, Base64.NO_WRAP)
+
+                val history = chatMessageDao.getByTask(taskId).map { it.toDomain() }
+                val messages = buildApiMessages(history) + ClaudeMessageDto(
+                    role = "user",
+                    content = listOf(
+                        ClaudeContentBlock.Image(
+                            source = ImageSource(data = base64Image),
+                        ),
+                        ClaudeContentBlock.Text(
+                            text = if (cameraFacing == "back") {
+                                PromptBuilder.buildWorkPhotoPrompt(task)
+                            } else {
+                                PromptBuilder.buildPresencePhotoPrompt()
+                            },
+                        ),
+                    ),
+                )
+
+                val request = ClaudeMessagesRequest(
+                    system = PromptBuilder.buildSystemPrompt(task),
+                    messages = messages,
+                )
+
+                val result = claudeApiService.sendMessage(request)
+                result.fold(
+                    onSuccess = { response ->
+                        val text = response.content
+                            .firstOrNull { it.type == "text" }?.text
+                            ?: "No analysis available."
+                        val message = ChatMessage(
+                            id = UUID.randomUUID().toString(),
+                            taskId = taskId,
+                            role = ChatRole.ASSISTANT,
+                            content = text,
+                            photoId = photoId,
+                            createdAt = System.currentTimeMillis(),
+                        )
+                        chatMessageDao.insert(message.toEntity())
+                        Result.success(message)
+                    },
+                    onFailure = { Result.failure(it) },
+                )
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    private suspend fun sendToClaudeApi(
+        taskId: String,
+        task: Task?,
+    ): Result<ChatMessage> = withContext(Dispatchers.IO) {
+        try {
+            val history = chatMessageDao.getByTask(taskId).map { it.toDomain() }
+            val messages = buildApiMessages(history)
+
+            val request = ClaudeMessagesRequest(
+                system = PromptBuilder.buildSystemPrompt(task),
+                messages = messages,
+            )
+
+            val result = claudeApiService.sendMessage(request)
+            result.fold(
+                onSuccess = { response ->
+                    val text = response.content
+                        .firstOrNull { it.type == "text" }?.text
+                        ?: "I couldn't generate a response."
+                    val message = ChatMessage(
+                        id = UUID.randomUUID().toString(),
+                        taskId = taskId,
+                        role = ChatRole.ASSISTANT,
+                        content = text,
+                        photoId = null,
+                        createdAt = System.currentTimeMillis(),
+                    )
+                    chatMessageDao.insert(message.toEntity())
+                    Result.success(message)
+                },
+                onFailure = { Result.failure(it) },
+            )
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun insertPhotoMessage(
+        taskId: String,
+        photoId: String,
+        cameraFacing: String,
+    ): ChatMessage {
+        val content = if (cameraFacing == "back") "Work photo" else "Selfie"
+        val message = ChatMessage(
+            id = UUID.randomUUID().toString(),
+            taskId = taskId,
+            role = ChatRole.USER,
+            content = content,
+            photoId = photoId,
+            createdAt = System.currentTimeMillis(),
+        )
+        chatMessageDao.insert(message.toEntity())
+        return message
+    }
+
+    private fun buildApiMessages(history: List<ChatMessage>): List<ClaudeMessageDto> =
+        history
+            .filter { it.role != ChatRole.SYSTEM }
+            .map { msg ->
+                ClaudeMessageDto(
+                    role = when (msg.role) {
+                        ChatRole.USER -> "user"
+                        ChatRole.ASSISTANT -> "assistant"
+                        ChatRole.SYSTEM -> "user"
+                    },
+                    content = listOf(ClaudeContentBlock.Text(text = msg.content)),
+                )
+            }
+}

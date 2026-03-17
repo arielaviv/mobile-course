@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Lux Field</string>
+    <string name="app_name">Field Survey</string>
 
     <!-- Login -->
     <string name="login_subtitle">Field Technician</string>
@@ -99,7 +99,7 @@
     <string name="settings_map_style">Map Style</string>
     <string name="settings_logout">Log Out</string>
     <string name="settings_map_default">Default</string>
-    <string name="settings_map_lux_dark">Lux Dark</string>
+    <string name="settings_map_dark">Dark</string>
 
     <!-- Add Distribution Point -->
     <string name="add_dp_title">Add Point</string>
