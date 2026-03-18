@@ -2,26 +2,36 @@ package com.field.survey.ui.dp
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.field.survey.data.repository.DistributionPointRepository
 import com.field.survey.data.repository.AuthRepository
+import com.field.survey.data.repository.DistributionPointRepository
 import com.field.survey.data.repository.TokenProvider
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.DpType
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.CancellationTokenSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
+import java.util.Locale
 import java.util.UUID
 import javax.inject.Inject
+
+enum class LocationMode {
+    GPS,
+    ADDRESS,
+    MANUAL,
+}
 
 data class AddDpUiState(
     val label: String = "",
@@ -29,6 +39,8 @@ data class AddDpUiState(
     val notes: String = "",
     val latitude: Double? = null,
     val longitude: Double? = null,
+    val addressQuery: String = "",
+    val locationMode: LocationMode = LocationMode.GPS,
     val isLoadingLocation: Boolean = true,
     val locationError: String? = null,
     val photoPath: String? = null,
@@ -68,20 +80,30 @@ class AddDpViewModel @Inject constructor(
                             latitude = location.latitude,
                             longitude = location.longitude,
                             isLoadingLocation = false,
+                            locationMode = LocationMode.GPS,
                         )
                     }
                 } else {
                     _uiState.update {
-                        it.copy(isLoadingLocation = false, locationError = "Could not get location")
+                        it.copy(
+                            isLoadingLocation = false,
+                            locationError = "GPS unavailable. Use address or manual coordinates.",
+                        )
                     }
                 }
             } catch (e: SecurityException) {
                 _uiState.update {
-                    it.copy(isLoadingLocation = false, locationError = "Location permission required. Please grant it in Settings.")
+                    it.copy(
+                        isLoadingLocation = false,
+                        locationError = "Location permission denied. Use address or manual input.",
+                    )
                 }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoadingLocation = false, locationError = "Could not get location. Tap retry.")
+                    it.copy(
+                        isLoadingLocation = false,
+                        locationError = "GPS unavailable. Use address or manual coordinates.",
+                    )
                 }
             }
         }
@@ -107,6 +129,57 @@ class AddDpViewModel @Inject constructor(
         fetchLocation()
     }
 
+    fun setLocationMode(mode: LocationMode) {
+        _uiState.update { it.copy(locationMode = mode, locationError = null) }
+    }
+
+    fun onAddressChanged(address: String) {
+        _uiState.update { it.copy(addressQuery = address, error = null) }
+    }
+
+    fun searchAddress() {
+        val address = _uiState.value.addressQuery.trim()
+        if (address.isBlank()) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoadingLocation = true, locationError = null) }
+            try {
+                val results = withContext(Dispatchers.IO) {
+                    @Suppress("DEPRECATION")
+                    Geocoder(context, Locale.getDefault()).getFromLocationName(address, 1)
+                }
+                val location = results?.firstOrNull()
+                if (location != null) {
+                    _uiState.update {
+                        it.copy(
+                            latitude = location.latitude,
+                            longitude = location.longitude,
+                            isLoadingLocation = false,
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(isLoadingLocation = false, locationError = "Address not found")
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(isLoadingLocation = false, locationError = "Could not search address")
+                }
+            }
+        }
+    }
+
+    fun setManualCoordinates(lat: Double, lng: Double) {
+        _uiState.update {
+            it.copy(
+                latitude = lat,
+                longitude = lng,
+                locationError = null,
+            )
+        }
+    }
+
     fun save() {
         val state = _uiState.value
         if (state.label.isBlank()) {
@@ -114,7 +187,7 @@ class AddDpViewModel @Inject constructor(
             return
         }
         if (state.latitude == null || state.longitude == null) {
-            _uiState.update { it.copy(error = "Location not available") }
+            _uiState.update { it.copy(error = "Location is required") }
             return
         }
 

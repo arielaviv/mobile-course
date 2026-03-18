@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -179,42 +180,143 @@ fun AddDpScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // GPS location
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Icon(
-                    Icons.Default.LocationOn,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp),
+            // Location mode selector
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                FilterChip(
+                    selected = uiState.locationMode == LocationMode.GPS,
+                    onClick = {
+                        viewModel.setLocationMode(LocationMode.GPS)
+                        viewModel.retryLocation()
+                    },
+                    label = { Text("GPS") },
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                if (uiState.isLoadingLocation) {
-                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = stringResource(R.string.add_dp_fetching_location),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else if (uiState.locationError != null) {
-                    Text(
-                        text = uiState.locationError ?: "",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = viewModel::retryLocation, modifier = Modifier.size(24.dp)) {
-                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                FilterChip(
+                    selected = uiState.locationMode == LocationMode.ADDRESS,
+                    onClick = { viewModel.setLocationMode(LocationMode.ADDRESS) },
+                    label = { Text("Address") },
+                )
+                FilterChip(
+                    selected = uiState.locationMode == LocationMode.MANUAL,
+                    onClick = { viewModel.setLocationMode(LocationMode.MANUAL) },
+                    label = { Text("Coordinates") },
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            when (uiState.locationMode) {
+                LocationMode.GPS -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        if (uiState.isLoadingLocation) {
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = stringResource(R.string.add_dp_fetching_location),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        } else if (uiState.locationError != null) {
+                            Text(
+                                text = uiState.locationError ?: "",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            IconButton(onClick = viewModel::retryLocation, modifier = Modifier.size(24.dp)) {
+                                Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                            }
+                        } else {
+                            Text(
+                                text = "%.5f, %.5f".format(uiState.latitude, uiState.longitude),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                        }
                     }
-                } else {
-                    Text(
-                        text = "%.5f, %.5f".format(uiState.latitude, uiState.longitude),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
+                }
+
+                LocationMode.ADDRESS -> {
+                    var addressText by remember { mutableStateOf(uiState.addressQuery) }
+                    OutlinedTextField(
+                        value = addressText,
+                        onValueChange = {
+                            addressText = it
+                            viewModel.onAddressChanged(it)
+                        },
+                        label = { Text("Address") },
+                        placeholder = { Text("e.g. 14 Rothschild Blvd, Tel Aviv") },
+                        singleLine = true,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth(),
+                        trailingIcon = {
+                            IconButton(onClick = { viewModel.searchAddress() }) {
+                                Icon(Icons.Default.Search, contentDescription = "Search")
+                            }
+                        },
                     )
+                    if (uiState.latitude != null && uiState.longitude != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Found: %.5f, %.5f".format(uiState.latitude, uiState.longitude),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                    if (uiState.locationError != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = uiState.locationError ?: "",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                }
+
+                LocationMode.MANUAL -> {
+                    var latText by remember { mutableStateOf(uiState.latitude?.toString() ?: "") }
+                    var lngText by remember { mutableStateOf(uiState.longitude?.toString() ?: "") }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedTextField(
+                            value = latText,
+                            onValueChange = {
+                                latText = it
+                                val lat = it.toDoubleOrNull()
+                                val lng = lngText.toDoubleOrNull()
+                                if (lat != null && lng != null) viewModel.setManualCoordinates(lat, lng)
+                            },
+                            label = { Text("Latitude") },
+                            placeholder = { Text("32.0636") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1f),
+                        )
+                        OutlinedTextField(
+                            value = lngText,
+                            onValueChange = {
+                                lngText = it
+                                val lat = latText.toDoubleOrNull()
+                                val lng = it.toDoubleOrNull()
+                                if (lat != null && lng != null) viewModel.setManualCoordinates(lat, lng)
+                            },
+                            label = { Text("Longitude") },
+                            placeholder = { Text("34.7708") },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.weight(1f),
+                        )
+                    }
                 }
             }
 
