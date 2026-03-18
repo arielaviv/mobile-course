@@ -121,6 +121,17 @@
     <string name="weather_wind">الرياح</string>
     <string name="weather_wind_value">%.1f م/ث</string>
 
+    <!-- My Distribution Points -->
+    <string name="my_dps_title">نقاطي</string>
+    <string name="my_dps_empty_title">لا توجد نقاط بعد</string>
+    <string name="my_dps_empty_subtitle">النقاط التي تنشئها ستظهر هنا</string>
+    <string name="my_dps_edit">تعديل</string>
+    <string name="my_dps_delete">حذف</string>
+    <string name="my_dps_delete_title">حذف نقطة</string>
+    <string name="my_dps_delete_message">هل أنت متأكد أنك تريد حذف \"%1$s\"؟</string>
+    <string name="my_dps_delete_confirm">حذف</string>
+    <string name="my_dps_delete_cancel">إلغاء</string>
+
     <!-- General -->
     <string name="back">رجوع</string>
     <string name="error_generic">حدث خطأ ما</string>

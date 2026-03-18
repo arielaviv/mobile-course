@@ -121,6 +121,17 @@
     <string name="weather_wind">רוח</string>
     <string name="weather_wind_value">%.1f מ/ש</string>
 
+    <!-- My Distribution Points -->
+    <string name="my_dps_title">הנקודות שלי</string>
+    <string name="my_dps_empty_title">אין נקודות עדיין</string>
+    <string name="my_dps_empty_subtitle">נקודות שתיצור יופיעו כאן</string>
+    <string name="my_dps_edit">ערוך</string>
+    <string name="my_dps_delete">מחק</string>
+    <string name="my_dps_delete_title">מחיקת נקודה</string>
+    <string name="my_dps_delete_message">האם אתה בטוח שברצונך למחוק את \"%1$s\"?</string>
+    <string name="my_dps_delete_confirm">מחק</string>
+    <string name="my_dps_delete_cancel">ביטול</string>
+
     <!-- General -->
     <string name="back">חזור</string>
     <string name="error_generic">משהו השתבש</string>

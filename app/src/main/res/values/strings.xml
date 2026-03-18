@@ -121,6 +121,17 @@
     <string name="weather_wind">Wind</string>
     <string name="weather_wind_value">%.1f m/s</string>
 
+    <!-- My Distribution Points -->
+    <string name="my_dps_title">My Points</string>
+    <string name="my_dps_empty_title">No points yet</string>
+    <string name="my_dps_empty_subtitle">Points you create will appear here</string>
+    <string name="my_dps_edit">Edit</string>
+    <string name="my_dps_delete">Delete</string>
+    <string name="my_dps_delete_title">Delete Point</string>
+    <string name="my_dps_delete_message">Are you sure you want to delete \"%1$s\"?</string>
+    <string name="my_dps_delete_confirm">Delete</string>
+    <string name="my_dps_delete_cancel">Cancel</string>
+
     <!-- General -->
     <string name="back">Back</string>
     <string name="error_generic">Something went wrong</string>
