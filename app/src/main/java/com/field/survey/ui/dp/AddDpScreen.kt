@@ -42,6 +42,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -82,19 +85,25 @@ fun AddDpScreen(
         if (uiState.isSaved) onSaved()
     }
 
-    val photoFile = File(context.cacheDir, "dp_photo_${System.currentTimeMillis()}.jpg")
-    val photoUri = FileProvider.getUriForFile(
-        context,
-        "${context.packageName}.fileprovider",
-        photoFile,
-    )
+    var currentPhotoFile by remember { mutableStateOf<File?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
     ) { success ->
-        if (success) {
-            viewModel.onPhotoTaken(photoFile.absolutePath)
+        if (success && currentPhotoFile != null) {
+            viewModel.onPhotoTaken(currentPhotoFile!!.absolutePath)
         }
+    }
+
+    fun launchCamera() {
+        val file = File(context.cacheDir, "dp_photo_${System.currentTimeMillis()}.jpg")
+        currentPhotoFile = file
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            file,
+        )
+        cameraLauncher.launch(uri)
     }
 
     Scaffold(
@@ -180,7 +189,7 @@ fun AddDpScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedButton(
-                    onClick = { cameraLauncher.launch(photoUri) },
+                    onClick = { launchCamera() },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -199,7 +208,7 @@ fun AddDpScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     OutlinedButton(
-                        onClick = { cameraLauncher.launch(photoUri) },
+                        onClick = { launchCamera() },
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
