@@ -115,6 +115,12 @@
     <string name="add_dp_gallery">גלריה</string>
     <string name="add_dp_save">שמור נקודה</string>
 
+    <!-- Weather -->
+    <string name="weather_error">מזג אוויר לא זמין — בדוק את OPENWEATHER_API_KEY ב-local.properties</string>
+    <string name="weather_humidity">לחות</string>
+    <string name="weather_wind">רוח</string>
+    <string name="weather_wind_value">%.1f מ/ש</string>
+
     <!-- General -->
     <string name="back">חזור</string>
     <string name="error_generic">משהו השתבש</string>

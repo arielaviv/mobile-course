@@ -46,6 +46,11 @@ android {
             "ELEVENLABS_API_KEY",
             "\"${localProperties.getProperty("ELEVENLABS_API_KEY", "")}\"",
         )
+        buildConfigField(
+            "String",
+            "OPENWEATHER_API_KEY",
+            "\"${localProperties.getProperty("OPENWEATHER_API_KEY", "")}\"",
+        )
     }
 
     buildTypes {
