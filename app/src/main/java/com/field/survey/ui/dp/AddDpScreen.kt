@@ -27,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -103,9 +104,26 @@ fun AddDpScreen(
         }
     }
 
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri: Uri? ->
+        uri?.let {
+            try {
+                val file = File(context.cacheDir, "dp_gallery_${System.currentTimeMillis()}.jpg")
+                context.contentResolver.openInputStream(it)?.use { input ->
+                    file.outputStream().use { output -> input.copyTo(output) }
+                }
+                viewModel.onPhotoTaken(file.absolutePath)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Could not load image", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
     val onTakePhoto: () -> Unit = {
         if (!hasCameraApp) {
-            Toast.makeText(context, "No camera available on this device", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "No camera available, opening gallery", Toast.LENGTH_SHORT).show()
+            galleryLauncher.launch("image/*")
         } else {
             try {
                 val file = File(context.cacheDir, "dp_photo_${System.currentTimeMillis()}.jpg")
@@ -120,6 +138,10 @@ fun AddDpScreen(
                 Toast.makeText(context, "Could not open camera: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    val onPickFromGallery: () -> Unit = {
+        galleryLauncher.launch("image/*")
     }
 
     Scaffold(
@@ -204,14 +226,25 @@ fun AddDpScreen(
                         .clip(RoundedCornerShape(12.dp)),
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedButton(
-                    onClick = onTakePhoto,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(stringResource(R.string.add_dp_retake_photo))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(
+                        onClick = onTakePhoto,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(stringResource(R.string.add_dp_retake_photo))
+                    }
+                    OutlinedButton(
+                        onClick = onPickFromGallery,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.weight(1f),
+                    ) {
+                        Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(stringResource(R.string.add_dp_gallery))
+                    }
                 }
             } else {
                 Box(
@@ -223,13 +256,26 @@ fun AddDpScreen(
                         .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center,
                 ) {
-                    OutlinedButton(
-                        onClick = onTakePhoto,
-                        shape = RoundedCornerShape(12.dp),
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.add_dp_take_photo))
+                        OutlinedButton(
+                            onClick = onTakePhoto,
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.add_dp_take_photo))
+                        }
+                        OutlinedButton(
+                            onClick = onPickFromGallery,
+                            shape = RoundedCornerShape(12.dp),
+                        ) {
+                            Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.add_dp_gallery))
+                        }
                     }
                 }
             }

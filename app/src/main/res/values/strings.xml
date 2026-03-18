@@ -112,6 +112,7 @@
     <string name="add_dp_label_placeholder">e.g. DP-R14, JB-7</string>
     <string name="add_dp_notes_field">Notes</string>
     <string name="add_dp_notes_placeholder">Optional notes about this point</string>
+    <string name="add_dp_gallery">Gallery</string>
     <string name="add_dp_save">Save Point</string>
 
     <!-- General -->
