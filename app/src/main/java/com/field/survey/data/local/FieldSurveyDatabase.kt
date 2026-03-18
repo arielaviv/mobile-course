@@ -23,7 +23,7 @@ import com.field.survey.data.local.entity.WorkOrderEntity
         ChatMessageEntity::class,
         DistributionPointEntity::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = true,
 )
 abstract class FieldSurveyDatabase : RoomDatabase() {

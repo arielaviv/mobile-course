@@ -13,9 +13,11 @@ data class DistributionPointEntity(
     val latitude: Double,
     val longitude: Double,
     val photoPath: String?,
+    val imageBase64: String?,
     val notes: String,
     val createdAt: Long,
     val createdBy: String,
+    val createdByName: String,
 ) {
     fun toDomain(): DistributionPoint = DistributionPoint(
         id = id,
@@ -24,9 +26,11 @@ data class DistributionPointEntity(
         latitude = latitude,
         longitude = longitude,
         photoPath = photoPath,
+        imageBase64 = imageBase64,
         notes = notes,
         createdAt = createdAt,
         createdBy = createdBy,
+        createdByName = createdByName,
     )
 
     companion object {
@@ -38,9 +42,11 @@ data class DistributionPointEntity(
                 latitude = dp.latitude,
                 longitude = dp.longitude,
                 photoPath = dp.photoPath,
+                imageBase64 = dp.imageBase64,
                 notes = dp.notes,
                 createdAt = dp.createdAt,
                 createdBy = dp.createdBy,
+                createdByName = dp.createdByName,
             )
     }
 }

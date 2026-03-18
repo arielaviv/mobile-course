@@ -8,6 +8,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.field.survey.data.repository.DistributionPointRepository
+import com.field.survey.data.repository.AuthRepository
 import com.field.survey.data.repository.TokenProvider
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.DpType
@@ -41,6 +42,7 @@ class AddDpViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: DistributionPointRepository,
     private val tokenProvider: TokenProvider,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddDpUiState())
@@ -122,9 +124,11 @@ class AddDpViewModel @Inject constructor(
                     latitude = state.latitude,
                     longitude = state.longitude,
                     photoPath = state.photoPath,
+                    imageBase64 = null,
                     notes = state.notes.trim(),
                     createdAt = System.currentTimeMillis(),
-                    createdBy = tokenProvider.getUserId(),
+                    createdBy = authRepository.getUserId(),
+                    createdByName = authRepository.getUserName(),
                 )
                 repository.save(dp)
                 _uiState.update { it.copy(isSaving = false, isSaved = true) }
