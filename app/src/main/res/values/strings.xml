@@ -115,6 +115,11 @@
     <string name="add_dp_gallery">Gallery</string>
     <string name="add_dp_save">Save Point</string>
 
+    <!-- Weather -->
+    <string name="weather_humidity">Humidity</string>
+    <string name="weather_wind">Wind</string>
+    <string name="weather_wind_value">%.1f m/s</string>
+
     <!-- General -->
     <string name="back">Back</string>
     <string name="error_generic">Something went wrong</string>

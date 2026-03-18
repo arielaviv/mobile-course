@@ -44,6 +44,7 @@ import com.field.survey.BuildConfig
 import com.field.survey.R
 import com.field.survey.ui.components.EmptyState
 import com.field.survey.ui.map.components.OsmMapContent
+import com.field.survey.ui.map.components.WeatherCard
 import com.field.survey.ui.map.components.WorkOrderBottomSheet
 import com.field.survey.ui.map.components.WorkOrderMapContent
 import kotlinx.coroutines.launch
@@ -164,6 +165,15 @@ fun MapScreen(
                 LinearProgressIndicator(
                     modifier = Modifier.align(Alignment.TopCenter),
                     color = MaterialTheme.colorScheme.tertiary,
+                )
+            }
+
+            if (uiState.weather != null) {
+                WeatherCard(
+                    weather = uiState.weather!!,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(start = 12.dp, bottom = 12.dp),
                 )
             }
 

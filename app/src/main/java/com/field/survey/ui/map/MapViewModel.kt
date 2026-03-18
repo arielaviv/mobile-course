@@ -6,7 +6,9 @@ import com.field.survey.data.repository.AuthRepository
 import com.field.survey.data.repository.DistributionPointRepository
 import com.field.survey.data.repository.MapStyle
 import com.field.survey.data.repository.PreferencesRepository
+import com.field.survey.data.repository.WeatherRepository
 import com.field.survey.domain.model.DistributionPoint
+import com.field.survey.domain.model.Weather
 import com.field.survey.domain.model.WorkOrder
 import com.field.survey.domain.usecase.GetAssignedWorkOrdersUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +27,7 @@ data class MapUiState(
     val error: String? = null,
     val userName: String = "",
     val loggedOut: Boolean = false,
+    val weather: Weather? = null,
 )
 
 @HiltViewModel
@@ -33,6 +36,7 @@ class MapViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val preferencesRepository: PreferencesRepository,
     private val distributionPointRepository: DistributionPointRepository,
+    private val weatherRepository: WeatherRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MapUiState())
@@ -45,6 +49,7 @@ class MapViewModel @Inject constructor(
         observeDistributionPoints()
         syncDistributionPoints()
         refresh()
+        fetchWeather()
     }
 
     private fun observeWorkOrders() {
@@ -69,6 +74,15 @@ class MapViewModel @Inject constructor(
         }
     }
 
+    private fun fetchWeather() {
+        viewModelScope.launch {
+            val result = weatherRepository.getWeather(lat = DEFAULT_LAT, lon = DEFAULT_LON)
+            result.onSuccess { weather ->
+                _uiState.update { it.copy(weather = weather) }
+            }
+        }
+    }
+
     fun refresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
@@ -82,6 +96,7 @@ class MapViewModel @Inject constructor(
                 },
             )
         }
+        fetchWeather()
     }
 
     fun selectWorkOrder(workOrder: WorkOrder?) {
@@ -91,5 +106,10 @@ class MapViewModel @Inject constructor(
     fun logout() {
         authRepository.logout()
         _uiState.update { it.copy(loggedOut = true) }
+    }
+
+    companion object {
+        private const val DEFAULT_LAT = 32.0750
+        private const val DEFAULT_LON = 34.7725
     }
 }

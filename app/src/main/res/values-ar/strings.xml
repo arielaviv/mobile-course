@@ -115,6 +115,11 @@
     <string name="add_dp_gallery">المعرض</string>
     <string name="add_dp_save">حفظ النقطة</string>
 
+    <!-- Weather -->
+    <string name="weather_humidity">الرطوبة</string>
+    <string name="weather_wind">الرياح</string>
+    <string name="weather_wind_value">%.1f م/ث</string>
+
     <!-- General -->
     <string name="back">رجوع</string>
     <string name="error_generic">حدث خطأ ما</string>
