@@ -112,6 +112,7 @@
     <string name="add_dp_label_placeholder">לדוגמה: DP-R14, JB-7</string>
     <string name="add_dp_notes_field">הערות</string>
     <string name="add_dp_notes_placeholder">הערות אופציונליות על נקודה זו</string>
+    <string name="add_dp_gallery">גלריה</string>
     <string name="add_dp_save">שמור נקודה</string>
 
     <!-- General -->

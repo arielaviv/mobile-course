@@ -60,7 +60,14 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
                 `createdBy` TEXT NOT NULL,
                 PRIMARY KEY(`id`)
             )
-            """.trimIndent()
+            """.trimIndent(),
         )
+    }
+}
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("ALTER TABLE `distribution_points` ADD COLUMN `imageBase64` TEXT")
+        db.execSQL("ALTER TABLE `distribution_points` ADD COLUMN `createdByName` TEXT NOT NULL DEFAULT ''")
     }
 }

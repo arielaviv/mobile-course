@@ -112,6 +112,7 @@
     <string name="add_dp_label_placeholder">مثال: DP-R14, JB-7</string>
     <string name="add_dp_notes_field">ملاحظات</string>
     <string name="add_dp_notes_placeholder">ملاحظات اختيارية حول هذه النقطة</string>
+    <string name="add_dp_gallery">المعرض</string>
     <string name="add_dp_save">حفظ النقطة</string>
 
     <!-- General -->

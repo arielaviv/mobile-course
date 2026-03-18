@@ -18,4 +18,7 @@ interface DistributionPointDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(dp: DistributionPointEntity)
+
+    @Query("DELETE FROM distribution_points WHERE id = :id")
+    suspend fun deleteById(id: String)
 }

@@ -43,6 +43,7 @@ class MapViewModel @Inject constructor(
         _uiState.update { it.copy(userName = authRepository.getUserName()) }
         observeWorkOrders()
         observeDistributionPoints()
+        syncDistributionPoints()
         refresh()
     }
 
@@ -59,6 +60,12 @@ class MapViewModel @Inject constructor(
             distributionPointRepository.observeAll().collect { dps ->
                 _uiState.update { it.copy(distributionPoints = dps) }
             }
+        }
+    }
+
+    private fun syncDistributionPoints() {
+        viewModelScope.launch {
+            distributionPointRepository.syncFromFirestore()
         }
     }
 
