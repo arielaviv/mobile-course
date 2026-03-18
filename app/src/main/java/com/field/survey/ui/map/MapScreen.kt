@@ -182,8 +182,8 @@ fun MapScreen(
                 WeatherCard(
                     weather = uiState.weather!!,
                     modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 12.dp, bottom = 12.dp),
+                        .align(Alignment.TopStart)
+                        .padding(start = 12.dp, top = 8.dp),
                 )
             } else if (uiState.weatherError != null) {
                 Text(
@@ -191,8 +191,8 @@ fun MapScreen(
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(start = 12.dp, bottom = 12.dp)
+                        .align(Alignment.TopStart)
+                        .padding(start = 12.dp, top = 8.dp)
                         .background(
                             MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
                             RoundedCornerShape(8.dp),
