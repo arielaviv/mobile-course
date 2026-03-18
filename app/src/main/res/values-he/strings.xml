@@ -132,6 +132,10 @@
     <string name="my_dps_delete_confirm">מחק</string>
     <string name="my_dps_delete_cancel">ביטול</string>
 
+    <!-- Edit Distribution Point -->
+    <string name="edit_dp_title">עריכת נקודה</string>
+    <string name="edit_dp_save">שמור שינויים</string>
+
     <!-- General -->
     <string name="back">חזור</string>
     <string name="error_generic">משהו השתבש</string>

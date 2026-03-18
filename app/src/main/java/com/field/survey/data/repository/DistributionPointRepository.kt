@@ -29,6 +29,9 @@ class DistributionPointRepository @Inject constructor(
     fun observeByUser(userId: String): Flow<List<DistributionPoint>> =
         dao.observeByUser(userId).map { entities -> entities.map { it.toDomain() } }
 
+    suspend fun getById(id: String): DistributionPoint? =
+        dao.getById(id)?.toDomain()
+
     fun observeFromFirestore(): Flow<List<DistributionPoint>> = callbackFlow {
         val listener = collection
             .orderBy("createdAt", Query.Direction.DESCENDING)

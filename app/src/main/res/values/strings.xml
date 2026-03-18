@@ -132,6 +132,10 @@
     <string name="my_dps_delete_confirm">Delete</string>
     <string name="my_dps_delete_cancel">Cancel</string>
 
+    <!-- Edit Distribution Point -->
+    <string name="edit_dp_title">Edit Point</string>
+    <string name="edit_dp_save">Save Changes</string>
+
     <!-- General -->
     <string name="back">Back</string>
     <string name="error_generic">Something went wrong</string>
