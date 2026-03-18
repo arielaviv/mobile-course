@@ -1,7 +1,10 @@
 package com.field.survey.ui.dp
 
 import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -87,6 +90,11 @@ fun AddDpScreen(
 
     var currentPhotoFile by remember { mutableStateOf<File?>(null) }
 
+    val hasCameraApp = remember {
+        val intent = Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+        context.packageManager.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY).isNotEmpty()
+    }
+
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
     ) { success ->
@@ -95,15 +103,23 @@ fun AddDpScreen(
         }
     }
 
-    fun launchCamera() {
-        val file = File(context.cacheDir, "dp_photo_${System.currentTimeMillis()}.jpg")
-        currentPhotoFile = file
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${context.packageName}.fileprovider",
-            file,
-        )
-        cameraLauncher.launch(uri)
+    val onTakePhoto: () -> Unit = {
+        if (!hasCameraApp) {
+            Toast.makeText(context, "No camera available on this device", Toast.LENGTH_SHORT).show()
+        } else {
+            try {
+                val file = File(context.cacheDir, "dp_photo_${System.currentTimeMillis()}.jpg")
+                currentPhotoFile = file
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file,
+                )
+                cameraLauncher.launch(uri)
+            } catch (e: Exception) {
+                Toast.makeText(context, "Could not open camera: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     Scaffold(
@@ -189,7 +205,7 @@ fun AddDpScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedButton(
-                    onClick = { launchCamera() },
+                    onClick = onTakePhoto,
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
@@ -208,7 +224,7 @@ fun AddDpScreen(
                     contentAlignment = Alignment.Center,
                 ) {
                     OutlinedButton(
-                        onClick = { launchCamera() },
+                        onClick = onTakePhoto,
                         shape = RoundedCornerShape(12.dp),
                     ) {
                         Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(18.dp))
