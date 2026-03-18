@@ -13,6 +13,9 @@ interface DistributionPointDao {
     @Query("SELECT * FROM distribution_points ORDER BY createdAt DESC")
     fun observeAll(): Flow<List<DistributionPointEntity>>
 
+    @Query("SELECT * FROM distribution_points WHERE createdBy = :userId ORDER BY createdAt DESC")
+    fun observeByUser(userId: String): Flow<List<DistributionPointEntity>>
+
     @Query("SELECT * FROM distribution_points WHERE id = :id")
     suspend fun getById(id: String): DistributionPointEntity?
 
@@ -21,4 +24,7 @@ interface DistributionPointDao {
 
     @Query("DELETE FROM distribution_points WHERE id = :id")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM distribution_points")
+    suspend fun deleteAll()
 }

@@ -15,6 +15,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.field.survey.ui.camera.CameraScreen
 import com.field.survey.ui.dp.AddDpScreen
+import com.field.survey.ui.dp.EditDpScreen
+import com.field.survey.ui.dp.MyDpsScreen
 import com.field.survey.ui.login.LoginScreen
 import com.field.survey.ui.login.RegisterScreen
 import com.field.survey.ui.map.MapScreen
@@ -99,6 +101,28 @@ fun AppNavGraph() {
                 onAddDpClick = {
                     navController.navigate(Screen.AddDp.route)
                 },
+                onMyDpsClick = {
+                    navController.navigate(Screen.MyDps.route)
+                },
+            )
+        }
+
+        composable(Screen.MyDps.route) {
+            MyDpsScreen(
+                onBack = { navController.popBackStack() },
+                onEditDp = { dpId ->
+                    navController.navigate(Screen.EditDp.createRoute(dpId))
+                },
+            )
+        }
+
+        composable(
+            route = Screen.EditDp.route,
+            arguments = listOf(navArgument("dpId") { type = NavType.StringType }),
+        ) {
+            EditDpScreen(
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() },
             )
         }
 

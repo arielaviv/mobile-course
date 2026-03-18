@@ -26,6 +26,12 @@ class DistributionPointRepository @Inject constructor(
     fun observeAll(): Flow<List<DistributionPoint>> =
         dao.observeAll().map { entities -> entities.map { it.toDomain() } }
 
+    fun observeByUser(userId: String): Flow<List<DistributionPoint>> =
+        dao.observeByUser(userId).map { entities -> entities.map { it.toDomain() } }
+
+    suspend fun getById(id: String): DistributionPoint? =
+        dao.getById(id)?.toDomain()
+
     fun observeFromFirestore(): Flow<List<DistributionPoint>> = callbackFlow {
         val listener = collection
             .orderBy("createdAt", Query.Direction.DESCENDING)
@@ -83,6 +89,7 @@ class DistributionPointRepository @Inject constructor(
                     null
                 }
             }
+            dao.deleteAll()
             dps.forEach { dao.insert(it) }
         } catch (_: Exception) {
             // Offline — rely on Room cache
