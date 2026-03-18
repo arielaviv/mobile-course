@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.WorkOutline
@@ -57,6 +58,7 @@ fun MapScreen(
     onWorkOrderClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
     onAddDpClick: () -> Unit,
+    onMyDpsClick: () -> Unit,
     viewModel: MapViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -100,6 +102,12 @@ fun MapScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onMyDpsClick) {
+                        Icon(
+                            imageVector = Icons.Default.FormatListBulleted,
+                            contentDescription = stringResource(R.string.my_dps_title),
+                        )
+                    }
                     IconButton(onClick = { viewModel.refresh() }) {
                         Icon(
                             imageVector = Icons.Default.Refresh,
