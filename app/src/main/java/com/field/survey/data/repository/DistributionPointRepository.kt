@@ -89,6 +89,7 @@ class DistributionPointRepository @Inject constructor(
                     null
                 }
             }
+            dao.deleteAll()
             dps.forEach { dao.insert(it) }
         } catch (_: Exception) {
             // Offline — rely on Room cache

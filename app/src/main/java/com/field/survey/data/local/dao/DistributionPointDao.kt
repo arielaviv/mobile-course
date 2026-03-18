@@ -24,4 +24,7 @@ interface DistributionPointDao {
 
     @Query("DELETE FROM distribution_points WHERE id = :id")
     suspend fun deleteById(id: String)
+
+    @Query("DELETE FROM distribution_points")
+    suspend fun deleteAll()
 }
