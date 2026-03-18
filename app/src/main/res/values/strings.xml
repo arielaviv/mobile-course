@@ -116,6 +116,7 @@
     <string name="add_dp_save">Save Point</string>
 
     <!-- Weather -->
+    <string name="weather_error">Weather unavailable — check your OPENWEATHER_API_KEY in local.properties</string>
     <string name="weather_humidity">Humidity</string>
     <string name="weather_wind">Wind</string>
     <string name="weather_wind_value">%.1f m/s</string>

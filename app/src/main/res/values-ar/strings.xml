@@ -116,6 +116,7 @@
     <string name="add_dp_save">حفظ النقطة</string>
 
     <!-- Weather -->
+    <string name="weather_error">الطقس غير متاح — تحقق من OPENWEATHER_API_KEY في local.properties</string>
     <string name="weather_humidity">الرطوبة</string>
     <string name="weather_wind">الرياح</string>
     <string name="weather_wind_value">%.1f م/ث</string>

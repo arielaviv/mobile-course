@@ -28,6 +28,7 @@ data class MapUiState(
     val userName: String = "",
     val loggedOut: Boolean = false,
     val weather: Weather? = null,
+    val weatherError: String? = null,
 )
 
 @HiltViewModel
@@ -77,9 +78,14 @@ class MapViewModel @Inject constructor(
     private fun fetchWeather() {
         viewModelScope.launch {
             val result = weatherRepository.getWeather(lat = DEFAULT_LAT, lon = DEFAULT_LON)
-            result.onSuccess { weather ->
-                _uiState.update { it.copy(weather = weather) }
-            }
+            result.fold(
+                onSuccess = { weather ->
+                    _uiState.update { it.copy(weather = weather, weatherError = null) }
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(weatherError = e.message) }
+                },
+            )
         }
     }
 
