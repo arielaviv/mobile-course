@@ -72,8 +72,60 @@ class AuthRepository @Inject constructor(
 
     fun getUserEmail(): String = auth.currentUser?.email ?: ""
 
+    suspend fun getUserProfile(): Result<UserProfile> {
+        val uid = auth.currentUser?.uid ?: return Result.failure(Exception("Not logged in"))
+        return try {
+            val doc = firestore.collection("users").document(uid).get().await()
+            Result.success(
+                UserProfile(
+                    name = doc.getString("name") ?: getUserName(),
+                    email = getUserEmail(),
+                    photoBase64 = doc.getString("photoBase64") ?: "",
+                ),
+            )
+        } catch (e: Exception) {
+            Result.success(
+                UserProfile(
+                    name = getUserName(),
+                    email = getUserEmail(),
+                    photoBase64 = "",
+                ),
+            )
+        }
+    }
+
+    suspend fun updateProfile(name: String, photoBase64: String?): Result<Unit> {
+        val user = auth.currentUser ?: return Result.failure(Exception("Not logged in"))
+        return try {
+            user.updateProfile(
+                UserProfileChangeRequest.Builder()
+                    .setDisplayName(name)
+                    .build(),
+            ).await()
+
+            val updates = mutableMapOf<String, Any>(
+                "name" to name,
+            )
+            if (photoBase64 != null) {
+                updates["photoBase64"] = photoBase64
+            }
+            firestore.collection("users").document(user.uid).update(updates).await()
+
+            tokenProvider.saveUserInfo(user.uid, name, "")
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     fun logout() {
         auth.signOut()
         tokenProvider.clear()
     }
 }
+
+data class UserProfile(
+    val name: String,
+    val email: String,
+    val photoBase64: String,
+)

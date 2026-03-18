@@ -102,6 +102,7 @@ class MapViewModel @Inject constructor(
                 },
             )
         }
+        syncDistributionPoints()
         fetchWeather()
     }
 
