@@ -85,6 +85,12 @@ fun AddDpScreen(
         }
     }
 
+    LaunchedEffect(locationPermission.status.isGranted) {
+        if (locationPermission.status.isGranted && uiState.locationError != null) {
+            viewModel.retryLocation()
+        }
+    }
+
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onSaved()
     }

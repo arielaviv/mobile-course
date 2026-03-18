@@ -75,9 +75,13 @@ class AddDpViewModel @Inject constructor(
                         it.copy(isLoadingLocation = false, locationError = "Could not get location")
                     }
                 }
+            } catch (e: SecurityException) {
+                _uiState.update {
+                    it.copy(isLoadingLocation = false, locationError = "Location permission required. Please grant it in Settings.")
+                }
             } catch (e: Exception) {
                 _uiState.update {
-                    it.copy(isLoadingLocation = false, locationError = e.message ?: "Location error")
+                    it.copy(isLoadingLocation = false, locationError = "Could not get location. Tap retry.")
                 }
             }
         }
