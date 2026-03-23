@@ -23,7 +23,7 @@ object NetworkModule {
 
     private const val NOMINATIM_BASE_URL = "https://nominatim.openstreetmap.org/"
     private const val ANTHROPIC_BASE_URL = "https://api.anthropic.com/"
-    private const val USER_AGENT = "FieldSurvey/1.0 (arielaviv@users.noreply.github.com)"
+    private const val USER_AGENT = "FieldSurvey/1.0 (android)"
     private const val ANTHROPIC_VERSION = "2023-06-01"
 
     @Provides
