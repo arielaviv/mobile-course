@@ -7,6 +7,8 @@ import com.field.survey.data.local.MIGRATION_1_2
 import com.field.survey.data.local.MIGRATION_2_3
 import com.field.survey.data.local.MIGRATION_3_4
 import com.field.survey.data.local.MIGRATION_4_5
+import com.field.survey.data.local.MIGRATION_5_6
+import com.field.survey.data.local.dao.CommentDao
 import com.field.survey.data.local.dao.DistributionPointDao
 import dagger.Module
 import dagger.Provides
@@ -27,10 +29,15 @@ object DatabaseModule {
             FieldSurveyDatabase::class.java,
             "field_survey.db",
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
             .build()
     }
 
     @Provides
-    fun provideDistributionPointDao(database: FieldSurveyDatabase): DistributionPointDao = database.distributionPointDao()
+    fun provideDistributionPointDao(database: FieldSurveyDatabase): DistributionPointDao =
+        database.distributionPointDao()
+
+    @Provides
+    fun provideCommentDao(database: FieldSurveyDatabase): CommentDao =
+        database.commentDao()
 }
