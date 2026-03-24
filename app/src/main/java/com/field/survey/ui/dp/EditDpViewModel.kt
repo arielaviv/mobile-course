@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 data class EditDpUiState(
     val label: String = "",
-    val type: DpType = DpType.DP,
+    val type: DpType = DpType.OTHER,
     val notes: String = "",
     val photoPath: String? = null,
     val imageBase64: String? = null,

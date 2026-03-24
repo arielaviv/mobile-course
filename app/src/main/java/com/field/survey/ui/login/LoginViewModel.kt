@@ -3,7 +3,6 @@ package com.field.survey.ui.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.field.survey.data.repository.AuthRepository
-import com.field.survey.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +21,6 @@ data class LoginUiState(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
@@ -44,12 +42,15 @@ class LoginViewModel @Inject constructor(
     }
 
     fun login() {
+        val email = _uiState.value.email.trim()
+        val password = _uiState.value.password
+        if (email.isBlank() || password.isBlank()) {
+            _uiState.update { it.copy(error = "Email and password are required") }
+            return
+        }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val result = loginUseCase(
-                email = _uiState.value.email.trim(),
-                password = _uiState.value.password,
-            )
+            val result = authRepository.login(email, password)
             result.fold(
                 onSuccess = {
                     _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }

@@ -6,11 +6,8 @@ import com.field.survey.data.local.FieldSurveyDatabase
 import com.field.survey.data.local.MIGRATION_1_2
 import com.field.survey.data.local.MIGRATION_2_3
 import com.field.survey.data.local.MIGRATION_3_4
-import com.field.survey.data.local.dao.ChatMessageDao
+import com.field.survey.data.local.MIGRATION_4_5
 import com.field.survey.data.local.dao.DistributionPointDao
-import com.field.survey.data.local.dao.TaskDao
-import com.field.survey.data.local.dao.TaskPhotoDao
-import com.field.survey.data.local.dao.WorkOrderDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,21 +27,9 @@ object DatabaseModule {
             FieldSurveyDatabase::class.java,
             "field_survey.db",
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
             .build()
     }
-
-    @Provides
-    fun provideWorkOrderDao(database: FieldSurveyDatabase): WorkOrderDao = database.workOrderDao()
-
-    @Provides
-    fun provideTaskDao(database: FieldSurveyDatabase): TaskDao = database.taskDao()
-
-    @Provides
-    fun provideTaskPhotoDao(database: FieldSurveyDatabase): TaskPhotoDao = database.taskPhotoDao()
-
-    @Provides
-    fun provideChatMessageDao(database: FieldSurveyDatabase): ChatMessageDao = database.chatMessageDao()
 
     @Provides
     fun provideDistributionPointDao(database: FieldSurveyDatabase): DistributionPointDao = database.distributionPointDao()

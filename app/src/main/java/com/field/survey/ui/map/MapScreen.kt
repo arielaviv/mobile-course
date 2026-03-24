@@ -5,18 +5,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -24,17 +21,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,17 +36,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.field.survey.BuildConfig
 import com.field.survey.R
-import com.field.survey.ui.components.EmptyState
+import com.field.survey.ui.map.components.MapboxMapContent
 import com.field.survey.ui.map.components.OsmMapContent
 import com.field.survey.ui.map.components.WeatherCard
-import com.field.survey.ui.map.components.WorkOrderBottomSheet
-import com.field.survey.ui.map.components.WorkOrderMapContent
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
-    onWorkOrderClick: (String) -> Unit,
     onSettingsClick: () -> Unit,
     onAddDpClick: () -> Unit,
     onMyDpsClick: () -> Unit,
@@ -63,9 +50,6 @@ fun MapScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val mapStyle by viewModel.mapStyle.collectAsStateWithLifecycle()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
@@ -73,7 +57,6 @@ fun MapScreen(
                 title = {
                     if (uiState.userName.isNotEmpty()) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            // User initial avatar
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
@@ -104,7 +87,7 @@ fun MapScreen(
                 actions = {
                     IconButton(onClick = onMyDpsClick) {
                         Icon(
-                            imageVector = Icons.Default.FormatListBulleted,
+                            imageVector = Icons.AutoMirrored.Filled.FormatListBulleted,
                             contentDescription = stringResource(R.string.my_dps_title),
                         )
                     }
@@ -146,27 +129,14 @@ fun MapScreen(
                 .padding(paddingValues),
         ) {
             if (hasMapToken) {
-                WorkOrderMapContent(
-                    workOrders = uiState.workOrders,
-                    selectedWorkOrder = uiState.selectedWorkOrder,
+                MapboxMapContent(
+                    distributionPoints = uiState.distributionPoints,
                     mapboxToken = BuildConfig.MAPBOX_PUBLIC_TOKEN,
                     styleUri = mapStyle.styleUri,
-                    onMarkerClick = { wo ->
-                        viewModel.selectWorkOrder(wo)
-                        showBottomSheet = true
-                        scope.launch { sheetState.show() }
-                    },
                 )
             } else {
                 OsmMapContent(
-                    workOrders = uiState.workOrders,
                     distributionPoints = uiState.distributionPoints,
-                    selectedWorkOrder = uiState.selectedWorkOrder,
-                    onMarkerClick = { wo ->
-                        viewModel.selectWorkOrder(wo)
-                        showBottomSheet = true
-                        scope.launch { sheetState.show() }
-                    },
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -184,44 +154,6 @@ fun MapScreen(
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(start = 12.dp, top = 8.dp),
-                )
-            } else if (uiState.weatherError != null) {
-                Text(
-                    text = stringResource(R.string.weather_error),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(start = 12.dp, top = 8.dp)
-                        .background(
-                            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.9f),
-                            RoundedCornerShape(8.dp),
-                        )
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                )
-            }
-
-            if (uiState.workOrders.isEmpty() && !uiState.isLoading) {
-                EmptyState(
-                    icon = Icons.Default.WorkOutline,
-                    title = stringResource(R.string.map_empty_title),
-                    subtitle = stringResource(R.string.map_empty_subtitle),
-                    modifier = Modifier.align(Alignment.Center),
-                )
-            }
-        }
-
-        if (showBottomSheet) {
-            ModalBottomSheet(
-                onDismissRequest = { showBottomSheet = false },
-                sheetState = sheetState,
-                containerColor = MaterialTheme.colorScheme.surface,
-            ) {
-                WorkOrderBottomSheet(
-                    workOrders = uiState.workOrders,
-                    selectedWorkOrder = uiState.selectedWorkOrder,
-                    onWorkOrderSelect = { viewModel.selectWorkOrder(it) },
-                    onViewDetails = { onWorkOrderClick(it.id) },
                 )
             }
         }

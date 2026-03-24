@@ -3,7 +3,7 @@ package com.field.survey.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.field.survey.domain.model.DistributionPoint
-import com.field.survey.domain.model.DpType
+import com.field.survey.domain.model.toDpType
 
 @Entity(tableName = "distribution_points")
 data class DistributionPointEntity(
@@ -22,7 +22,7 @@ data class DistributionPointEntity(
     fun toDomain(): DistributionPoint = DistributionPoint(
         id = id,
         label = label,
-        type = DpType.valueOf(type),
+        type = type.toDpType(),
         latitude = latitude,
         longitude = longitude,
         photoPath = photoPath,

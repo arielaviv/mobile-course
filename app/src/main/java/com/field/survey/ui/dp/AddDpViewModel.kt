@@ -35,7 +35,7 @@ enum class LocationMode {
 
 data class AddDpUiState(
     val label: String = "",
-    val type: DpType = DpType.DP,
+    val type: DpType = DpType.OTHER,
     val notes: String = "",
     val latitude: Double? = null,
     val longitude: Double? = null,

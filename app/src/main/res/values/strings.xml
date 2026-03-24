@@ -3,7 +3,7 @@
     <string name="app_name">Field Survey</string>
 
     <!-- Login -->
-    <string name="login_subtitle">Field Technician</string>
+    <string name="login_subtitle">Field Survey App</string>
     <string name="login_email_label">Email</string>
     <string name="login_email_placeholder">you@example.com</string>
     <string name="login_password_label">Password</string>
@@ -13,7 +13,7 @@
 
     <!-- Registration -->
     <string name="register_title">Create Account</string>
-    <string name="register_subtitle">Join your crew</string>
+    <string name="register_subtitle">Start surveying</string>
     <string name="register_name_label">Full Name</string>
     <string name="register_name_placeholder">Enter your name</string>
     <string name="register_button">Create Account</string>
@@ -21,78 +21,6 @@
     <!-- Map -->
     <string name="map_refresh">Refresh</string>
     <string name="map_my_location">My Location</string>
-    <string name="map_work_orders_title">Work Orders (%1$d)</string>
-    <string name="map_view_details">View Details</string>
-    <string name="map_empty_title">No work orders</string>
-    <string name="map_empty_subtitle">No work orders assigned to you right now</string>
-
-    <!-- Status labels -->
-    <string name="status_draft">Draft</string>
-    <string name="status_pending">Pending</string>
-    <string name="status_scheduled">Scheduled</string>
-    <string name="status_in_progress">In Progress</string>
-    <string name="status_completed">Completed</string>
-    <string name="status_failed">Failed</string>
-    <string name="status_cancelled">Cancelled</string>
-    <string name="status_blocked">Blocked</string>
-    <string name="status_escalated">Escalated</string>
-    <string name="status_coa_pending">COA Pending</string>
-    <string name="status_coa_approved">COA Approved</string>
-    <string name="status_coa_rejected">COA Rejected</string>
-    <string name="status_skipped">Skipped</string>
-
-    <!-- Work Order -->
-    <string name="wo_detail_title">Work Order</string>
-    <string name="wo_tier_label">Tier %1$d</string>
-    <string name="wo_tasks_header">Tasks (%1$d)</string>
-    <string name="wo_task_estimate">~%1$d min</string>
-    <string name="wo_empty_title">No tasks</string>
-    <string name="wo_empty_subtitle">This work order has no tasks yet</string>
-
-    <!-- Task -->
-    <string name="task_detail_title">Task</string>
-    <string name="task_steps_header">Steps (%1$d)</string>
-    <string name="task_start">Start Task</string>
-    <string name="task_complete">Complete Task</string>
-    <string name="task_completed_label">Completed</string>
-    <string name="task_complete_all_steps_hint">Complete all steps to finish this task</string>
-
-    <!-- Camera -->
-    <string name="camera_take_work_photo">Take Work Photo</string>
-    <string name="camera_take_selfie">Take Selfie</string>
-    <string name="camera_capture">Capture</string>
-    <string name="camera_retake">Retake</string>
-    <string name="camera_use_photo">Use Photo</string>
-    <string name="camera_permission_rationale">Camera access is needed to take work photos and selfies for proof of presence</string>
-    <string name="camera_work_photo">Work Photo</string>
-    <string name="camera_selfie">Selfie</string>
-
-    <!-- Photos -->
-    <string name="photo_gallery_title">Photos</string>
-    <string name="photo_analyzing">Analyzing…</string>
-    <string name="photo_count">%1$d photos</string>
-    <string name="photo_empty_title">No photos</string>
-    <string name="photo_empty_subtitle">Take photos to document your work</string>
-
-    <!-- AI Chat -->
-    <string name="ai_chat_title">AI Assistant</string>
-    <string name="ai_chat_input_hint">Ask a question…</string>
-    <string name="ai_chat_send">Send</string>
-    <string name="ai_chat_thinking">Thinking…</string>
-    <string name="ai_chat_error">Failed to get response</string>
-    <string name="ai_chat_empty">Ask me anything about this task</string>
-
-    <!-- Voice -->
-    <string name="voice_mic">Voice input</string>
-    <string name="voice_speak">Read aloud</string>
-    <string name="voice_listening">Listening…</string>
-    <string name="voice_auto_speak">Auto-read</string>
-    <string name="voice_permission_rationale">Microphone access needed for voice input</string>
-
-    <!-- Chat Camera -->
-    <string name="chat_work_photo">Work photo</string>
-    <string name="chat_selfie">Selfie</string>
-    <string name="chat_camera_menu_title">Take photo</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
@@ -109,14 +37,13 @@
     <string name="add_dp_retake_photo">Retake Photo</string>
     <string name="add_dp_type_label">Type</string>
     <string name="add_dp_label_field">Label</string>
-    <string name="add_dp_label_placeholder">e.g. DP-R14, JB-7</string>
+    <string name="add_dp_label_placeholder">e.g. MH-14, POLE-7</string>
     <string name="add_dp_notes_field">Notes</string>
     <string name="add_dp_notes_placeholder">Optional notes about this point</string>
     <string name="add_dp_gallery">Gallery</string>
     <string name="add_dp_save">Save Point</string>
 
     <!-- Weather -->
-    <string name="weather_error">Weather unavailable — check your OPENWEATHER_API_KEY in local.properties</string>
     <string name="weather_humidity">Humidity</string>
     <string name="weather_wind">Wind</string>
     <string name="weather_wind_value">%.1f m/s</string>
@@ -135,6 +62,17 @@
     <!-- Edit Distribution Point -->
     <string name="edit_dp_title">Edit Point</string>
     <string name="edit_dp_save">Save Changes</string>
+
+    <!-- DP Types -->
+    <string name="dp_type_manhole">Manhole</string>
+    <string name="dp_type_junction_box">Junction Box</string>
+    <string name="dp_type_cabinet">Cabinet</string>
+    <string name="dp_type_pole">Pole</string>
+    <string name="dp_type_duct">Duct</string>
+    <string name="dp_type_handhole">Handhole</string>
+    <string name="dp_type_pedestal">Pedestal</string>
+
+    <string name="dp_type_other">Other</string>
 
     <!-- General -->
     <string name="back">Back</string>

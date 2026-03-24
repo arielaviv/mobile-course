@@ -25,7 +25,6 @@ class AuthRepository @Inject constructor(
             tokenProvider.saveUserInfo(
                 user.uid,
                 user.displayName ?: "",
-                "",
             )
             Result.success(Unit)
         } catch (e: Exception) {
@@ -57,7 +56,7 @@ class AuthRepository @Inject constructor(
                 user.uid,
                 user.getIdToken(false).await()?.token ?: "",
             )
-            tokenProvider.saveUserInfo(user.uid, name, "")
+            tokenProvider.saveUserInfo(user.uid, name)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
@@ -111,7 +110,7 @@ class AuthRepository @Inject constructor(
             }
             firestore.collection("users").document(user.uid).update(updates).await()
 
-            tokenProvider.saveUserInfo(user.uid, name, "")
+            tokenProvider.saveUserInfo(user.uid, name)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

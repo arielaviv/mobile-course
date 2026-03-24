@@ -24,8 +24,6 @@ class TokenProvider @Inject constructor(
 
     fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
 
-    fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
-
     fun saveTokens(accessToken: String, refreshToken: String) {
         prefs.edit()
             .putString(KEY_ACCESS_TOKEN, accessToken)
@@ -33,19 +31,16 @@ class TokenProvider @Inject constructor(
             .apply()
     }
 
-    fun saveUserInfo(userId: String, userName: String, crewId: String) {
+    fun saveUserInfo(userId: String, userName: String) {
         prefs.edit()
             .putString(KEY_USER_ID, userId)
             .putString(KEY_USER_NAME, userName)
-            .putString(KEY_CREW_ID, crewId)
             .apply()
     }
 
     fun getUserName(): String = prefs.getString(KEY_USER_NAME, "") ?: ""
 
     fun getUserId(): String = prefs.getString(KEY_USER_ID, "") ?: ""
-
-    fun getCrewId(): String = prefs.getString(KEY_CREW_ID, "") ?: ""
 
     fun isLoggedIn(): Boolean = getAccessToken() != null
 
@@ -58,6 +53,5 @@ class TokenProvider @Inject constructor(
         private const val KEY_REFRESH_TOKEN = "refresh_token"
         private const val KEY_USER_ID = "user_id"
         private const val KEY_USER_NAME = "user_name"
-        private const val KEY_CREW_ID = "crew_id"
     }
 }

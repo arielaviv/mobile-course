@@ -4,7 +4,7 @@ import android.util.Base64
 import com.field.survey.data.local.dao.DistributionPointDao
 import com.field.survey.data.local.entity.DistributionPointEntity
 import com.field.survey.domain.model.DistributionPoint
-import com.field.survey.domain.model.DpType
+import com.field.survey.domain.model.toDpType
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
@@ -45,7 +45,7 @@ class DistributionPointRepository @Inject constructor(
                         DistributionPoint(
                             id = doc.id,
                             label = doc.getString("label") ?: "",
-                            type = DpType.valueOf(doc.getString("type") ?: "DP"),
+                            type = (doc.getString("type") ?: "DP").toDpType(),
                             latitude = doc.getDouble("latitude") ?: 0.0,
                             longitude = doc.getDouble("longitude") ?: 0.0,
                             photoPath = null,

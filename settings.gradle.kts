@@ -31,5 +31,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "lux-field"
+rootProject.name = "field-survey"
 include(":app")

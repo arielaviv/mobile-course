@@ -6,14 +6,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.field.survey.ui.camera.CameraScreen
 import com.field.survey.ui.dp.AddDpScreen
 import com.field.survey.ui.dp.EditDpScreen
 import com.field.survey.ui.dp.MyDpsScreen
@@ -21,9 +18,6 @@ import com.field.survey.ui.login.LoginScreen
 import com.field.survey.ui.login.RegisterScreen
 import com.field.survey.ui.map.MapScreen
 import com.field.survey.ui.settings.SettingsScreen
-import com.field.survey.ui.workorder.TaskDetailScreen
-import com.field.survey.ui.workorder.TaskDetailViewModel
-import com.field.survey.ui.workorder.WorkOrderDetailScreen
 
 private const val NAV_ANIM_DURATION = 300
 
@@ -83,18 +77,8 @@ fun AppNavGraph() {
             )
         }
 
-        composable(Screen.AddDp.route) {
-            AddDpScreen(
-                onBack = { navController.popBackStack() },
-                onSaved = { navController.popBackStack() },
-            )
-        }
-
         composable(Screen.Map.route) {
             MapScreen(
-                onWorkOrderClick = { workOrderId ->
-                    navController.navigate(Screen.WorkOrderDetail.createRoute(workOrderId))
-                },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings.route)
                 },
@@ -104,6 +88,13 @@ fun AppNavGraph() {
                 onMyDpsClick = {
                     navController.navigate(Screen.MyDps.route)
                 },
+            )
+        }
+
+        composable(Screen.AddDp.route) {
+            AddDpScreen(
+                onBack = { navController.popBackStack() },
+                onSaved = { navController.popBackStack() },
             )
         }
 
@@ -134,76 +125,6 @@ fun AppNavGraph() {
                         popUpTo(0) { inclusive = true }
                     }
                 },
-            )
-        }
-
-        composable(
-            route = Screen.WorkOrderDetail.route,
-            arguments = listOf(navArgument("workOrderId") { type = NavType.StringType }),
-        ) { backStackEntry ->
-            val workOrderId = backStackEntry.arguments?.getString("workOrderId") ?: return@composable
-            WorkOrderDetailScreen(
-                workOrderId = workOrderId,
-                onTaskClick = { taskId ->
-                    navController.navigate(Screen.TaskDetail.createRoute(workOrderId, taskId))
-                },
-                onBack = { navController.popBackStack() },
-            )
-        }
-
-        composable(
-            route = Screen.TaskDetail.route,
-            arguments = listOf(
-                navArgument("workOrderId") { type = NavType.StringType },
-                navArgument("taskId") { type = NavType.StringType },
-            ),
-        ) { backStackEntry ->
-            val workOrderId = backStackEntry.arguments?.getString("workOrderId") ?: return@composable
-            val taskId = backStackEntry.arguments?.getString("taskId") ?: return@composable
-
-            // Observe saved photo ID result from camera screen
-            val savedPhotoId = backStackEntry.savedStateHandle.get<String>("savedPhotoId")
-            val viewModel: TaskDetailViewModel = hiltViewModel()
-
-            LaunchedEffect(savedPhotoId) {
-                savedPhotoId?.let {
-                    viewModel.onPhotoSaved(it)
-                    backStackEntry.savedStateHandle.remove<String>("savedPhotoId")
-                }
-            }
-
-            TaskDetailScreen(
-                workOrderId = workOrderId,
-                taskId = taskId,
-                onBack = { navController.popBackStack() },
-                onNavigateToCamera = { woId, tId, facing ->
-                    navController.navigate(
-                        Screen.Camera.createRoute(
-                            workOrderId = woId,
-                            taskId = tId,
-                            cameraFacing = facing,
-                        )
-                    )
-                },
-                viewModel = viewModel,
-            )
-        }
-
-        composable(
-            route = Screen.Camera.route,
-            arguments = listOf(
-                navArgument("workOrderId") { type = NavType.StringType },
-                navArgument("taskId") { type = NavType.StringType },
-                navArgument("stepId") { type = NavType.StringType },
-                navArgument("cameraFacing") { type = NavType.StringType },
-            ),
-        ) {
-            CameraScreen(
-                onPhotoSaved = { photoId ->
-                    navController.previousBackStackEntry?.savedStateHandle?.set("savedPhotoId", photoId)
-                    navController.popBackStack()
-                },
-                onBack = { navController.popBackStack() },
             )
         }
     }

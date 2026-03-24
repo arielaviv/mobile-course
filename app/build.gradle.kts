@@ -38,16 +38,6 @@ android {
         )
         buildConfigField(
             "String",
-            "CLAUDE_API_KEY",
-            "\"${localProperties.getProperty("ANTHROPIC_API_KEY", "")}\"",
-        )
-        buildConfigField(
-            "String",
-            "ELEVENLABS_API_KEY",
-            "\"${localProperties.getProperty("ELEVENLABS_API_KEY", "")}\"",
-        )
-        buildConfigField(
-            "String",
             "OPENWEATHER_API_KEY",
             "\"${localProperties.getProperty("OPENWEATHER_API_KEY", "")}\"",
         )
@@ -55,8 +45,6 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:3000\"")
-            buildConfigField("boolean", "USE_MOCK_API", "true")
         }
         release {
             isMinifyEnabled = true
@@ -65,8 +53,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            buildConfigField("String", "API_BASE_URL", "\"https://fieldsurvey.app\"")
-            buildConfigField("boolean", "USE_MOCK_API", "false")
         }
     }
 
@@ -139,13 +125,6 @@ dependencies {
 
     // Security
     implementation(libs.security.crypto)
-
-    // CameraX
-    implementation(libs.camerax.core)
-    implementation(libs.camerax.camera2)
-    implementation(libs.camerax.lifecycle)
-    implementation(libs.camerax.view)
-    implementation("com.google.guava:guava:32.1.3-android")
 
     // Accompanist
     implementation(libs.accompanist.permissions)

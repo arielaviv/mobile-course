@@ -187,7 +187,7 @@ private fun DpCard(
                         modifier = Modifier.weight(1f, fill = false),
                     )
                     Text(
-                        text = dp.type.label,
+                        text = stringResource(dp.type.labelRes),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier

@@ -3,7 +3,7 @@
     <string name="app_name">Field Survey</string>
 
     <!-- Login -->
-    <string name="login_subtitle">טכנאי שטח</string>
+    <string name="login_subtitle">אפליקציית סקר שטח</string>
     <string name="login_email_label">אימייל</string>
     <string name="login_email_placeholder">you@example.com</string>
     <string name="login_password_label">סיסמה</string>
@@ -13,7 +13,7 @@
 
     <!-- Registration -->
     <string name="register_title">יצירת חשבון</string>
-    <string name="register_subtitle">הצטרף לצוות שלך</string>
+    <string name="register_subtitle">התחל לסקור</string>
     <string name="register_name_label">שם מלא</string>
     <string name="register_name_placeholder">הזן את שמך</string>
     <string name="register_button">צור חשבון</string>
@@ -21,78 +21,6 @@
     <!-- Map -->
     <string name="map_refresh">רענון</string>
     <string name="map_my_location">המיקום שלי</string>
-    <string name="map_work_orders_title">הזמנות עבודה (%1$d)</string>
-    <string name="map_view_details">הצג פרטים</string>
-    <string name="map_empty_title">אין הזמנות עבודה</string>
-    <string name="map_empty_subtitle">אין הזמנות עבודה שהוקצו לך כרגע</string>
-
-    <!-- Status labels -->
-    <string name="status_draft">טיוטה</string>
-    <string name="status_pending">ממתין</string>
-    <string name="status_scheduled">מתוזמן</string>
-    <string name="status_in_progress">בביצוע</string>
-    <string name="status_completed">הושלם</string>
-    <string name="status_failed">נכשל</string>
-    <string name="status_cancelled">בוטל</string>
-    <string name="status_blocked">חסום</string>
-    <string name="status_escalated">הוסלם</string>
-    <string name="status_coa_pending">ממתין לאישור</string>
-    <string name="status_coa_approved">אושר</string>
-    <string name="status_coa_rejected">נדחה</string>
-    <string name="status_skipped">דולג</string>
-
-    <!-- Work Order -->
-    <string name="wo_detail_title">הזמנת עבודה</string>
-    <string name="wo_tier_label">שכבה %1$d</string>
-    <string name="wo_tasks_header">משימות (%1$d)</string>
-    <string name="wo_task_estimate">~%1$d דק׳</string>
-    <string name="wo_empty_title">אין משימות</string>
-    <string name="wo_empty_subtitle">להזמנת עבודה זו אין משימות עדיין</string>
-
-    <!-- Task -->
-    <string name="task_detail_title">משימה</string>
-    <string name="task_steps_header">שלבים (%1$d)</string>
-    <string name="task_start">התחל משימה</string>
-    <string name="task_complete">סיים משימה</string>
-    <string name="task_completed_label">הושלמה</string>
-    <string name="task_complete_all_steps_hint">השלם את כל השלבים כדי לסיים את המשימה</string>
-
-    <!-- Camera -->
-    <string name="camera_take_work_photo">צלם תמונת עבודה</string>
-    <string name="camera_take_selfie">צלם סלפי</string>
-    <string name="camera_capture">צלם</string>
-    <string name="camera_retake">צלם שוב</string>
-    <string name="camera_use_photo">השתמש בתמונה</string>
-    <string name="camera_permission_rationale">נדרשת גישה למצלמה לצילום תמונות עבודה וסלפי להוכחת נוכחות</string>
-    <string name="camera_work_photo">תמונת עבודה</string>
-    <string name="camera_selfie">סלפי</string>
-
-    <!-- Photos -->
-    <string name="photo_gallery_title">תמונות</string>
-    <string name="photo_analyzing">מנתח…</string>
-    <string name="photo_count">%1$d תמונות</string>
-    <string name="photo_empty_title">אין תמונות</string>
-    <string name="photo_empty_subtitle">צלם תמונות לתיעוד העבודה</string>
-
-    <!-- AI Chat -->
-    <string name="ai_chat_title">עוזר AI</string>
-    <string name="ai_chat_input_hint">שאל שאלה…</string>
-    <string name="ai_chat_send">שלח</string>
-    <string name="ai_chat_thinking">חושב…</string>
-    <string name="ai_chat_error">שגיאה בקבלת תגובה</string>
-    <string name="ai_chat_empty">שאל אותי כל דבר על המשימה הזו</string>
-
-    <!-- Voice -->
-    <string name="voice_mic">קלט קולי</string>
-    <string name="voice_speak">הקרא בקול</string>
-    <string name="voice_listening">מקשיב…</string>
-    <string name="voice_auto_speak">הקראה אוטומטית</string>
-    <string name="voice_permission_rationale">נדרשת גישה למיקרופון לקלט קולי</string>
-
-    <!-- Chat Camera -->
-    <string name="chat_work_photo">צילום עבודה</string>
-    <string name="chat_selfie">סלפי</string>
-    <string name="chat_camera_menu_title">צלם תמונה</string>
 
     <!-- Settings -->
     <string name="settings_title">הגדרות</string>
@@ -109,14 +37,13 @@
     <string name="add_dp_retake_photo">צלם שוב</string>
     <string name="add_dp_type_label">סוג</string>
     <string name="add_dp_label_field">תווית</string>
-    <string name="add_dp_label_placeholder">לדוגמה: DP-R14, JB-7</string>
+    <string name="add_dp_label_placeholder">לדוגמה: MH-14, POLE-7</string>
     <string name="add_dp_notes_field">הערות</string>
     <string name="add_dp_notes_placeholder">הערות אופציונליות על נקודה זו</string>
     <string name="add_dp_gallery">גלריה</string>
     <string name="add_dp_save">שמור נקודה</string>
 
     <!-- Weather -->
-    <string name="weather_error">מזג אוויר לא זמין — בדוק את OPENWEATHER_API_KEY ב-local.properties</string>
     <string name="weather_humidity">לחות</string>
     <string name="weather_wind">רוח</string>
     <string name="weather_wind_value">%.1f מ/ש</string>
@@ -135,6 +62,17 @@
     <!-- Edit Distribution Point -->
     <string name="edit_dp_title">עריכת נקודה</string>
     <string name="edit_dp_save">שמור שינויים</string>
+
+    <!-- DP Types -->
+    <string name="dp_type_manhole">תא ביוב</string>
+    <string name="dp_type_junction_box">קופסת חיבורים</string>
+    <string name="dp_type_cabinet">ארון</string>
+    <string name="dp_type_pole">עמוד</string>
+    <string name="dp_type_duct">תעלה</string>
+    <string name="dp_type_handhole">תא יד</string>
+    <string name="dp_type_pedestal">כן</string>
+
+    <string name="dp_type_other">אחר</string>
 
     <!-- General -->
     <string name="back">חזור</string>

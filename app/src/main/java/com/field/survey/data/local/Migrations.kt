@@ -71,3 +71,13 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("ALTER TABLE `distribution_points` ADD COLUMN `createdByName` TEXT NOT NULL DEFAULT ''")
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS `work_orders`")
+        db.execSQL("DROP TABLE IF EXISTS `tasks`")
+        db.execSQL("DROP TABLE IF EXISTS `task_photos`")
+        db.execSQL("DROP TABLE IF EXISTS `chat_messages`")
+        db.execSQL("DROP TABLE IF EXISTS `sync_queue`")
+    }
+}
