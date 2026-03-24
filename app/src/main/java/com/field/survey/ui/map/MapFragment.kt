@@ -19,6 +19,8 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 
 @AndroidEntryPoint
@@ -51,6 +53,21 @@ class MapFragment : Fragment() {
         mapView.setMultiTouchControls(true)
         mapView.controller.setZoom(13.0)
         mapView.controller.setCenter(GeoPoint(32.0750, 34.7725))
+
+        val tapOverlay = MapEventsOverlay(object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint?) = false
+            override fun longPressHelper(p: GeoPoint?): Boolean {
+                if (p != null) {
+                    val action = MapFragmentDirections.actionMapToAddPoint(
+                        latitude = p.latitude.toFloat(),
+                        longitude = p.longitude.toFloat(),
+                    )
+                    findNavController().navigate(action)
+                }
+                return true
+            }
+        })
+        mapView.overlays.add(tapOverlay)
 
         binding.progressBar.isVisible = true
 

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.SavedStateHandle
 import com.field.survey.data.repository.AuthRepository
 import com.field.survey.data.repository.DistributionPointRepository
 import com.field.survey.domain.model.DistributionPoint
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddPointViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val repository: DistributionPointRepository,
     private val authRepository: AuthRepository,
 ) : ViewModel() {
@@ -35,6 +37,15 @@ class AddPointViewModel @Inject constructor(
 
     private val _longitude = MutableLiveData(0.0)
     val longitude: LiveData<Double> = _longitude
+
+    init {
+        val lat = savedStateHandle.get<Float>("latitude") ?: 0f
+        val lng = savedStateHandle.get<Float>("longitude") ?: 0f
+        if (lat != 0f && lng != 0f) {
+            _latitude.value = lat.toDouble()
+            _longitude.value = lng.toDouble()
+        }
+    }
 
     private val _isSaving = MutableLiveData(false)
     val isSaving: LiveData<Boolean> = _isSaving
