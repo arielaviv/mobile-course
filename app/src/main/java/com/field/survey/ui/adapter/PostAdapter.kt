@@ -4,15 +4,17 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.field.survey.databinding.ItemPostBinding
 import com.field.survey.domain.model.DistributionPoint
-import com.field.survey.domain.model.DpType
 
 class PostAdapter(
     private val onClick: (DistributionPoint) -> Unit,
+    private val onEdit: ((DistributionPoint) -> Unit)? = null,
+    private val onDelete: ((DistributionPoint) -> Unit)? = null,
 ) : ListAdapter<DistributionPoint, PostAdapter.PostViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
@@ -49,6 +51,12 @@ class PostAdapter(
             }
 
             binding.root.setOnClickListener { onClick(point) }
+
+            binding.btnEdit.isVisible = onEdit != null
+            binding.btnDelete.isVisible = onDelete != null
+
+            binding.btnEdit.setOnClickListener { onEdit?.invoke(point) }
+            binding.btnDelete.setOnClickListener { onDelete?.invoke(point) }
         }
     }
 

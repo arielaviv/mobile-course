@@ -34,10 +34,12 @@ class FeedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = PostAdapter { point ->
-            val action = FeedFragmentDirections.actionFeedToDetail(point.id)
-            findNavController().navigate(action)
-        }
+        adapter = PostAdapter(
+            onClick = { point ->
+                val action = FeedFragmentDirections.actionFeedToDetail(point.id)
+                findNavController().navigate(action)
+            },
+        )
 
         binding.rvPosts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPosts.adapter = adapter
