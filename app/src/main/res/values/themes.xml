@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.FieldSurvey" parent="android:Theme.Material.NoActionBar">
+    <style name="Theme.FieldSurvey" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/zinc_100</item>
+        <item name="colorOnPrimary">@color/zinc_900</item>
+        <item name="colorSurface">@color/bg_mid</item>
+        <item name="colorOnSurface">@color/zinc_100</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>

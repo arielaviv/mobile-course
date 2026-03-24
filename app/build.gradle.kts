@@ -3,13 +3,13 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.navigation.safeargs)
 }
 
 val localProperties =
@@ -66,7 +66,7 @@ android {
     }
 
     buildFeatures {
-        compose = true
+        viewBinding = true
         buildConfig = true
     }
 }
@@ -76,29 +76,25 @@ room {
 }
 
 dependencies {
-    // AndroidX Core
+    // AndroidX
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.constraintlayout)
+    implementation(libs.swiperefreshlayout)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.activity.compose)
-
-    // Compose
-    implementation(platform(libs.compose.bom))
-    implementation(libs.compose.ui)
-    implementation(libs.compose.ui.graphics)
-    implementation(libs.compose.ui.tooling.preview)
-    implementation(libs.compose.material3)
-    implementation(libs.compose.material.icons)
-    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // Navigation
-    implementation(libs.navigation.compose)
+    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.ui.ktx)
 
     // Hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation(libs.hilt.navigation.compose)
 
     // Room
     implementation(libs.room.runtime)
@@ -114,10 +110,9 @@ dependencies {
 
     // Mapbox
     implementation(libs.mapbox.maps)
-    implementation(libs.mapbox.maps.compose)
 
     // Image Loading
-    implementation(libs.coil.compose)
+    implementation(libs.picasso)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
@@ -126,10 +121,7 @@ dependencies {
     // Security
     implementation(libs.security.crypto)
 
-    // Accompanist
-    implementation(libs.accompanist.permissions)
-
-    // OpenStreetMap (free map fallback when Mapbox token unavailable)
+    // OpenStreetMap
     implementation(libs.osmdroid)
 
     // Location

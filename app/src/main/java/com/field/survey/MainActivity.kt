@@ -1,27 +1,14 @@
 package com.field.survey
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
-import com.field.survey.ui.navigation.AppNavGraph
-import com.field.survey.ui.theme.FieldSurveyTheme
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            FieldSurveyTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {
-                    AppNavGraph()
-                }
-            }
-        }
+        setContentView(R.layout.activity_main)
     }
 }
