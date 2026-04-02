@@ -32,6 +32,18 @@ class LoginViewModel
             }
         }
 
+        private fun mapAuthError(e: Throwable): Int {
+            val msg = e.message ?: ""
+            return when {
+                "password" in msg.lowercase() -> R.string.error_wrong_password
+                "no user record" in msg.lowercase() || "user not found" in msg.lowercase() -> R.string.error_user_not_found
+                "email address is badly formatted" in msg.lowercase() -> R.string.error_invalid_email
+                "network" in msg.lowercase() -> R.string.error_network
+                "credential is incorrect" in msg.lowercase() || "credential is malformed" in msg.lowercase() -> R.string.error_wrong_password
+                else -> R.string.error_generic
+            }
+        }
+
         fun login(
             email: String,
             password: String,
@@ -51,7 +63,7 @@ class LoginViewModel
                     },
                     onFailure = {
                         _isLoading.value = false
-                        _error.value = R.string.error_generic
+                        _error.value = mapAuthError(it)
                     },
                 )
             }
