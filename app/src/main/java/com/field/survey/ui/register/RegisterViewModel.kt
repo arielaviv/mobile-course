@@ -26,6 +26,17 @@ class RegisterViewModel
         private val _registerSuccess = MutableLiveData(false)
         val registerSuccess: LiveData<Boolean> = _registerSuccess
 
+        private fun mapAuthError(e: Throwable): Int {
+            val msg = e.message ?: ""
+            return when {
+                "email address is already in use" in msg.lowercase() -> R.string.error_email_in_use
+                "email address is badly formatted" in msg.lowercase() -> R.string.error_invalid_email
+                "password is invalid" in msg.lowercase() || "weak" in msg.lowercase() -> R.string.error_weak_password
+                "network" in msg.lowercase() -> R.string.error_network
+                else -> R.string.error_generic
+            }
+        }
+
         fun register(
             name: String,
             email: String,
@@ -50,8 +61,7 @@ class RegisterViewModel
                     },
                     onFailure = {
                         _isLoading.value = false
-                        android.util.Log.e("RegisterViewModel", "Registration failed", it)
-                        _error.value = R.string.error_generic
+                        _error.value = mapAuthError(it)
                     },
                 )
             }
