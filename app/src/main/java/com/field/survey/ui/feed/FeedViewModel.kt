@@ -31,7 +31,7 @@ class FeedViewModel
         val isRefreshing: LiveData<Boolean> = _isRefreshing
 
         init {
-            refresh()
+            repository.startRealtimeSync()
         }
 
         fun refresh() {
@@ -40,5 +40,10 @@ class FeedViewModel
                 repository.syncFromFirestore()
                 _isRefreshing.value = false
             }
+        }
+
+        override fun onCleared() {
+            super.onCleared()
+            repository.stopRealtimeSync()
         }
     }

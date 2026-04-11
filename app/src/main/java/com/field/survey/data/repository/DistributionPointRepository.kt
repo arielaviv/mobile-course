@@ -10,9 +10,14 @@ import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.toDpType
 import com.field.survey.ui.util.ImageCompression
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,6 +31,48 @@ class DistributionPointRepository
     ) {
         private val firestore = FirebaseFirestore.getInstance()
         private val collection = firestore.collection("distribution_points")
+        private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        private var listenerRegistration: ListenerRegistration? = null
+
+        fun startRealtimeSync() {
+            if (listenerRegistration != null) return
+            listenerRegistration = collection
+                .orderBy("createdAt", Query.Direction.DESCENDING)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null || snapshot == null) return@addSnapshotListener
+                    val dps = snapshot.documents.mapNotNull { doc ->
+                        try {
+                            DistributionPointEntity(
+                                id = doc.id,
+                                label = doc.getString("label") ?: "",
+                                type = (doc.getString("type") ?: "POLES").toDpType().name,
+                                latitude = doc.getDouble("latitude") ?: 0.0,
+                                longitude = doc.getDouble("longitude") ?: 0.0,
+                                pathCoordinates = doc.getString("pathCoordinates"),
+                                photoPath = null,
+                                imageBase64 = doc.getString("imageBase64"),
+                                notes = doc.getString("notes") ?: "",
+                                createdAt = doc.getLong("createdAt") ?: 0L,
+                                createdBy = doc.getString("createdBy") ?: "",
+                                createdByName = doc.getString("createdByName") ?: "",
+                                updatedAt = doc.getLong("updatedAt"),
+                                updatedBy = doc.getString("updatedBy"),
+                            )
+                        } catch (_: Exception) {
+                            null
+                        }
+                    }
+                    scope.launch {
+                        dao.deleteAll()
+                        dao.insertAll(dps)
+                    }
+                }
+        }
+
+        fun stopRealtimeSync() {
+            listenerRegistration?.remove()
+            listenerRegistration = null
+        }
 
         fun observeAll(): Flow<List<DistributionPoint>> = dao.observeAll().map { entities -> entities.map { it.toDomain() } }
 
