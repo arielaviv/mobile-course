@@ -37,7 +37,10 @@ class DetailFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         commentAdapter = CommentAdapter()
@@ -69,11 +72,13 @@ class DetailFragment : Fragment() {
             binding.tvNotes.text = point.notes.ifBlank { "No description" }
             binding.tvAuthor.text = "By ${point.createdByName.ifBlank { "Unknown" }}"
 
-            val dateStr = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
-                .format(Date(point.createdAt))
-            binding.tvLocation.text = "%.4f, %.4f · %s".format(
-                point.latitude, point.longitude, dateStr,
-            )
+            val dateStr =
+                SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
+                    .format(Date(point.createdAt))
+            binding.tvLocation.text =
+                "%.4f, %.4f · %s".format(
+                    point.latitude, point.longitude, dateStr,
+                )
 
             if (!point.imageBase64.isNullOrBlank()) {
                 try {

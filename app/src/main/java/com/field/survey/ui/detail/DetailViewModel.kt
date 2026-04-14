@@ -17,56 +17,59 @@ import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
-    private val pointRepository: DistributionPointRepository,
-    private val commentRepository: CommentRepository,
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class DetailViewModel
+    @Inject
+    constructor(
+        savedStateHandle: SavedStateHandle,
+        private val pointRepository: DistributionPointRepository,
+        private val commentRepository: CommentRepository,
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
 
-    private val pointId: String = savedStateHandle["pointId"] ?: ""
+        private val pointId: String = savedStateHandle["pointId"] ?: ""
 
-    private val _point = MutableLiveData<DistributionPoint?>()
-    val point: LiveData<DistributionPoint?> = _point
+        private val _point = MutableLiveData<DistributionPoint?>()
+        val point: LiveData<DistributionPoint?> = _point
 
-    val comments: LiveData<List<Comment>> =
-        commentRepository.observeComments(pointId).asLiveData()
+        val comments: LiveData<List<Comment>> =
+            commentRepository.observeComments(pointId).asLiveData()
 
-    private val _isLoading = MutableLiveData(true)
-    val isLoading: LiveData<Boolean> = _isLoading
+        private val _isLoading = MutableLiveData(true)
+        val isLoading: LiveData<Boolean> = _isLoading
 
-    init {
-        loadPoint()
-        syncComments()
-    }
+        init {
+            loadPoint()
+            syncComments()
+        }
 
-    private fun loadPoint() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val dp = pointRepository.getById(pointId)
-            _point.value = dp
-            _isLoading.value = false
+        private fun loadPoint() {
+            viewModelScope.launch {
+                _isLoading.value = true
+                val dp = pointRepository.getById(pointId)
+                _point.value = dp
+                _isLoading.value = false
+            }
+        }
+
+        private fun syncComments() {
+            viewModelScope.launch {
+                commentRepository.syncComments(pointId)
+            }
+        }
+
+        fun addComment(text: String) {
+            if (text.isBlank()) return
+            viewModelScope.launch {
+                val comment =
+                    Comment(
+                        id = UUID.randomUUID().toString(),
+                        postId = pointId,
+                        userId = authRepository.getUserId(),
+                        userName = authRepository.getUserName(),
+                        text = text.trim(),
+                        createdAt = System.currentTimeMillis(),
+                    )
+                commentRepository.addComment(comment)
+            }
         }
     }
-
-    private fun syncComments() {
-        viewModelScope.launch {
-            commentRepository.syncComments(pointId)
-        }
-    }
-
-    fun addComment(text: String) {
-        if (text.isBlank()) return
-        viewModelScope.launch {
-            val comment = Comment(
-                id = UUID.randomUUID().toString(),
-                postId = pointId,
-                userId = authRepository.getUserId(),
-                userName = authRepository.getUserName(),
-                text = text.trim(),
-                createdAt = System.currentTimeMillis(),
-            )
-            commentRepository.addComment(comment)
-        }
-    }
-}
