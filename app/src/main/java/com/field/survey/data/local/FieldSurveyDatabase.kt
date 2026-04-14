@@ -12,10 +12,11 @@ import com.field.survey.data.local.entity.DistributionPointEntity
         DistributionPointEntity::class,
         CommentEntity::class,
     ],
-    version = 6,
+    version = 8,
     exportSchema = true,
 )
 abstract class FieldSurveyDatabase : RoomDatabase() {
     abstract fun distributionPointDao(): DistributionPointDao
+
     abstract fun commentDao(): CommentDao
 }

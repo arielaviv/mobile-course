@@ -12,26 +12,33 @@ data class DistributionPointEntity(
     val type: String,
     val latitude: Double,
     val longitude: Double,
+    val pathCoordinates: String?,
     val photoPath: String?,
     val imageBase64: String?,
     val notes: String,
     val createdAt: Long,
     val createdBy: String,
     val createdByName: String,
+    val updatedAt: Long? = null,
+    val updatedBy: String? = null,
 ) {
-    fun toDomain(): DistributionPoint = DistributionPoint(
-        id = id,
-        label = label,
-        type = type.toDpType(),
-        latitude = latitude,
-        longitude = longitude,
-        photoPath = photoPath,
-        imageBase64 = imageBase64,
-        notes = notes,
-        createdAt = createdAt,
-        createdBy = createdBy,
-        createdByName = createdByName,
-    )
+    fun toDomain(): DistributionPoint =
+        DistributionPoint(
+            id = id,
+            label = label,
+            type = type.toDpType(),
+            latitude = latitude,
+            longitude = longitude,
+            pathCoordinates = pathCoordinates,
+            photoPath = photoPath,
+            imageBase64 = imageBase64,
+            notes = notes,
+            createdAt = createdAt,
+            createdBy = createdBy,
+            createdByName = createdByName,
+            updatedAt = updatedAt,
+            updatedBy = updatedBy,
+        )
 
     companion object {
         fun fromDomain(dp: DistributionPoint): DistributionPointEntity =
@@ -41,12 +48,15 @@ data class DistributionPointEntity(
                 type = dp.type.name,
                 latitude = dp.latitude,
                 longitude = dp.longitude,
+                pathCoordinates = dp.pathCoordinates,
                 photoPath = dp.photoPath,
                 imageBase64 = dp.imageBase64,
                 notes = dp.notes,
                 createdAt = dp.createdAt,
                 createdBy = dp.createdBy,
                 createdByName = dp.createdByName,
+                updatedAt = dp.updatedAt,
+                updatedBy = dp.updatedBy,
             )
     }
 }
