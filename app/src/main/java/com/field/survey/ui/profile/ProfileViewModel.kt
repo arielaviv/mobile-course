@@ -1,0 +1,74 @@
+package com.field.survey.ui.profile
+
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.field.survey.data.repository.AuthRepository
+import com.field.survey.data.repository.UserProfile
+import com.field.survey.ui.util.ImageCompression
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class ProfileViewModel
+    @Inject
+    constructor(
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
+
+        private val _profile = MutableLiveData<UserProfile?>()
+        val profile: LiveData<UserProfile?> = _profile
+
+        private val _email = MutableLiveData<String>()
+        val email: LiveData<String> = _email
+
+        private val _isSaving = MutableLiveData(false)
+        val isSaving: LiveData<Boolean> = _isSaving
+
+        private val _saveResult = MutableLiveData<String?>()
+        val saveResult: LiveData<String?> = _saveResult
+
+        private var newPhotoBase64: String? = null
+
+        init {
+            _email.value = authRepository.getUserEmail()
+            loadProfile()
+        }
+
+        private fun loadProfile() {
+            viewModelScope.launch {
+                val result = authRepository.getUserProfile()
+                result.onSuccess { p ->
+                    _profile.value = p
+                }
+            }
+        }
+
+        fun setPhotoFromPath(path: String) {
+            newPhotoBase64 = ImageCompression.fileToCompressedBase64(path)
+        }
+
+        fun save(name: String) {
+            if (name.isBlank()) {
+                _saveResult.value = "Name cannot be empty"
+                return
+            }
+            viewModelScope.launch {
+                _isSaving.value = true
+                val result = authRepository.updateProfile(name.trim(), newPhotoBase64)
+                result.fold(
+                    onSuccess = {
+                        _isSaving.value = false
+                        _saveResult.value = "Profile updated"
+                        loadProfile()
+                    },
+                    onFailure = { e ->
+                        _isSaving.value = false
+                        _saveResult.value = e.message ?: "Failed to save"
+                    },
+                )
+            }
+        }
+    }

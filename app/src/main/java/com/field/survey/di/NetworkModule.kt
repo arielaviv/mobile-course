@@ -1,8 +1,8 @@
 package com.field.survey.di
 
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.field.survey.BuildConfig
 import com.field.survey.data.remote.WeatherApiService
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,18 +21,20 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideJson(): Json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-        isLenient = true
-    }
+    fun provideJson(): Json =
+        Json {
+            ignoreUnknownKeys = true
+            coerceInputValues = true
+            isLenient = true
+        }
 
     @Provides
     @Singleton
     fun provideWeatherOkHttpClient(): OkHttpClient {
-        val builder = OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
+        val builder =
+            OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(15, TimeUnit.SECONDS)
 
         if (BuildConfig.DEBUG) {
             builder.addInterceptor(

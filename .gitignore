@@ -22,3 +22,6 @@ local.properties
 
 # Local config
 .claude/
+nul
+hs_err_*
+replay_*

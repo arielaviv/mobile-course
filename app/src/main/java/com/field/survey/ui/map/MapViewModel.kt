@@ -1,87 +1,54 @@
 package com.field.survey.ui.map
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.field.survey.data.repository.AuthRepository
 import com.field.survey.data.repository.DistributionPointRepository
-import com.field.survey.data.repository.MapStyle
-import com.field.survey.data.repository.PreferencesRepository
 import com.field.survey.data.repository.WeatherRepository
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.Weather
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class MapUiState(
-    val distributionPoints: List<DistributionPoint> = emptyList(),
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val userName: String = "",
-    val loggedOut: Boolean = false,
-    val weather: Weather? = null,
-)
-
 @HiltViewModel
-class MapViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val preferencesRepository: PreferencesRepository,
-    private val distributionPointRepository: DistributionPointRepository,
-    private val weatherRepository: WeatherRepository,
-) : ViewModel() {
+class MapViewModel
+    @Inject
+    constructor(
+        private val repository: DistributionPointRepository,
+        private val weatherRepository: WeatherRepository,
+    ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MapUiState())
-    val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
-    val mapStyle: StateFlow<MapStyle> = preferencesRepository.mapStyle
+        val posts: LiveData<List<DistributionPoint>> =
+            repository.observeAll().asLiveData()
 
-    init {
-        _uiState.update { it.copy(userName = authRepository.getUserName()) }
-        observeDistributionPoints()
-        syncDistributionPoints()
-        fetchWeather()
-    }
+        private val _weather = MutableLiveData<Weather?>()
+        val weather: LiveData<Weather?> = _weather
 
-    private fun observeDistributionPoints() {
-        viewModelScope.launch {
-            distributionPointRepository.observeAll().collect { dps ->
-                _uiState.update { it.copy(distributionPoints = dps) }
+        private val _isLoading = MutableLiveData(false)
+        val isLoading: LiveData<Boolean> = _isLoading
+
+        init {
+            syncFromFirestore()
+        }
+
+        fun fetchWeather(
+            lat: Double,
+            lon: Double,
+        ) {
+            viewModelScope.launch {
+                val result = weatherRepository.getWeather(lat, lon)
+                _weather.value = result.getOrNull()
+            }
+        }
+
+        private fun syncFromFirestore() {
+            viewModelScope.launch {
+                _isLoading.value = true
+                repository.syncFromFirestore()
+                _isLoading.value = false
             }
         }
     }
-
-    private fun syncDistributionPoints() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            distributionPointRepository.syncFromFirestore()
-            _uiState.update { it.copy(isLoading = false) }
-        }
-    }
-
-    private fun fetchWeather() {
-        viewModelScope.launch {
-            val result = weatherRepository.getWeather(lat = DEFAULT_LAT, lon = DEFAULT_LON)
-            result.onSuccess { weather ->
-                _uiState.update { it.copy(weather = weather) }
-            }
-        }
-    }
-
-    fun refresh() {
-        syncDistributionPoints()
-        fetchWeather()
-    }
-
-    fun logout() {
-        authRepository.logout()
-        _uiState.update { it.copy(loggedOut = true) }
-    }
-
-    companion object {
-        private const val DEFAULT_LAT = 32.0750
-        private const val DEFAULT_LON = 34.7725
-    }
-}

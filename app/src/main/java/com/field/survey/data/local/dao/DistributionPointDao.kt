@@ -16,6 +16,13 @@ interface DistributionPointDao {
     @Query("SELECT * FROM distribution_points WHERE createdBy = :userId ORDER BY createdAt DESC")
     fun observeByUser(userId: String): Flow<List<DistributionPointEntity>>
 
+    @Query(
+        "SELECT * FROM distribution_points " +
+            "ORDER BY COALESCE(updatedAt, createdAt) DESC " +
+            "LIMIT :limit",
+    )
+    fun observeRecent(limit: Int): Flow<List<DistributionPointEntity>>
+
     @Query("SELECT * FROM distribution_points WHERE id = :id")
     suspend fun getById(id: String): DistributionPointEntity?
 

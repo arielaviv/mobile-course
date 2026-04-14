@@ -15,26 +15,28 @@ enum class MapStyle(val label: String, val styleUri: String?) {
 }
 
 @Singleton
-class PreferencesRepository @Inject constructor(
-    @ApplicationContext context: Context,
-) {
-    private val prefs: SharedPreferences =
-        context.getSharedPreferences("field_survey_prefs", Context.MODE_PRIVATE)
+class PreferencesRepository
+    @Inject
+    constructor(
+        @ApplicationContext context: Context,
+    ) {
+        private val prefs: SharedPreferences =
+            context.getSharedPreferences("field_survey_prefs", Context.MODE_PRIVATE)
 
-    private val _mapStyle = MutableStateFlow(loadMapStyle())
-    val mapStyle: StateFlow<MapStyle> = _mapStyle.asStateFlow()
+        private val _mapStyle = MutableStateFlow(loadMapStyle())
+        val mapStyle: StateFlow<MapStyle> = _mapStyle.asStateFlow()
 
-    fun setMapStyle(style: MapStyle) {
-        prefs.edit().putString(KEY_MAP_STYLE, style.name).apply()
-        _mapStyle.value = style
+        fun setMapStyle(style: MapStyle) {
+            prefs.edit().putString(KEY_MAP_STYLE, style.name).apply()
+            _mapStyle.value = style
+        }
+
+        private fun loadMapStyle(): MapStyle {
+            val name = prefs.getString(KEY_MAP_STYLE, MapStyle.DEFAULT.name)
+            return MapStyle.entries.find { it.name == name } ?: MapStyle.DEFAULT
+        }
+
+        companion object {
+            private const val KEY_MAP_STYLE = "map_style"
+        }
     }
-
-    private fun loadMapStyle(): MapStyle {
-        val name = prefs.getString(KEY_MAP_STYLE, MapStyle.DEFAULT.name)
-        return MapStyle.entries.find { it.name == name } ?: MapStyle.DEFAULT
-    }
-
-    companion object {
-        private const val KEY_MAP_STYLE = "map_style"
-    }
-}
