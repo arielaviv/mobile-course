@@ -3,9 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_layers"
+        android:icon="@drawable/ic_layers"
+        android:title="Layers"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_measure"
+        android:icon="@drawable/ic_ruler"
+        android:title="Measure"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_satellite"
         android:title="Satellite"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_pitch"
+        android:title="Flat view"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/action_terrain"

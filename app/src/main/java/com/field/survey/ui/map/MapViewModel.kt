@@ -1,32 +1,54 @@
 package com.field.survey.ui.map
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.field.survey.data.repository.DistributionPointRepository
 import com.field.survey.data.repository.WeatherRepository
 import com.field.survey.domain.model.DistributionPoint
+import com.field.survey.domain.model.Weather
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel @Inject constructor(
-    private val repository: DistributionPointRepository,
-    private val weatherRepository: WeatherRepository,
-) : ViewModel() {
+class MapViewModel
+    @Inject
+    constructor(
+        private val repository: DistributionPointRepository,
+        private val weatherRepository: WeatherRepository,
+    ) : ViewModel() {
 
-    val posts: LiveData<List<DistributionPoint>> =
-        repository.observeAll().asLiveData()
+        val posts: LiveData<List<DistributionPoint>> =
+            repository.observeAll().asLiveData()
 
-    init {
-        syncFromFirestore()
-    }
+        private val _weather = MutableLiveData<Weather?>()
+        val weather: LiveData<Weather?> = _weather
 
-    private fun syncFromFirestore() {
-        viewModelScope.launch {
-            repository.syncFromFirestore()
+        private val _isLoading = MutableLiveData(false)
+        val isLoading: LiveData<Boolean> = _isLoading
+
+        init {
+            syncFromFirestore()
+        }
+
+        fun fetchWeather(
+            lat: Double,
+            lon: Double,
+        ) {
+            viewModelScope.launch {
+                val result = weatherRepository.getWeather(lat, lon)
+                _weather.value = result.getOrNull()
+            }
+        }
+
+        private fun syncFromFirestore() {
+            viewModelScope.launch {
+                _isLoading.value = true
+                repository.syncFromFirestore()
+                _isLoading.value = false
+            }
         }
     }
-}

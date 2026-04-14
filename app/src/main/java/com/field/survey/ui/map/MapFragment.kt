@@ -5,19 +5,29 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.field.survey.R
 import com.field.survey.databinding.FragmentMapBinding
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.DpType
+import com.field.survey.domain.model.PathCoordinates
+import com.field.survey.ui.addpoint.AddPointSheet
+import com.field.survey.ui.detail.PointDetailSheet
+import com.field.survey.ui.util.GeoMath
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.LineString
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.ImageHolder
 import com.mapbox.maps.Style
 import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.extension.style.layers.addLayer
@@ -25,16 +35,28 @@ import com.mapbox.maps.extension.style.layers.generated.CircleLayer
 import com.mapbox.maps.extension.style.layers.generated.LineLayer
 import com.mapbox.maps.extension.style.layers.generated.SymbolLayer
 import com.mapbox.maps.extension.style.layers.getLayerAs
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.extension.style.sources.addSource
 import com.mapbox.maps.extension.style.sources.generated.GeoJsonSource
 import com.mapbox.maps.extension.style.sources.getSourceAs
 import com.mapbox.maps.extension.style.terrain.generated.Terrain
 import com.mapbox.maps.extension.style.terrain.generated.removeTerrain
 import com.mapbox.maps.extension.style.terrain.generated.setTerrain
+import com.mapbox.maps.plugin.LocationPuck2D
+import com.mapbox.maps.plugin.PuckBearing
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
+import com.mapbox.maps.plugin.animation.flyTo
+import com.mapbox.maps.plugin.attribution.attribution
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapLongClickListener
+import com.mapbox.maps.plugin.gestures.gestures
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.logo.logo
+import com.mapbox.maps.plugin.scalebar.scalebar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MapFragment : Fragment() {
@@ -43,10 +65,21 @@ class MapFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MapViewModel by viewModels()
 
+    @Inject lateinit var mapEvents: MapEventsBus
+
+    @Inject lateinit var filtersBus: MapFiltersBus
+
     private var isSatellite = false
     private var terrainEnabled = false
-    private var drawMode = false
+    private var pitch3D = true
+
+    private var pendingType: DpType? = null
     private val drawnPoints = mutableListOf<Point>()
+
+    private var measureMode = false
+    private val measurePoints = mutableListOf<Point>()
+
+    private var markers: MarkerBitmaps.MarkerSet? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,42 +90,127 @@ class MapFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
 
+        markers = MarkerBitmaps.build(requireContext())
+
         val mapView = binding.mapView
+
+        mapView.scalebar.enabled = false
+        mapView.compass.enabled = false
+        mapView.attribution.enabled = false
+        mapView.logo.enabled = false
+        mapView.gestures.pitchEnabled = true
 
         mapView.mapboxMap.setCamera(
             CameraOptions.Builder()
                 .center(Point.fromLngLat(34.7725, 32.0750))
-                .zoom(13.0)
+                .zoom(15.0)
+                .pitch(INITIAL_PITCH)
                 .build(),
         )
 
         mapView.mapboxMap.loadStyle(Style.STANDARD) { style ->
+            setupImages(style)
             setupSources(style)
             setupLayers(style)
             enableLocationPuck()
             observePoints()
+            fetchWeatherForMapCenter()
         }
 
-        // satellite toggle
+        mapEvents.updateMapCenter(mapView.mapboxMap.cameraState.center)
+        mapView.mapboxMap.subscribeMapIdle {
+            mapEvents.updateMapCenter(mapView.mapboxMap.cameraState.center)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mapEvents.events.collect { event ->
+                    when (event) {
+                        is MapEvent.FlyTo -> {
+                            mapView.mapboxMap.flyTo(
+                                CameraOptions.Builder()
+                                    .center(event.point)
+                                    .zoom(event.zoom)
+                                    .pitch(if (pitch3D) INITIAL_PITCH else 0.0)
+                                    .build(),
+                                MapAnimationOptions.mapAnimationOptions { duration(620L) },
+                            )
+                        }
+                        is MapEvent.ShowPoint -> {
+                            PointDetailSheet.newInstance(event.pointId)
+                                .show(parentFragmentManager, PointDetailSheet.TAG)
+                        }
+                    }
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                filtersBus.visibleTypes.collect {
+                    viewModel.posts.value?.let { points -> updateGeoJsonSource(points) }
+                }
+            }
+        }
+
+        viewModel.weather.observe(viewLifecycleOwner) { weather ->
+            if (weather != null) {
+                binding.weatherCard.isVisible = true
+                binding.tvWeatherCity.text = weather.cityName
+                binding.tvWeatherEmoji.text = weatherEmoji(weather.conditionCode)
+                binding.tvWeatherTemp.text = "${weather.temperature.toInt()}\u00B0C"
+                binding.tvWeatherDesc.text = weather.description
+                binding.tvWeatherHumidity.text = "${getString(R.string.weather_humidity)}: ${weather.humidity}%"
+                binding.tvWeatherWind.text = getString(R.string.weather_wind_value, weather.windSpeed)
+            } else {
+                binding.weatherCard.isVisible = false
+            }
+        }
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            binding.progressBar.isVisible = loading
+        }
+
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.action_layers -> {
+                    LayersSheet.newInstance().show(parentFragmentManager, LayersSheet.TAG)
+                    true
+                }
+                R.id.action_measure -> {
+                    toggleMeasureMode()
+                    true
+                }
                 R.id.action_satellite -> {
                     isSatellite = !isSatellite
                     item.title = if (isSatellite) "Street" else "Satellite"
                     val newStyle = if (isSatellite) Style.SATELLITE_STREETS else Style.STANDARD
                     mapView.mapboxMap.loadStyle(newStyle) { style ->
+                        setupImages(style)
                         setupSources(style)
                         setupLayers(style)
                         if (terrainEnabled) enableTerrain(style)
                         viewModel.posts.value?.let { updateGeoJsonSource(it) }
                     }
+                    true
+                }
+                R.id.action_pitch -> {
+                    pitch3D = !pitch3D
+                    item.title = if (pitch3D) "Flat view" else "3D view"
+                    mapView.mapboxMap.flyTo(
+                        CameraOptions.Builder().pitch(if (pitch3D) INITIAL_PITCH else 0.0).build(),
+                        MapAnimationOptions.mapAnimationOptions { duration(520L) },
+                    )
                     true
                 }
                 R.id.action_terrain -> {
@@ -107,139 +225,311 @@ class MapFragment : Fragment() {
             }
         }
 
-        // long press -> add point
-        mapView.mapboxMap.addOnMapLongClickListener { point ->
-            if (!drawMode) {
-                val action = MapFragmentDirections.actionMapToAddPoint(
-                    latitude = point.latitude().toFloat(),
-                    longitude = point.longitude().toFloat(),
-                )
-                findNavController().navigate(action)
-            }
+        mapView.mapboxMap.addOnMapLongClickListener {
+            if (measureMode) clearMeasure()
             true
         }
 
-        // tap -> detail or draw vertex
         mapView.mapboxMap.addOnMapClickListener { point ->
-            if (drawMode) {
-                drawnPoints.add(point)
-                updateDrawLine()
+            if (measureMode) {
+                measurePoints.add(point)
+                updateMeasureLine()
+                updateMeasurePill()
+                return@addOnMapClickListener true
+            }
+            val type = pendingType
+            if (type != null) {
+                if (type.isLine) {
+                    drawnPoints.add(point)
+                    updateDrawLine()
+                    updateDrawHint()
+                    binding.fabDone.isVisible = drawnPoints.size >= 2
+                } else {
+                    navigateToAddPoint(type, listOf(point))
+                    exitAddMode()
+                }
                 return@addOnMapClickListener true
             }
 
-            // check if tapped on a point marker
             val pixel = mapView.mapboxMap.pixelForCoordinate(point)
             mapView.mapboxMap.queryRenderedFeatures(
                 com.mapbox.maps.RenderedQueryGeometry(pixel),
-                com.mapbox.maps.RenderedQueryOptions(listOf(UNCLUSTERED_LAYER_ID), null),
+                com.mapbox.maps.RenderedQueryOptions(
+                    listOf(
+                        UNCLUSTERED_LAYER_ID,
+                        UNDERGROUND_HIT_LAYER_ID,
+                        AERIAL_HIT_LAYER_ID,
+                    ),
+                    null,
+                ),
             ) { result ->
                 result.value?.firstOrNull()?.let { queriedFeature ->
                     val pointId = queriedFeature.queriedFeature.feature.getStringProperty("id")
                     if (pointId != null) {
-                        val action = MapFragmentDirections.actionMapToDetail(pointId)
-                        findNavController().navigate(action)
+                        PointDetailSheet.newInstance(pointId).show(parentFragmentManager, PointDetailSheet.TAG)
                     }
                 }
             }
             true
         }
 
-        // draw mode fab
-        binding.fabDraw.setOnClickListener {
-            drawMode = !drawMode
-            if (drawMode) {
-                drawnPoints.clear()
-                Toast.makeText(requireContext(), "Tap map to draw. Tap again to finish.", Toast.LENGTH_SHORT).show()
-                binding.fabDraw.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
-            } else {
-                binding.fabDraw.setImageResource(android.R.drawable.ic_menu_edit)
-                // keep drawn line visible
-            }
+        binding.fabAdd.setOnClickListener { showAddMenu() }
+
+        binding.fabDone.setOnClickListener {
+            val type = pendingType ?: return@setOnClickListener
+            if (drawnPoints.size < 2) return@setOnClickListener
+            navigateToAddPoint(type, drawnPoints.toList())
+            exitAddMode()
         }
     }
 
+    private fun showAddMenu() {
+        if (measureMode) {
+            Toast.makeText(requireContext(), "Stop measuring first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (pendingType != null) {
+            exitAddMode()
+            return
+        }
+        val popup = PopupMenu(requireContext(), binding.fabAdd)
+        DpType.entries.forEachIndexed { index, type ->
+            popup.menu.add(0, index, index, getString(type.labelRes))
+        }
+        popup.setOnMenuItemClickListener { item ->
+            val type = DpType.entries[item.itemId]
+            enterAddMode(type)
+            true
+        }
+        popup.show()
+    }
+
+    private fun enterAddMode(type: DpType) {
+        pendingType = type
+        drawnPoints.clear()
+        clearDrawLine()
+        if (type.isLine) {
+            val color = if (type == DpType.AERIAL_SPAN) COLOR_AERIAL else COLOR_UNDERGROUND
+            binding.mapView.mapboxMap.style
+                ?.getLayerAs<LineLayer>(DRAW_LINE_LAYER_ID)
+                ?.lineColor(Color.parseColor(color))
+        }
+        binding.fabAdd.setImageResource(android.R.drawable.ic_menu_close_clear_cancel)
+        binding.fabDone.isVisible = false
+        updateDrawHint()
+    }
+
+    private fun exitAddMode() {
+        pendingType = null
+        drawnPoints.clear()
+        clearDrawLine()
+        binding.fabAdd.setImageResource(android.R.drawable.ic_input_add)
+        binding.fabDone.isVisible = false
+        binding.tvDrawHint.isVisible = false
+    }
+
+    private fun updateDrawHint() {
+        val type =
+            pendingType ?: run {
+                binding.tvDrawHint.isVisible = false
+                return
+            }
+        val label = getString(type.labelRes)
+        binding.tvDrawHint.text =
+            if (type.isLine) {
+                getString(R.string.add_dp_line_vertices, label, drawnPoints.size)
+            } else {
+                getString(R.string.map_tap_to_place, label)
+            }
+        binding.tvDrawHint.isVisible = true
+    }
+
+    private fun navigateToAddPoint(
+        type: DpType,
+        points: List<Point>,
+    ) {
+        val first = points.first()
+        val pathJson =
+            if (type.isLine) {
+                PathCoordinates.encode(points.map { it.longitude() to it.latitude() })
+            } else {
+                ""
+            }
+        AddPointSheet.newInstance(
+            latitude = first.latitude().toFloat(),
+            longitude = first.longitude().toFloat(),
+            dpType = type.name,
+            pathCoordinates = pathJson,
+        ).show(parentFragmentManager, AddPointSheet.TAG)
+    }
+
+    private fun setupImages(style: Style) {
+        val m = markers ?: return
+        style.addImage(MARKER_POLE_ID, m.pole)
+        style.addImage(MARKER_OFFICE_ID, m.centralOffice)
+    }
+
     private fun setupSources(style: Style) {
-        // points source with clustering
         if (style.getSourceAs<GeoJsonSource>(POINTS_SOURCE_ID) == null) {
-            val source = GeoJsonSource.Builder(POINTS_SOURCE_ID)
-                .cluster(true)
-                .clusterRadius(50)
-                .clusterMaxZoom(14)
-                .build()
+            val source =
+                GeoJsonSource.Builder(POINTS_SOURCE_ID)
+                    .cluster(true)
+                    .clusterRadius(50)
+                    .clusterMaxZoom(14)
+                    .build()
             style.addSource(source)
         }
 
-        // draw line source
+        if (style.getSourceAs<GeoJsonSource>(LINES_SOURCE_ID) == null) {
+            style.addSource(GeoJsonSource.Builder(LINES_SOURCE_ID).build())
+        }
+
+        if (style.getSourceAs<GeoJsonSource>(LINE_LABELS_SOURCE_ID) == null) {
+            style.addSource(GeoJsonSource.Builder(LINE_LABELS_SOURCE_ID).build())
+        }
+
         if (style.getSourceAs<GeoJsonSource>(DRAW_SOURCE_ID) == null) {
-            val drawSource = GeoJsonSource.Builder(DRAW_SOURCE_ID).build()
-            style.addSource(drawSource)
+            style.addSource(GeoJsonSource.Builder(DRAW_SOURCE_ID).build())
         }
     }
 
     private fun setupLayers(style: Style) {
-        // cluster circles
+        // Transparent hit layers for lines (fat tap target) — underneath visible lines
+        if (style.getLayerAs<LineLayer>(UNDERGROUND_HIT_LAYER_ID) == null) {
+            val hit = LineLayer(UNDERGROUND_HIT_LAYER_ID, LINES_SOURCE_ID)
+            hit.filter(Expression.eq(Expression.get("type"), Expression.literal("UNDERGROUND_PATH")))
+            hit.lineColor(Color.TRANSPARENT)
+            hit.lineWidth(20.0)
+            style.addLayer(hit)
+        }
+        if (style.getLayerAs<LineLayer>(AERIAL_HIT_LAYER_ID) == null) {
+            val hit = LineLayer(AERIAL_HIT_LAYER_ID, LINES_SOURCE_ID)
+            hit.filter(Expression.eq(Expression.get("type"), Expression.literal("AERIAL_SPAN")))
+            hit.lineColor(Color.TRANSPARENT)
+            hit.lineWidth(20.0)
+            style.addLayer(hit)
+        }
+
+        if (style.getLayerAs<LineLayer>(UNDERGROUND_LAYER_ID) == null) {
+            val layer = LineLayer(UNDERGROUND_LAYER_ID, LINES_SOURCE_ID)
+            layer.filter(Expression.eq(Expression.get("type"), Expression.literal("UNDERGROUND_PATH")))
+            layer.lineColor(Color.parseColor(COLOR_UNDERGROUND))
+            layer.lineWidth(4.0)
+            style.addLayer(layer)
+        }
+
+        if (style.getLayerAs<LineLayer>(AERIAL_LAYER_ID) == null) {
+            val layer = LineLayer(AERIAL_LAYER_ID, LINES_SOURCE_ID)
+            layer.filter(Expression.eq(Expression.get("type"), Expression.literal("AERIAL_SPAN")))
+            layer.lineColor(Color.parseColor(COLOR_AERIAL))
+            layer.lineWidth(4.0)
+            style.addLayer(layer)
+        }
+
         if (style.getLayerAs<CircleLayer>(CLUSTER_LAYER_ID) == null) {
             val clusterLayer = CircleLayer(CLUSTER_LAYER_ID, POINTS_SOURCE_ID)
             clusterLayer.filter(Expression.has("point_count"))
-            clusterLayer.circleColor(Color.parseColor("#3B82F6"))
-            clusterLayer.circleRadius(20.0)
-            clusterLayer.circleStrokeWidth(2.0)
+            clusterLayer.circleColor(Color.parseColor(COLOR_AERIAL))
+            clusterLayer.circleRadius(
+                Expression.interpolate(
+                    Expression.linear(),
+                    Expression.get("point_count"),
+                    Expression.literal(2),
+                    Expression.literal(22),
+                    Expression.literal(50),
+                    Expression.literal(34),
+                    Expression.literal(200),
+                    Expression.literal(44),
+                ),
+            )
+            clusterLayer.circleStrokeWidth(3.0)
             clusterLayer.circleStrokeColor(Color.WHITE)
             style.addLayer(clusterLayer)
         }
 
-        // cluster count text
         if (style.getLayerAs<SymbolLayer>(CLUSTER_COUNT_LAYER_ID) == null) {
             val countLayer = SymbolLayer(CLUSTER_COUNT_LAYER_ID, POINTS_SOURCE_ID)
             countLayer.filter(Expression.has("point_count"))
-            countLayer.textSize(12.0)
+            countLayer.textField(Expression.get("point_count_abbreviated"))
+            countLayer.textSize(13.0)
             countLayer.textColor(Color.WHITE)
             style.addLayer(countLayer)
         }
 
-        // unclustered points
-        if (style.getLayerAs<CircleLayer>(UNCLUSTERED_LAYER_ID) == null) {
-            val pointLayer = CircleLayer(UNCLUSTERED_LAYER_ID, POINTS_SOURCE_ID)
-            pointLayer.filter(Expression.not(Expression.has("point_count")))
-            pointLayer.circleRadius(8.0)
-            pointLayer.circleColor(Color.parseColor("#3B82F6"))
-            pointLayer.circleStrokeWidth(2.0)
-            pointLayer.circleStrokeColor(Color.WHITE)
-            style.addLayer(pointLayer)
+        if (style.getLayerAs<SymbolLayer>(UNCLUSTERED_LAYER_ID) == null) {
+            val symbolLayer = SymbolLayer(UNCLUSTERED_LAYER_ID, POINTS_SOURCE_ID)
+            symbolLayer.filter(Expression.not(Expression.has("point_count")))
+            symbolLayer.iconImage(
+                Expression.match(
+                    Expression.get("type"),
+                    Expression.literal("POLES"),
+                    Expression.literal(MARKER_POLE_ID),
+                    Expression.literal("CENTRAL_OFFICES"),
+                    Expression.literal(MARKER_OFFICE_ID),
+                    Expression.literal(MARKER_POLE_ID),
+                ),
+            )
+            symbolLayer.iconAnchor(IconAnchor.BOTTOM)
+            symbolLayer.iconAllowOverlap(true)
+            symbolLayer.iconIgnorePlacement(true)
+            style.addLayer(symbolLayer)
         }
 
-        // draw line layer
+        if (style.getLayerAs<SymbolLayer>(LINE_LABELS_LAYER_ID) == null) {
+            val labelLayer = SymbolLayer(LINE_LABELS_LAYER_ID, LINE_LABELS_SOURCE_ID)
+            labelLayer.textField(Expression.get("length"))
+            labelLayer.textSize(12.0)
+            labelLayer.textColor(Color.WHITE)
+            labelLayer.textHaloColor(Color.BLACK)
+            labelLayer.textHaloWidth(1.2)
+            labelLayer.textAllowOverlap(false)
+            labelLayer.textIgnorePlacement(false)
+            style.addLayer(labelLayer)
+        }
+
         if (style.getLayerAs<LineLayer>(DRAW_LINE_LAYER_ID) == null) {
             val lineLayer = LineLayer(DRAW_LINE_LAYER_ID, DRAW_SOURCE_ID)
-            lineLayer.lineColor(Color.parseColor("#F59E0B"))
+            lineLayer.lineColor(Color.parseColor(COLOR_UNDERGROUND))
             lineLayer.lineWidth(3.0)
+            lineLayer.lineDasharray(listOf(2.0, 2.0))
             style.addLayer(lineLayer)
         }
     }
 
     private fun enableLocationPuck() {
-        binding.mapView.location.enabled = true
-        binding.mapView.location.pulsingEnabled = true
+        binding.mapView.location.updateSettings {
+            enabled = true
+            pulsingEnabled = true
+            locationPuck =
+                LocationPuck2D(
+                    topImage = ImageHolder.from(R.drawable.puck_top),
+                    bearingImage = ImageHolder.from(R.drawable.puck_bearing),
+                    shadowImage = ImageHolder.from(R.drawable.puck_shadow),
+                )
+            puckBearing = PuckBearing.HEADING
+            puckBearingEnabled = true
+        }
     }
 
     private fun enableTerrain(style: Style) {
         try {
             if (style.getSourceAs<com.mapbox.maps.extension.style.sources.generated.RasterDemSource>("terrain-source") == null) {
-                val demSource = com.mapbox.maps.extension.style.sources.generated.RasterDemSource.Builder("terrain-source")
-                    .url("mapbox://mapbox.mapbox-terrain-dem-v1")
-                    .build()
+                val demSource =
+                    com.mapbox.maps.extension.style.sources.generated.RasterDemSource.Builder("terrain-source")
+                        .url("mapbox://mapbox.mapbox-terrain-dem-v1")
+                        .build()
                 style.addSource(demSource)
             }
             style.setTerrain(Terrain("terrain-source"))
         } catch (_: Exception) {
-            // terrain not supported on this device
         }
     }
 
     private fun disableTerrain(style: Style) {
         try {
             style.removeTerrain()
-        } catch (_: Exception) {}
+        } catch (_: Exception) {
+        }
     }
 
     private fun observePoints() {
@@ -249,29 +539,163 @@ class MapFragment : Fragment() {
     }
 
     private fun updateGeoJsonSource(points: List<DistributionPoint>) {
-        val features = points.map { dp ->
-            Feature.fromGeometry(
-                Point.fromLngLat(dp.longitude, dp.latitude),
-            ).apply {
-                addStringProperty("id", dp.id)
-                addStringProperty("label", dp.label)
-                addStringProperty("type", dp.type.name)
-                addStringProperty("notes", dp.notes)
+        val visible = filtersBus.visibleTypes.value
+        val (linePoints, pointPoints) =
+            points.asSequence()
+                .filter { it.type in visible }
+                .partition { it.type.isLine }
+
+        val pointFeatures =
+            pointPoints.map { dp ->
+                Feature.fromGeometry(
+                    Point.fromLngLat(dp.longitude, dp.latitude),
+                ).apply {
+                    addStringProperty("id", dp.id)
+                    addStringProperty("label", dp.label)
+                    addStringProperty("type", dp.type.name)
+                    addStringProperty("notes", dp.notes)
+                }
             }
-        }
+
+        val labelFeatures = mutableListOf<Feature>()
+        val lineFeatures =
+            linePoints.mapNotNull { dp ->
+                val verts = PathCoordinates.decode(dp.pathCoordinates)
+                if (verts.size < 2) return@mapNotNull null
+                val linePts = verts.map { (lng, lat) -> Point.fromLngLat(lng, lat) }
+                val lineFeature =
+                    Feature.fromGeometry(LineString.fromLngLats(linePts)).apply {
+                        addStringProperty("id", dp.id)
+                        addStringProperty("label", dp.label)
+                        addStringProperty("type", dp.type.name)
+                    }
+                val (midLng, midLat, lengthM) = midpointAndLength(verts)
+                labelFeatures +=
+                    Feature.fromGeometry(Point.fromLngLat(midLng, midLat)).apply {
+                        addStringProperty("id", dp.id)
+                        addStringProperty("type", dp.type.name)
+                        addStringProperty("length", GeoMath.formatDistance(lengthM))
+                    }
+                lineFeature
+            }
+
         binding.mapView.mapboxMap.style?.let { style ->
             style.getSourceAs<GeoJsonSource>(POINTS_SOURCE_ID)
-                ?.featureCollection(FeatureCollection.fromFeatures(features))
+                ?.featureCollection(FeatureCollection.fromFeatures(pointFeatures))
+            style.getSourceAs<GeoJsonSource>(LINES_SOURCE_ID)
+                ?.featureCollection(FeatureCollection.fromFeatures(lineFeatures))
+            style.getSourceAs<GeoJsonSource>(LINE_LABELS_SOURCE_ID)
+                ?.featureCollection(FeatureCollection.fromFeatures(labelFeatures))
         }
     }
 
+    /**
+     * Returns (midLng, midLat, totalMeters). The midpoint is the position at half of the
+     * accumulated distance along the polyline (length-weighted), interpolated linearly
+     * between the two adjacent vertices.
+     */
+    private fun midpointAndLength(verts: List<Pair<Double, Double>>): Triple<Double, Double, Double> {
+        if (verts.size < 2) return Triple(verts.first().first, verts.first().second, 0.0)
+        val segMeters =
+            (1 until verts.size).map { i ->
+                val (lng1, lat1) = verts[i - 1]
+                val (lng2, lat2) = verts[i]
+                GeoMath.haversineMeters(lat1, lng1, lat2, lng2)
+            }
+        val total = segMeters.sum()
+        if (total == 0.0) return Triple(verts.first().first, verts.first().second, 0.0)
+        val half = total / 2.0
+        var acc = 0.0
+        for (i in segMeters.indices) {
+            val nextAcc = acc + segMeters[i]
+            if (nextAcc >= half) {
+                val into = (half - acc) / segMeters[i]
+                val (lng1, lat1) = verts[i]
+                val (lng2, lat2) = verts[i + 1]
+                val midLng = lng1 + (lng2 - lng1) * into
+                val midLat = lat1 + (lat2 - lat1) * into
+                return Triple(midLng, midLat, total)
+            }
+            acc = nextAcc
+        }
+        val last = verts.last()
+        return Triple(last.first, last.second, total)
+    }
+
     private fun updateDrawLine() {
-        if (drawnPoints.size < 2) return
+        if (drawnPoints.size < 2) {
+            clearDrawLine()
+            return
+        }
         val lineString = LineString.fromLngLats(drawnPoints)
         binding.mapView.mapboxMap.style?.let { style ->
             style.getSourceAs<GeoJsonSource>(DRAW_SOURCE_ID)
                 ?.geometry(lineString)
         }
+    }
+
+    private fun clearDrawLine() {
+        binding.mapView.mapboxMap.style?.let { style ->
+            style.getSourceAs<GeoJsonSource>(DRAW_SOURCE_ID)
+                ?.featureCollection(FeatureCollection.fromFeatures(emptyList()))
+        }
+    }
+
+    private fun toggleMeasureMode() {
+        if (pendingType != null) {
+            Toast.makeText(requireContext(), "Finish your feature first", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (measureMode) {
+            exitMeasureMode()
+        } else {
+            enterMeasureMode()
+        }
+    }
+
+    private fun enterMeasureMode() {
+        measureMode = true
+        measurePoints.clear()
+        binding.mapView.mapboxMap.style
+            ?.getLayerAs<LineLayer>(DRAW_LINE_LAYER_ID)
+            ?.lineColor(Color.WHITE)
+        clearDrawLine()
+        binding.tvMeasurePill.text = "Tap the map to measure"
+        binding.tvMeasurePill.isVisible = true
+    }
+
+    private fun exitMeasureMode() {
+        measureMode = false
+        measurePoints.clear()
+        clearDrawLine()
+        binding.tvMeasurePill.isVisible = false
+    }
+
+    private fun clearMeasure() {
+        measurePoints.clear()
+        clearDrawLine()
+        binding.tvMeasurePill.text = "Tap the map to measure"
+    }
+
+    private fun updateMeasureLine() {
+        if (measurePoints.size < 2) {
+            clearDrawLine()
+            return
+        }
+        val lineString = LineString.fromLngLats(measurePoints)
+        binding.mapView.mapboxMap.style?.let { style ->
+            style.getSourceAs<GeoJsonSource>(DRAW_SOURCE_ID)
+                ?.geometry(lineString)
+        }
+    }
+
+    private fun updateMeasurePill() {
+        if (measurePoints.size < 2) {
+            binding.tvMeasurePill.text = "Tap a second point"
+            return
+        }
+        val total = GeoMath.polylineMeters(measurePoints.map { it.longitude() to it.latitude() })
+        binding.tvMeasurePill.text = "Total: ${GeoMath.formatDistance(total)}"
     }
 
     override fun onStart() {
@@ -290,12 +714,40 @@ class MapFragment : Fragment() {
         _binding = null
     }
 
+    private fun fetchWeatherForMapCenter() {
+        val center = binding.mapView.mapboxMap.cameraState.center
+        viewModel.fetchWeather(center.latitude(), center.longitude())
+    }
+
+    private fun weatherEmoji(code: Int): String =
+        when (code / 100) {
+            2 -> "\u26C8"
+            3 -> "\uD83C\uDF27"
+            5 -> "\uD83C\uDF27"
+            6 -> "\u2744"
+            7 -> "\uD83C\uDF2B"
+            8 -> if (code == 800) "\u2600" else "\u26C5"
+            else -> "\uD83C\uDF24"
+        }
+
     companion object {
         private const val POINTS_SOURCE_ID = "points-source"
+        private const val LINES_SOURCE_ID = "lines-source"
         private const val DRAW_SOURCE_ID = "draw-source"
         private const val CLUSTER_LAYER_ID = "cluster-layer"
         private const val CLUSTER_COUNT_LAYER_ID = "cluster-count-layer"
         private const val UNCLUSTERED_LAYER_ID = "unclustered-layer"
+        private const val UNDERGROUND_LAYER_ID = "underground-layer"
+        private const val AERIAL_LAYER_ID = "aerial-layer"
+        private const val UNDERGROUND_HIT_LAYER_ID = "underground-hit-layer"
+        private const val AERIAL_HIT_LAYER_ID = "aerial-hit-layer"
         private const val DRAW_LINE_LAYER_ID = "draw-line-layer"
+        private const val LINE_LABELS_SOURCE_ID = "line-labels-source"
+        private const val LINE_LABELS_LAYER_ID = "line-labels-layer"
+        private const val MARKER_POLE_ID = "marker-pole"
+        private const val MARKER_OFFICE_ID = "marker-central-office"
+        private const val COLOR_UNDERGROUND = "#F59E0B"
+        private const val COLOR_AERIAL = "#3B82F6"
+        private const val INITIAL_PITCH = 45.0
     }
 }
