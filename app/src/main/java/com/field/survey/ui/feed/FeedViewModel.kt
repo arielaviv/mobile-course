@@ -12,25 +12,30 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedViewModel @Inject constructor(
-    private val repository: DistributionPointRepository,
-) : ViewModel() {
+class FeedViewModel
+    @Inject
+    constructor(
+        private val repository: DistributionPointRepository,
+    ) : ViewModel() {
 
-    val posts: LiveData<List<DistributionPoint>> =
-        repository.observeAll().asLiveData()
+        val posts: LiveData<List<DistributionPoint>> =
+            repository.observeAll().asLiveData()
 
-    private val _isRefreshing = MutableLiveData(false)
-    val isRefreshing: LiveData<Boolean> = _isRefreshing
+        val recentActivity: LiveData<List<DistributionPoint>> =
+            repository.observeRecent(5).asLiveData()
 
-    init {
-        refresh()
-    }
+        private val _isRefreshing = MutableLiveData(false)
+        val isRefreshing: LiveData<Boolean> = _isRefreshing
 
-    fun refresh() {
-        viewModelScope.launch {
-            _isRefreshing.value = true
-            repository.syncFromFirestore()
-            _isRefreshing.value = false
+        init {
+            refresh()
+        }
+
+        fun refresh() {
+            viewModelScope.launch {
+                _isRefreshing.value = true
+                repository.syncFromFirestore()
+                _isRefreshing.value = false
+            }
         }
     }
-}

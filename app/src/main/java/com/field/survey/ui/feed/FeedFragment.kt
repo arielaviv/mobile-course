@@ -9,9 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.field.survey.R
 import com.field.survey.databinding.FragmentFeedBinding
 import com.field.survey.ui.adapter.PostAdapter
+import com.field.survey.ui.addpoint.AddPointSheet
+import com.field.survey.ui.detail.PointDetailSheet
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -21,6 +24,7 @@ class FeedFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: FeedViewModel by viewModels()
     private lateinit var adapter: PostAdapter
+    private lateinit var recentAdapter: RecentActivityAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,25 +35,37 @@ class FeedFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = PostAdapter(
-            onClick = { point ->
-                val action = FeedFragmentDirections.actionFeedToDetail(point.id)
-                findNavController().navigate(action)
-            },
-        )
+        adapter =
+            PostAdapter(
+                onClick = { point ->
+                    val action = FeedFragmentDirections.actionFeedToDetail(point.id)
+                    findNavController().navigate(action)
+                },
+            )
 
         binding.rvPosts.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPosts.adapter = adapter
+
+        recentAdapter =
+            RecentActivityAdapter { point ->
+                PointDetailSheet.newInstance(point.id).show(parentFragmentManager, PointDetailSheet.TAG)
+            }
+        binding.rvRecent.layoutManager =
+            LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
+        binding.rvRecent.adapter = recentAdapter
 
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refresh()
         }
 
         binding.fabAdd.setOnClickListener {
-            findNavController().navigate(R.id.action_feed_to_addPoint)
+            AddPointSheet.newInstance().show(parentFragmentManager, AddPointSheet.TAG)
         }
 
         binding.toolbar.setOnMenuItemClickListener { item ->
@@ -84,6 +100,13 @@ class FeedFragment : Fragment() {
         viewModel.posts.observe(viewLifecycleOwner) { posts ->
             adapter.submitList(posts)
             binding.tvEmpty.isVisible = posts.isEmpty()
+        }
+
+        viewModel.recentActivity.observe(viewLifecycleOwner) { recent ->
+            recentAdapter.submitList(recent)
+            val show = recent.isNotEmpty()
+            binding.tvRecentTitle.isVisible = show
+            binding.rvRecent.isVisible = show
         }
 
         viewModel.isRefreshing.observe(viewLifecycleOwner) { refreshing ->
