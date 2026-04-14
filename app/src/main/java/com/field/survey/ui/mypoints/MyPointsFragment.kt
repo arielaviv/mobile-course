@@ -33,29 +33,41 @@ class MyPointsFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
             findNavController().popBackStack()
         }
 
-        adapter = PostAdapter(
-            onClick = { point ->
-                val action = MyPointsFragmentDirections.actionMyPointsToDetail(point.id)
-                findNavController().navigate(action)
-            },
-            onEdit = { point ->
-                val action = MyPointsFragmentDirections.actionMyPointsToEdit(point.id)
-                findNavController().navigate(action)
-            },
-            onDelete = { point ->
-                showDeleteDialog(point)
-            },
-        )
+        adapter =
+            PostAdapter(
+                onClick = { point ->
+                    val action = MyPointsFragmentDirections.actionMyPointsToDetail(point.id)
+                    findNavController().navigate(action)
+                },
+                onEdit = { point ->
+                    val action = MyPointsFragmentDirections.actionMyPointsToEdit(point.id)
+                    findNavController().navigate(action)
+                },
+                onDelete = { point ->
+                    showDeleteDialog(point)
+                },
+            )
 
         binding.rvPoints.layoutManager = LinearLayoutManager(requireContext())
         binding.rvPoints.adapter = adapter
+
+        viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            binding.progressBar.isVisible = loading
+            if (loading) {
+                binding.rvPoints.isVisible = false
+                binding.emptyState.isVisible = false
+            }
+        }
 
         viewModel.posts.observe(viewLifecycleOwner) { points ->
             adapter.submitList(points)

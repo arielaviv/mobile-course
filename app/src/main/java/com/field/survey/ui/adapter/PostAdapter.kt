@@ -17,14 +17,23 @@ class PostAdapter(
     private val onDelete: ((DistributionPoint) -> Unit)? = null,
 ) : ListAdapter<DistributionPoint, PostAdapter.PostViewHolder>(DiffCallback) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
-        val binding = ItemPostBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false,
-        )
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): PostViewHolder {
+        val binding =
+            ItemPostBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            )
         return PostViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: PostViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
@@ -61,10 +70,14 @@ class PostAdapter(
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<DistributionPoint>() {
-        override fun areItemsTheSame(old: DistributionPoint, new: DistributionPoint) =
-            old.id == new.id
+        override fun areItemsTheSame(
+            old: DistributionPoint,
+            new: DistributionPoint,
+        ) = old.id == new.id
 
-        override fun areContentsTheSame(old: DistributionPoint, new: DistributionPoint) =
-            old == new
+        override fun areContentsTheSame(
+            old: DistributionPoint,
+            new: DistributionPoint,
+        ) = old == new
     }
 }

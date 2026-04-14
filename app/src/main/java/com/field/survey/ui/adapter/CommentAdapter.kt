@@ -13,14 +13,23 @@ import java.util.Locale
 
 class CommentAdapter : ListAdapter<Comment, CommentAdapter.CommentViewHolder>(DiffCallback) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentViewHolder {
-        val binding = ItemCommentBinding.inflate(
-            LayoutInflater.from(parent.context), parent, false,
-        )
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int,
+    ): CommentViewHolder {
+        val binding =
+            ItemCommentBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            )
         return CommentViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: CommentViewHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: CommentViewHolder,
+        position: Int,
+    ) {
         holder.bind(getItem(position))
     }
 
@@ -38,7 +47,14 @@ class CommentAdapter : ListAdapter<Comment, CommentAdapter.CommentViewHolder>(Di
     }
 
     companion object DiffCallback : DiffUtil.ItemCallback<Comment>() {
-        override fun areItemsTheSame(old: Comment, new: Comment) = old.id == new.id
-        override fun areContentsTheSame(old: Comment, new: Comment) = old == new
+        override fun areItemsTheSame(
+            old: Comment,
+            new: Comment,
+        ) = old.id == new.id
+
+        override fun areContentsTheSame(
+            old: Comment,
+            new: Comment,
+        ) = old == new
     }
 }

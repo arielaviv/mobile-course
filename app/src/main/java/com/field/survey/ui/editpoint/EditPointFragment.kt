@@ -29,26 +29,28 @@ class EditPointFragment : Fragment() {
     private val viewModel: EditPointViewModel by viewModels()
 
     private var photoUri: Uri? = null
-    private var selectedType: DpType = DpType.MANHOLE
+    private var selectedType: DpType = DpType.POLES
 
-    private val takePictureLauncher = registerForActivityResult(
-        ActivityResultContracts.TakePicture(),
-    ) { success ->
-        if (success && photoUri != null) {
-            binding.ivPhoto.setImageURI(photoUri)
-            viewModel.setPhotoPath(photoUri?.path)
+    private val takePictureLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.TakePicture(),
+        ) { success ->
+            if (success && photoUri != null) {
+                binding.ivPhoto.setImageURI(photoUri)
+                viewModel.setPhotoPath(photoUri?.path)
+            }
         }
-    }
 
-    private val pickImageLauncher = registerForActivityResult(
-        ActivityResultContracts.GetContent(),
-    ) { uri ->
-        if (uri != null) {
-            binding.ivPhoto.setImageURI(uri)
-            val path = copyUriToLocal(uri)
-            viewModel.setPhotoPath(path)
+    private val pickImageLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.GetContent(),
+        ) { uri ->
+            if (uri != null) {
+                binding.ivPhoto.setImageURI(uri)
+                val path = copyUriToLocal(uri)
+                viewModel.setPhotoPath(path)
+            }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -59,7 +61,10 @@ class EditPointFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
@@ -70,11 +75,12 @@ class EditPointFragment : Fragment() {
 
         binding.btnTakePhoto.setOnClickListener {
             val file = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
-            photoUri = FileProvider.getUriForFile(
-                requireContext(),
-                "${requireContext().packageName}.fileprovider",
-                file,
-            )
+            photoUri =
+                FileProvider.getUriForFile(
+                    requireContext(),
+                    "${requireContext().packageName}.fileprovider",
+                    file,
+                )
             viewModel.setPhotoPath(file.absolutePath)
             takePictureLauncher.launch(photoUri!!)
         }
@@ -131,11 +137,12 @@ class EditPointFragment : Fragment() {
 
     private fun setupTypeChips() {
         DpType.entries.forEach { type ->
-            val chip = Chip(requireContext()).apply {
-                text = getString(type.labelRes)
-                isCheckable = true
-                tag = type
-            }
+            val chip =
+                Chip(requireContext()).apply {
+                    text = getString(type.labelRes)
+                    isCheckable = true
+                    tag = type
+                }
             binding.chipGroupType.addView(chip)
         }
 
