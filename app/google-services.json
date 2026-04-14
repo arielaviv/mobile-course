@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "101159032656",
-    "project_id": "lux-field",
-    "storage_bucket": "lux-field.firebasestorage.app"
+    "project_number": "677713296045",
+    "project_id": "mobile-app-course-b30cf",
+    "storage_bucket": "mobile-app-course-b30cf.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:101159032656:android:944106e89b37c00ea5be55",
+        "mobilesdk_app_id": "1:677713296045:android:f786b5b497d23d4fd06424",
         "android_client_info": {
           "package_name": "com.field.survey"
         }
@@ -15,26 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyByuavq7moht_Q2hvpGSbOT9sPRrIpEjUs"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:101159032656:android:7a0d1d251d726ec0a5be55",
-        "android_client_info": {
-          "package_name": "com.lux.field"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyByuavq7moht_Q2hvpGSbOT9sPRrIpEjUs"
+          "current_key": "AIzaSyDeFa4LaG5bIBiCWQE5wkUmHF9TJwGhIos"
         }
       ],
       "services": {
