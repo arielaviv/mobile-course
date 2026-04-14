@@ -6,11 +6,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-) : ViewModel() {
+class SettingsViewModel
+    @Inject
+    constructor(
+        private val authRepository: AuthRepository,
+    ) : ViewModel() {
 
-    fun logout() {
-        authRepository.logout()
+        fun logout() {
+            authRepository.logout()
+        }
     }
-}
