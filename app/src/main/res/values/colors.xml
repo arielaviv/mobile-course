@@ -1,22 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#18181b</color>
-    <color name="bg_top">#FF212126</color>
-    <color name="bg_mid">#FF18181b</color>
-    <color name="bg_bottom">#FF0c0c0f</color>
-    <color name="zinc_100">#FFf4f4f5</color>
-    <color name="zinc_400">#FFa1a1aa</color>
-    <color name="zinc_700">#FF3f3f46</color>
-    <color name="zinc_900">#FF18181b</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="error">#FFef4444</color>
 
-    <color name="marker_manhole">#FF6366F1</color>
-    <color name="marker_junction_box">#FF3B82F6</color>
-    <color name="marker_cabinet">#FF10B981</color>
-    <color name="marker_pole">#FFF59E0B</color>
-    <color name="marker_duct">#FF8B5CF6</color>
-    <color name="marker_handhole">#FF06B6D4</color>
-    <color name="marker_pedestal">#FFF97316</color>
-    <color name="marker_other">#FF71717A</color>
+    <!-- M3 color roles (light) — derived from seed #2563EB via Material Theme Builder -->
+    <color name="m3_primary">#FF4B5C92</color>
+    <color name="m3_on_primary">#FFFFFFFF</color>
+    <color name="m3_primary_container">#FFDBE1FF</color>
+    <color name="m3_on_primary_container">#FF324478</color>
+
+    <color name="m3_secondary">#FF595E72</color>
+    <color name="m3_on_secondary">#FFFFFFFF</color>
+    <color name="m3_secondary_container">#FFDDE1F9</color>
+    <color name="m3_on_secondary_container">#FF414659</color>
+
+    <color name="m3_tertiary">#FF745470</color>
+    <color name="m3_on_tertiary">#FFFFFFFF</color>
+    <color name="m3_tertiary_container">#FFFFD6F8</color>
+    <color name="m3_on_tertiary_container">#FF5A3D58</color>
+
+    <color name="m3_error">#FFBA1A1A</color>
+    <color name="m3_on_error">#FFFFFFFF</color>
+    <color name="m3_error_container">#FFFFDAD6</color>
+    <color name="m3_on_error_container">#FF93000A</color>
+
+    <color name="m3_background">#FFFAF8FF</color>
+    <color name="m3_on_background">#FF1A1B21</color>
+    <color name="m3_surface">#FFFAF8FF</color>
+    <color name="m3_on_surface">#FF1A1B21</color>
+    <color name="m3_surface_variant">#FFE2E2EC</color>
+    <color name="m3_on_surface_variant">#FF45464F</color>
+
+    <color name="m3_outline">#FF757680</color>
+    <color name="m3_outline_variant">#FFC5C6D0</color>
+    <color name="m3_scrim">#FF000000</color>
+    <color name="m3_inverse_surface">#FF2F3036</color>
+    <color name="m3_inverse_on_surface">#FFF1F0F7</color>
+    <color name="m3_inverse_primary">#FFB4C5FF</color>
+
+    <color name="m3_surface_dim">#FFDAD9E0</color>
+    <color name="m3_surface_bright">#FFFAF8FF</color>
+    <color name="m3_surface_container_lowest">#FFFFFFFF</color>
+    <color name="m3_surface_container_low">#FFF4F3FA</color>
+    <color name="m3_surface_container">#FFEEEDF4</color>
+    <color name="m3_surface_container_high">#FFE8E7EF</color>
+    <color name="m3_surface_container_highest">#FFE3E2E9</color>
+
+    <!-- Legacy aliases (existing layouts reference these; now pointing at proper M3 roles) -->
+    <color name="ic_launcher_background">#FFFFFFFF</color>
+    <color name="bg_top">@color/m3_surface_container_low</color>
+    <color name="bg_mid">@color/m3_surface</color>
+    <color name="bg_bottom">@color/m3_surface_container_high</color>
+    <color name="zinc_100">@color/m3_on_surface</color>
+    <color name="zinc_400">@color/m3_on_surface_variant</color>
+    <color name="zinc_700">@color/m3_outline_variant</color>
+    <color name="zinc_900">@color/m3_surface_container_low</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="error">@color/m3_error</color>
+    <color name="brand_primary">@color/m3_primary</color>
+    <color name="brand_primary_dark">@color/m3_on_primary_container</color>
+    <color name="brand_primary_container">@color/m3_primary_container</color>
+    <color name="brand_on_primary_container">@color/m3_on_primary_container</color>
+
+    <!-- Feature identity colors (unchanged — markers/lines carry meaning) -->
+    <color name="type_underground_path">#FFF59E0B</color>
+    <color name="type_aerial_span">#FF2563EB</color>
+    <color name="type_poles">#FF0891B2</color>
+    <color name="type_central_offices">#FF9333EA</color>
+
+    <!-- Translucent overlay for map pills/hint chrome -->
+    <color name="map_overlay_bg">#E6FAF8FF</color>
 </resources>

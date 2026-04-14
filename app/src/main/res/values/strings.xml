@@ -41,7 +41,7 @@
     <string name="add_dp_notes_field">Notes</string>
     <string name="add_dp_notes_placeholder">Optional notes about this point</string>
     <string name="add_dp_gallery">Gallery</string>
-    <string name="add_dp_save">Save Point</string>
+    <string name="add_dp_save">Save</string>
 
     <!-- Weather -->
     <string name="weather_humidity">Humidity</string>
@@ -64,15 +64,20 @@
     <string name="edit_dp_save">Save Changes</string>
 
     <!-- DP Types -->
-    <string name="dp_type_manhole">Manhole</string>
-    <string name="dp_type_junction_box">Junction Box</string>
-    <string name="dp_type_cabinet">Cabinet</string>
-    <string name="dp_type_pole">Pole</string>
-    <string name="dp_type_duct">Duct</string>
-    <string name="dp_type_handhole">Handhole</string>
-    <string name="dp_type_pedestal">Pedestal</string>
+    <string name="dp_type_underground_path">Underground Path</string>
+    <string name="dp_type_aerial_span">Aerial Span</string>
+    <string name="dp_type_poles">Pole</string>
+    <string name="dp_type_central_offices">Central Office</string>
 
-    <string name="dp_type_other">Other</string>
+    <!-- Map drawing -->
+    <string name="map_add_feature">Add feature</string>
+    <string name="map_tap_to_place">Tap the map to place %1$s</string>
+    <string name="map_tap_to_draw">Tap the map to add points, then tap done</string>
+    <string name="map_finish_drawing">Done</string>
+
+    <!-- Line features -->
+    <string name="add_dp_line_vertices">%1$s — %2$d vertices</string>
+    <string name="add_dp_line_length">%1$.1f m</string>
 
     <!-- General -->
     <string name="back">Back</string>
