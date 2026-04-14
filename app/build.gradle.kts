@@ -31,6 +31,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+        resourceConfigurations += listOf("en")
+
         buildConfigField(
             "String",
             "MAPBOX_PUBLIC_TOKEN",
@@ -82,6 +84,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.constraintlayout)
     implementation(libs.swiperefreshlayout)
+    implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

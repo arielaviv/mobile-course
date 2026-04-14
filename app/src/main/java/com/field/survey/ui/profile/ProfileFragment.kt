@@ -24,36 +24,38 @@ class ProfileFragment : Fragment() {
     private val viewModel: ProfileViewModel by viewModels()
     private var tempPhotoFile: File? = null
 
-    private val pickImage = registerForActivityResult(
-        ActivityResultContracts.GetContent(),
-    ) { uri ->
-        uri?.let {
-            binding.ivProfilePhoto.setImageURI(it)
-            val input = requireContext().contentResolver.openInputStream(it)
-            val bytes = input?.readBytes()
-            input?.close()
-            if (bytes != null) {
-                val tempFile = File(requireContext().cacheDir, "profile_temp.jpg")
-                tempFile.writeBytes(bytes)
-                viewModel.setPhotoFromPath(tempFile.absolutePath)
+    private val pickImage =
+        registerForActivityResult(
+            ActivityResultContracts.GetContent(),
+        ) { uri ->
+            uri?.let {
+                binding.ivProfilePhoto.setImageURI(it)
+                val input = requireContext().contentResolver.openInputStream(it)
+                val bytes = input?.readBytes()
+                input?.close()
+                if (bytes != null) {
+                    val tempFile = File(requireContext().cacheDir, "profile_temp.jpg")
+                    tempFile.writeBytes(bytes)
+                    viewModel.setPhotoFromPath(tempFile.absolutePath)
+                }
             }
         }
-    }
 
-    private val takePhoto = registerForActivityResult(
-        ActivityResultContracts.TakePicture(),
-    ) { success ->
-        if (success && tempPhotoFile != null) {
-            binding.ivProfilePhoto.setImageURI(
-                FileProvider.getUriForFile(
-                    requireContext(),
-                    "${requireContext().packageName}.fileprovider",
-                    tempPhotoFile!!,
-                ),
-            )
-            viewModel.setPhotoFromPath(tempPhotoFile!!.absolutePath)
+    private val takePhoto =
+        registerForActivityResult(
+            ActivityResultContracts.TakePicture(),
+        ) { success ->
+            if (success && tempPhotoFile != null) {
+                binding.ivProfilePhoto.setImageURI(
+                    FileProvider.getUriForFile(
+                        requireContext(),
+                        "${requireContext().packageName}.fileprovider",
+                        tempPhotoFile!!,
+                    ),
+                )
+                viewModel.setPhotoFromPath(tempPhotoFile!!.absolutePath)
+            }
         }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,7 +66,10 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbar.setNavigationOnClickListener {
@@ -108,8 +113,11 @@ class ProfileFragment : Fragment() {
                 binding.tvStatus.text = msg
                 binding.tvStatus.isVisible = true
                 binding.tvStatus.setTextColor(
-                    if (msg.contains("updated")) resources.getColor(com.field.survey.R.color.zinc_400, null)
-                    else resources.getColor(com.field.survey.R.color.error, null),
+                    if (msg.contains("updated")) {
+                        resources.getColor(com.field.survey.R.color.zinc_400, null)
+                    } else {
+                        resources.getColor(com.field.survey.R.color.error, null)
+                    },
                 )
             }
         }

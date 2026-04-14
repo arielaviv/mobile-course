@@ -39,6 +39,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version = "1.12.0" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.2.1" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefresh" }
+androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version = "1.3.7" }
 
 # Navigation
 navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigation" }
