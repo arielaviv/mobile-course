@@ -46,10 +46,6 @@
             app:destination="@id/detailFragment" />
 
         <action
-            android:id="@+id/action_feed_to_addPoint"
-            app:destination="@id/addPointFragment" />
-
-        <action
             android:id="@+id/action_feed_to_myPoints"
             app:destination="@id/myPointsFragment" />
 
@@ -75,23 +71,6 @@
         <argument
             android:name="pointId"
             app:argType="string" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/addPointFragment"
-        android:name="com.field.survey.ui.addpoint.AddPointFragment"
-        android:label="Add Point"
-        tools:layout="@layout/fragment_add_point">
-
-        <argument
-            android:name="latitude"
-            app:argType="float"
-            android:defaultValue="0" />
-
-        <argument
-            android:name="longitude"
-            app:argType="float"
-            android:defaultValue="0" />
     </fragment>
 
     <fragment
@@ -129,10 +108,6 @@
         <action
             android:id="@+id/action_map_to_detail"
             app:destination="@id/detailFragment" />
-
-        <action
-            android:id="@+id/action_map_to_addPoint"
-            app:destination="@id/addPointFragment" />
     </fragment>
 
     <fragment
