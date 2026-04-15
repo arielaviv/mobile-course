@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.field.survey.R
 import com.field.survey.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,8 +20,8 @@ class RegisterViewModel
         private val _isLoading = MutableLiveData(false)
         val isLoading: LiveData<Boolean> = _isLoading
 
-        private val _error = MutableLiveData<String?>(null)
-        val error: LiveData<String?> = _error
+        private val _error = MutableLiveData<Int?>(null)
+        val error: LiveData<Int?> = _error
 
         private val _registerSuccess = MutableLiveData(false)
         val registerSuccess: LiveData<Boolean> = _registerSuccess
@@ -31,11 +32,11 @@ class RegisterViewModel
             password: String,
         ) {
             if (name.isBlank() || email.isBlank()) {
-                _error.value = "All fields are required"
+                _error.value = R.string.register_all_fields_required
                 return
             }
             if (password.length < 6) {
-                _error.value = "Password must be at least 6 characters"
+                _error.value = R.string.register_password_too_short
                 return
             }
             viewModelScope.launch {
@@ -47,9 +48,9 @@ class RegisterViewModel
                         _isLoading.value = false
                         _registerSuccess.value = true
                     },
-                    onFailure = { e ->
+                    onFailure = {
                         _isLoading.value = false
-                        _error.value = e.message ?: "Registration failed"
+                        _error.value = R.string.error_generic
                     },
                 )
             }

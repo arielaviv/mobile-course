@@ -7,15 +7,20 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.field.survey.R
 import com.field.survey.databinding.FragmentFeedBinding
-import com.field.survey.ui.adapter.PostAdapter
+import com.field.survey.ui.adapter.PostPagingAdapter
 import com.field.survey.ui.addpoint.AddPointSheet
 import com.field.survey.ui.detail.PointDetailSheet
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FeedFragment : Fragment() {
@@ -23,8 +28,9 @@ class FeedFragment : Fragment() {
     private var _binding: FragmentFeedBinding? = null
     private val binding get() = _binding!!
     private val viewModel: FeedViewModel by viewModels()
-    private lateinit var adapter: PostAdapter
+    private lateinit var adapter: PostPagingAdapter
     private lateinit var recentAdapter: RecentActivityAdapter
+    private var shimmerRunning = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +48,7 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter =
-            PostAdapter(
+            PostPagingAdapter(
                 onClick = { point ->
                     val action = FeedFragmentDirections.actionFeedToDetail(point.id)
                     findNavController().navigate(action)
@@ -62,6 +68,7 @@ class FeedFragment : Fragment() {
 
         binding.swipeRefresh.setOnRefreshListener {
             viewModel.refresh()
+            adapter.refresh()
         }
 
         binding.fabAdd.setOnClickListener {
@@ -70,6 +77,10 @@ class FeedFragment : Fragment() {
 
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.action_stats -> {
+                    findNavController().navigate(R.id.action_feed_to_stats)
+                    true
+                }
                 R.id.action_profile -> {
                     findNavController().navigate(R.id.action_feed_to_profile)
                     true
@@ -97,9 +108,30 @@ class FeedFragment : Fragment() {
             }
         }
 
-        viewModel.posts.observe(viewLifecycleOwner) { posts ->
-            adapter.submitList(posts)
-            binding.tvEmpty.isVisible = posts.isEmpty()
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.pagedPosts.collect { adapter.submitData(it) }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow.collect { loadStates ->
+                    val isInitialLoading =
+                        loadStates.refresh is LoadState.Loading && adapter.itemCount == 0
+                    binding.shimmerFeed.isVisible = isInitialLoading
+                    if (isInitialLoading && !shimmerRunning) {
+                        binding.shimmerFeed.startShimmer()
+                        shimmerRunning = true
+                    } else if (!isInitialLoading && shimmerRunning) {
+                        binding.shimmerFeed.stopShimmer()
+                        shimmerRunning = false
+                    }
+
+                    binding.tvEmpty.isVisible =
+                        loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0
+                }
+            }
         }
 
         viewModel.recentActivity.observe(viewLifecycleOwner) { recent ->
@@ -114,7 +146,17 @@ class FeedFragment : Fragment() {
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        if (shimmerRunning) {
+            _binding?.shimmerFeed?.stopShimmer()
+            shimmerRunning = false
+        }
+    }
+
     override fun onDestroyView() {
+        _binding?.shimmerFeed?.stopShimmer()
+        shimmerRunning = false
         super.onDestroyView()
         _binding = null
     }

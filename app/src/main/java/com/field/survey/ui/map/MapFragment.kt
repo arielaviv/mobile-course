@@ -15,6 +15,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.field.survey.R
+import com.field.survey.data.repository.MapSettingsRepository
 import com.field.survey.databinding.FragmentMapBinding
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.DpType
@@ -22,6 +23,7 @@ import com.field.survey.domain.model.PathCoordinates
 import com.field.survey.ui.addpoint.AddPointSheet
 import com.field.survey.ui.detail.PointDetailSheet
 import com.field.survey.ui.util.GeoMath
+import com.mapbox.bindgen.Value
 import com.mapbox.geojson.Feature
 import com.mapbox.geojson.FeatureCollection
 import com.mapbox.geojson.LineString
@@ -68,6 +70,8 @@ class MapFragment : Fragment() {
     @Inject lateinit var mapEvents: MapEventsBus
 
     @Inject lateinit var filtersBus: MapFiltersBus
+
+    @Inject lateinit var mapSettings: MapSettingsRepository
 
     private var isSatellite = false
     private var terrainEnabled = false
@@ -119,12 +123,12 @@ class MapFragment : Fragment() {
         )
 
         mapView.mapboxMap.loadStyle(Style.STANDARD) { style ->
+            applyLightPreset(style)
             setupImages(style)
             setupSources(style)
             setupLayers(style)
             enableLocationPuck()
             observePoints()
-            fetchWeatherForMapCenter()
         }
 
         mapEvents.updateMapCenter(mapView.mapboxMap.cameraState.center)
@@ -163,20 +167,6 @@ class MapFragment : Fragment() {
             }
         }
 
-        viewModel.weather.observe(viewLifecycleOwner) { weather ->
-            if (weather != null) {
-                binding.weatherCard.isVisible = true
-                binding.tvWeatherCity.text = weather.cityName
-                binding.tvWeatherEmoji.text = weatherEmoji(weather.conditionCode)
-                binding.tvWeatherTemp.text = "${weather.temperature.toInt()}\u00B0C"
-                binding.tvWeatherDesc.text = weather.description
-                binding.tvWeatherHumidity.text = "${getString(R.string.weather_humidity)}: ${weather.humidity}%"
-                binding.tvWeatherWind.text = getString(R.string.weather_wind_value, weather.windSpeed)
-            } else {
-                binding.weatherCard.isVisible = false
-            }
-        }
-
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             binding.progressBar.isVisible = loading
         }
@@ -193,9 +183,10 @@ class MapFragment : Fragment() {
                 }
                 R.id.action_satellite -> {
                     isSatellite = !isSatellite
-                    item.title = if (isSatellite) "Street" else "Satellite"
+                    item.title = getString(if (isSatellite) R.string.map_street else R.string.map_satellite)
                     val newStyle = if (isSatellite) Style.SATELLITE_STREETS else Style.STANDARD
                     mapView.mapboxMap.loadStyle(newStyle) { style ->
+                        if (!isSatellite) applyLightPreset(style)
                         setupImages(style)
                         setupSources(style)
                         setupLayers(style)
@@ -206,7 +197,7 @@ class MapFragment : Fragment() {
                 }
                 R.id.action_pitch -> {
                     pitch3D = !pitch3D
-                    item.title = if (pitch3D) "Flat view" else "3D view"
+                    item.title = getString(if (pitch3D) R.string.map_flat_view else R.string.map_3d_view)
                     mapView.mapboxMap.flyTo(
                         CameraOptions.Builder().pitch(if (pitch3D) INITIAL_PITCH else 0.0).build(),
                         MapAnimationOptions.mapAnimationOptions { duration(520L) },
@@ -215,7 +206,7 @@ class MapFragment : Fragment() {
                 }
                 R.id.action_terrain -> {
                     terrainEnabled = !terrainEnabled
-                    item.title = if (terrainEnabled) "Flat" else "3D Terrain"
+                    item.title = getString(if (terrainEnabled) R.string.map_flat else R.string.map_3d_terrain)
                     mapView.mapboxMap.style?.let { style ->
                         if (terrainEnabled) enableTerrain(style) else disableTerrain(style)
                     }
@@ -285,7 +276,7 @@ class MapFragment : Fragment() {
 
     private fun showAddMenu() {
         if (measureMode) {
-            Toast.makeText(requireContext(), "Stop measuring first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.map_stop_measuring_first, Toast.LENGTH_SHORT).show()
             return
         }
         if (pendingType != null) {
@@ -643,7 +634,7 @@ class MapFragment : Fragment() {
 
     private fun toggleMeasureMode() {
         if (pendingType != null) {
-            Toast.makeText(requireContext(), "Finish your feature first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.map_finish_feature_first, Toast.LENGTH_SHORT).show()
             return
         }
         if (measureMode) {
@@ -660,7 +651,7 @@ class MapFragment : Fragment() {
             ?.getLayerAs<LineLayer>(DRAW_LINE_LAYER_ID)
             ?.lineColor(Color.WHITE)
         clearDrawLine()
-        binding.tvMeasurePill.text = "Tap the map to measure"
+        binding.tvMeasurePill.text = getString(R.string.map_tap_to_measure)
         binding.tvMeasurePill.isVisible = true
     }
 
@@ -674,7 +665,7 @@ class MapFragment : Fragment() {
     private fun clearMeasure() {
         measurePoints.clear()
         clearDrawLine()
-        binding.tvMeasurePill.text = "Tap the map to measure"
+        binding.tvMeasurePill.text = getString(R.string.map_tap_to_measure)
     }
 
     private fun updateMeasureLine() {
@@ -691,7 +682,7 @@ class MapFragment : Fragment() {
 
     private fun updateMeasurePill() {
         if (measurePoints.size < 2) {
-            binding.tvMeasurePill.text = "Tap a second point"
+            binding.tvMeasurePill.text = getString(R.string.map_tap_second_point)
             return
         }
         val total = GeoMath.polylineMeters(measurePoints.map { it.longitude() to it.latitude() })
@@ -701,6 +692,36 @@ class MapFragment : Fragment() {
     override fun onStart() {
         super.onStart()
         _binding?.mapView?.onStart()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        _binding?.mapView?.mapboxMap?.getStyle { style ->
+            if (!isSatellite) applyLightPreset(style)
+        }
+    }
+
+    private fun applyLightPreset(style: Style) {
+        style.setStyleImportConfigProperty("basemap", "lightPreset", Value(mapSettings.getLightPreset()))
+        applyMapDisplayToggles(style)
+        applyMapLanguage(style)
+    }
+
+    private fun applyMapDisplayToggles(style: Style) {
+        val toggles =
+            listOf(
+                "showRoadLabels" to (MapSettingsRepository.KEY_ROAD_LABELS to MapSettingsRepository.DEFAULT_ROAD_LABELS),
+                "showPointOfInterestLabels" to (MapSettingsRepository.KEY_POI_LABELS to MapSettingsRepository.DEFAULT_POI_LABELS),
+                "showPlaceLabels" to (MapSettingsRepository.KEY_PLACE_LABELS to MapSettingsRepository.DEFAULT_PLACE_LABELS),
+                "show3dObjects" to (MapSettingsRepository.KEY_3D_OBJECTS to MapSettingsRepository.DEFAULT_3D_OBJECTS),
+            )
+        toggles.forEach { (name, kv) ->
+            style.setStyleImportConfigProperty("basemap", name, Value(mapSettings.getBool(kv.first, kv.second)))
+        }
+    }
+
+    private fun applyMapLanguage(style: Style) {
+        style.setStyleImportConfigProperty("basemap", "language", Value("en"))
     }
 
     override fun onStop() {
@@ -713,22 +734,6 @@ class MapFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
-    private fun fetchWeatherForMapCenter() {
-        val center = binding.mapView.mapboxMap.cameraState.center
-        viewModel.fetchWeather(center.latitude(), center.longitude())
-    }
-
-    private fun weatherEmoji(code: Int): String =
-        when (code / 100) {
-            2 -> "\u26C8"
-            3 -> "\uD83C\uDF27"
-            5 -> "\uD83C\uDF27"
-            6 -> "\u2744"
-            7 -> "\uD83C\uDF2B"
-            8 -> if (code == 800) "\u2600" else "\u26C5"
-            else -> "\uD83C\uDF24"
-        }
 
     companion object {
         private const val POINTS_SOURCE_ID = "points-source"

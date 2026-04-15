@@ -43,10 +43,9 @@
     <string name="add_dp_gallery">Gallery</string>
     <string name="add_dp_save">Save</string>
 
-    <!-- Weather -->
-    <string name="weather_humidity">Humidity</string>
-    <string name="weather_wind">Wind</string>
-    <string name="weather_wind_value">%.1f m/s</string>
+    <!-- Location -->
+    <string name="point_near_address">Near: %1$s</string>
+    <string name="coords_copied">Coordinates copied to clipboard</string>
 
     <!-- My Distribution Points -->
     <string name="my_dps_title">My Points</string>
@@ -83,4 +82,104 @@
     <string name="back">Back</string>
     <string name="error_generic">Something went wrong</string>
     <string name="loading">Loading…</string>
+    <string name="camera_unavailable">No camera app available on this device</string>
+
+    <!-- Feed -->
+    <string name="feed_latest_changes">Latest changes</string>
+    <string name="feed_empty">No posts yet</string>
+
+    <!-- Comments -->
+    <string name="comments_header">Comments</string>
+    <string name="comments_empty">No comments yet</string>
+    <string name="comments_view_all">View all comments →</string>
+
+    <!-- Point detail actions -->
+    <string name="point_action_navigate">Navigate</string>
+    <string name="point_action_edit">Edit</string>
+    <string name="point_action_share">Share</string>
+    <string name="point_untitled">Untitled</string>
+    <string name="point_author_unknown">Unknown</string>
+    <string name="point_no_description">No description</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Profile</string>
+    <string name="profile_change_photo">Change Photo</string>
+    <string name="profile_save">Save</string>
+    <string name="profile_name">Name</string>
+
+    <!-- Details -->
+    <string name="detail_title">Details</string>
+    <string name="comment_hint">Add a comment…</string>
+
+    <!-- Settings misc -->
+    <string name="settings_app_version">App Version</string>
+
+    <!-- Layers -->
+    <string name="layers_title">Layers</string>
+    <string name="layers_subtitle">Show or hide feature types</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_feed">Feed</string>
+    <string name="nav_map">Map</string>
+
+    <!-- Map toolbar actions -->
+    <string name="map_measure">Measure</string>
+    <string name="map_satellite">Satellite</string>
+    <string name="map_street">Street</string>
+    <string name="map_flat_view">Flat view</string>
+    <string name="map_3d_view">3D view</string>
+    <string name="map_flat">Flat</string>
+    <string name="map_3d_terrain">3D Terrain</string>
+    <string name="map_stop_measuring_first">Stop measuring first</string>
+    <string name="map_finish_feature_first">Finish your feature first</string>
+    <string name="map_tap_to_measure">Tap the map to measure</string>
+    <string name="map_tap_second_point">Tap a second point</string>
+
+    <!-- Validation -->
+    <string name="register_all_fields_required">All fields are required</string>
+    <string name="register_password_too_short">Password must be at least 6 characters</string>
+    <string name="login_credentials_required">Email and password are required</string>
+    <string name="point_label_required">Label is required</string>
+    <string name="point_line_needs_two">Line needs at least 2 points</string>
+    <string name="profile_name_empty">Name cannot be empty</string>
+    <string name="profile_updated">Profile updated</string>
+
+    <!-- AI photo analysis -->
+    <string name="ai_analyze_button">Analyze with AI</string>
+    <string name="ai_analyze_loading">Analyzing…</string>
+    <string name="ai_analyze_success">Notes updated by AI</string>
+    <string name="ai_analyze_error">Couldn\'t analyze photo</string>
+    <string name="ai_analyze_no_photo">Take a photo first</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">Statistics</string>
+    <string name="stats_total_points">Total Points</string>
+    <string name="stats_total_caption">Across %1$d types · %2$d contributors</string>
+    <string name="stats_by_type">By Type</string>
+    <string name="stats_top_contributors">Top Contributors</string>
+    <string name="stats_this_week">This Week</string>
+    <string name="stats_no_data">No points yet — create some to see statistics</string>
+    <string name="stats_refresh">Refresh</string>
+    <string name="settings_view_stats">View Statistics</string>
+
+    <!-- CSV export -->
+    <string name="stats_export_csv">Export all to CSV</string>
+    <string name="stats_export_chooser">Share CSV</string>
+    <string name="stats_export_success">Exported %1$d points</string>
+    <string name="stats_export_error">Export failed</string>
+
+    <!-- Map lighting -->
+    <string name="settings_map_lighting">Map Lighting</string>
+    <string name="map_preset_dawn">Dawn</string>
+    <string name="map_preset_day">Day</string>
+    <string name="map_preset_dusk">Dusk</string>
+    <string name="map_preset_night">Night</string>
+
+    <!-- Map toggles -->
+    <string name="settings_map_display">Map Display</string>
+    <string name="settings_road_labels">Road labels</string>
+    <string name="settings_poi_labels">Points of interest</string>
+    <string name="settings_place_labels">Place names</string>
+    <string name="settings_3d_objects">3D buildings</string>
+
 </resources>

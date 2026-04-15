@@ -12,7 +12,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/bg_top"
         app:navigationIcon="@android:drawable/ic_menu_revert"
-        app:title="Details"
+        app:title="@string/detail_title"
         app:titleTextColor="@color/zinc_100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,7 +94,7 @@
                 android:id="@+id/tvCommentsHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Comments"
+                android:text="@string/comments_header"
                 android:textColor="@color/zinc_100"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -111,7 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="No comments yet"
+                android:text="@string/comments_empty"
                 android:textColor="@color/zinc_400"
                 android:textSize="13sp" />
 
@@ -135,7 +135,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@color/zinc_700"
-            android:hint="Add a comment..."
+            android:hint="@string/comment_hint"
             android:inputType="textMultiLine"
             android:maxLines="3"
             android:padding="12dp"

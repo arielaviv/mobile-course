@@ -7,8 +7,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.field.survey.R
 import com.field.survey.data.repository.AuthRepository
 import com.field.survey.data.repository.DistributionPointRepository
+import com.field.survey.data.repository.PhotoAnalysisRepository
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.DpType
 import com.field.survey.domain.model.PathCoordinates
@@ -27,6 +29,7 @@ class AddPointViewModel
         savedStateHandle: SavedStateHandle,
         private val repository: DistributionPointRepository,
         private val authRepository: AuthRepository,
+        private val photoAnalysisRepository: PhotoAnalysisRepository,
     ) : ViewModel() {
 
         private val argType: String = savedStateHandle["dpType"] ?: ""
@@ -40,7 +43,8 @@ class AddPointViewModel
         private val _selectedType = MutableLiveData(initialType)
         val selectedType: LiveData<DpType> = _selectedType
 
-        private val photoPath = MutableLiveData<String?>(null)
+        private val _photoPath = MutableLiveData<String?>(null)
+        val photoPath: LiveData<String?> = _photoPath
 
         private val _latitude = MutableLiveData(0.0)
         val latitude: LiveData<Double> = _latitude
@@ -68,15 +72,51 @@ class AddPointViewModel
         private val _saveSuccess = MutableLiveData(false)
         val saveSuccess: LiveData<Boolean> = _saveSuccess
 
-        private val _error = MutableLiveData<String?>(null)
-        val error: LiveData<String?> = _error
+        private val _error = MutableLiveData<Int?>(null)
+        val error: LiveData<Int?> = _error
+
+        private val _isAnalyzing = MutableLiveData(false)
+        val isAnalyzing: LiveData<Boolean> = _isAnalyzing
+
+        private val _aiNotes = MutableLiveData<String?>(null)
+        val aiNotes: LiveData<String?> = _aiNotes
+
+        private val _aiError = MutableLiveData<Int?>(null)
+        val aiError: LiveData<Int?> = _aiError
 
         fun setSelectedType(type: DpType) {
             _selectedType.value = type
         }
 
         fun setPhotoPath(path: String?) {
-            photoPath.value = path
+            _photoPath.value = path
+        }
+
+        fun analyzePhoto() {
+            val path = _photoPath.value
+            if (path.isNullOrBlank()) {
+                _aiError.value = R.string.ai_analyze_no_photo
+                return
+            }
+            if (_isAnalyzing.value == true) return
+
+            _isAnalyzing.value = true
+            _aiError.value = null
+            viewModelScope.launch {
+                val result = photoAnalysisRepository.analyzePhoto(path)
+                _isAnalyzing.value = false
+                result
+                    .onSuccess { _aiNotes.value = it }
+                    .onFailure { _aiError.value = R.string.ai_analyze_error }
+            }
+        }
+
+        fun consumeAiNotes() {
+            _aiNotes.value = null
+        }
+
+        fun consumeAiError() {
+            _aiError.value = null
         }
 
         @SuppressLint("MissingPermission")
@@ -98,13 +138,13 @@ class AddPointViewModel
             notes: String,
         ) {
             if (label.isBlank()) {
-                _error.value = "Label is required"
+                _error.value = R.string.point_label_required
                 return
             }
 
             val type = _selectedType.value ?: initialType
             if (type.isLine && vertices.size < 2) {
-                _error.value = "Line needs at least 2 points"
+                _error.value = R.string.point_line_needs_two
                 return
             }
 
@@ -121,7 +161,7 @@ class AddPointViewModel
                             latitude = _latitude.value ?: 0.0,
                             longitude = _longitude.value ?: 0.0,
                             pathCoordinates = if (type.isLine) pathCoordinatesArg.ifBlank { null } else null,
-                            photoPath = photoPath.value,
+                            photoPath = _photoPath.value,
                             imageBase64 = null,
                             notes = notes.trim(),
                             createdAt = System.currentTimeMillis(),
@@ -130,8 +170,8 @@ class AddPointViewModel
                         )
                     repository.save(dp)
                     _saveSuccess.value = true
-                } catch (e: Exception) {
-                    _error.value = e.message ?: "Failed to save point"
+                } catch (_: Exception) {
+                    _error.value = R.string.error_generic
                 } finally {
                     _isSaving.value = false
                 }

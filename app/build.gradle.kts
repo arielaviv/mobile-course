@@ -40,8 +40,8 @@ android {
         )
         buildConfigField(
             "String",
-            "OPENWEATHER_API_KEY",
-            "\"${localProperties.getProperty("OPENWEATHER_API_KEY", "")}\"",
+            "ANTHROPIC_API_KEY",
+            "\"${localProperties.getProperty("ANTHROPIC_API_KEY", "")}\"",
         )
     }
 
@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.swiperefreshlayout)
     implementation(libs.androidx.exifinterface)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -102,7 +103,14 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    implementation(libs.room.paging)
     ksp(libs.room.compiler)
+
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+
+    // Shimmer (skeleton loading)
+    implementation(libs.shimmer)
 
     // Network
     implementation(libs.retrofit)

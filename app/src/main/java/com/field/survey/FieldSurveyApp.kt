@@ -1,6 +1,8 @@
 package com.field.survey
 
 import android.app.Application
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.mapbox.common.MapboxOptions
 import dagger.hilt.android.HiltAndroidApp
 
@@ -11,5 +13,9 @@ class FieldSurveyApp : Application() {
         if (BuildConfig.MAPBOX_PUBLIC_TOKEN.isNotBlank()) {
             MapboxOptions.accessToken = BuildConfig.MAPBOX_PUBLIC_TOKEN
         }
+        FirebaseFirestore.getInstance().firestoreSettings =
+            FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(false)
+                .build()
     }
 }

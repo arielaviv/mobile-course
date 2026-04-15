@@ -5,27 +5,27 @@
     <item
         android:id="@+id/action_layers"
         android:icon="@drawable/ic_layers"
-        android:title="Layers"
+        android:title="@string/layers_title"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_measure"
         android:icon="@drawable/ic_ruler"
-        android:title="Measure"
+        android:title="@string/map_measure"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_satellite"
-        android:title="Satellite"
+        android:title="@string/map_satellite"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_pitch"
-        android:title="Flat view"
+        android:title="@string/map_flat_view"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/action_terrain"
-        android:title="3D Terrain"
+        android:title="@string/map_3d_terrain"
         app:showAsAction="never" />
 </menu>

@@ -1,6 +1,9 @@
 package com.field.survey.ui.detail
 
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Base64
@@ -8,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -94,7 +98,7 @@ class PointDetailSheet : BottomSheetDialogFragment() {
         viewModel.point.observe(viewLifecycleOwner) { point ->
             if (point == null) return@observe
 
-            binding.tvLabel.text = point.label.ifBlank { "Untitled" }
+            binding.tvLabel.text = point.label.ifBlank { getString(R.string.point_untitled) }
             binding.chipType.text = getString(point.type.labelRes)
 
             applyTypeTint(point.type)
@@ -102,7 +106,7 @@ class PointDetailSheet : BottomSheetDialogFragment() {
             val dateStr =
                 SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
                     .format(Date(point.createdAt))
-            val author = point.createdByName.ifBlank { "Unknown" }
+            val author = point.createdByName.ifBlank { getString(R.string.point_author_unknown) }
 
             binding.tvMeta.text =
                 if (point.type.isLine) {
@@ -113,7 +117,17 @@ class PointDetailSheet : BottomSheetDialogFragment() {
                     "$author · %.5f, %.5f · $dateStr".format(point.latitude, point.longitude)
                 }
 
-            binding.tvNotes.text = point.notes.ifBlank { "No description" }
+            if (!point.type.isLine) {
+                binding.tvMeta.setOnLongClickListener {
+                    val coords = "%.6f, %.6f".format(point.latitude, point.longitude)
+                    val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    clipboard.setPrimaryClip(ClipData.newPlainText("coordinates", coords))
+                    Toast.makeText(requireContext(), R.string.coords_copied, Toast.LENGTH_SHORT).show()
+                    true
+                }
+            }
+
+            binding.tvNotes.text = point.notes.ifBlank { getString(R.string.point_no_description) }
             binding.tvNotes.setTextColor(
                 ContextCompat.getColor(
                     requireContext(),
@@ -155,12 +169,23 @@ class PointDetailSheet : BottomSheetDialogFragment() {
             }
         }
 
+        viewModel.address.observe(viewLifecycleOwner) { address ->
+            if (address == null || (address.primary.isBlank() && address.secondary.isBlank())) {
+                binding.tvNearAddress.isVisible = false
+            } else {
+                val parts = listOf(address.primary, address.secondary).filter { it.isNotBlank() }
+                binding.tvNearAddress.text = getString(R.string.point_near_address, parts.joinToString(" · "))
+                binding.tvNearAddress.isVisible = true
+            }
+        }
+
         viewModel.comments.observe(viewLifecycleOwner) { comments ->
             val preview = comments.take(COMMENTS_PREVIEW_LIMIT)
             commentAdapter.submitList(preview)
             binding.tvNoComments.isVisible = comments.isEmpty()
             binding.tvCommentsHeader.text =
-                if (comments.isEmpty()) "Comments" else "Comments (${comments.size})"
+                if (comments.isEmpty()) getString(R.string.comments_header)
+                else "${getString(R.string.comments_header)} (${comments.size})"
             binding.btnViewAll.isVisible = comments.size > COMMENTS_PREVIEW_LIMIT || comments.isNotEmpty()
         }
     }

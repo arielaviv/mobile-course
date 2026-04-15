@@ -2,12 +2,14 @@ package com.field.survey.ui.addpoint
 
 import android.Manifest
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
@@ -16,10 +18,12 @@ import androidx.fragment.app.viewModels
 import com.field.survey.R
 import com.field.survey.databinding.FragmentAddPointBinding
 import com.field.survey.domain.model.DpType
+import com.field.survey.ui.util.bindErrorText
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.chip.Chip
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
@@ -118,7 +122,11 @@ class AddPointSheet : BottomSheetDialogFragment() {
                     file,
                 )
             viewModel.setPhotoPath(file.absolutePath)
-            takePictureLauncher.launch(photoUri!!)
+            try {
+                takePictureLauncher.launch(photoUri!!)
+            } catch (_: ActivityNotFoundException) {
+                Toast.makeText(requireContext(), R.string.camera_unavailable, Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.btnGallery.setOnClickListener {
@@ -129,6 +137,33 @@ class AddPointSheet : BottomSheetDialogFragment() {
             val label = binding.etLabel.text.toString()
             val notes = binding.etNotes.text.toString()
             viewModel.save(label, notes)
+        }
+
+        binding.btnAnalyzeAi.setOnClickListener {
+            viewModel.analyzePhoto()
+        }
+
+        viewModel.photoPath.observe(viewLifecycleOwner) { path ->
+            binding.btnAnalyzeAi.isEnabled = !path.isNullOrBlank() && viewModel.isAnalyzing.value != true
+        }
+
+        viewModel.isAnalyzing.observe(viewLifecycleOwner) { analyzing ->
+            binding.btnAnalyzeAi.isEnabled = analyzing == false && !viewModel.photoPath.value.isNullOrBlank()
+            binding.btnAnalyzeAi.text =
+                if (analyzing == true) getString(R.string.ai_analyze_loading) else getString(R.string.ai_analyze_button)
+        }
+
+        viewModel.aiNotes.observe(viewLifecycleOwner) { notes ->
+            if (notes.isNullOrBlank()) return@observe
+            binding.etNotes.setText(notes)
+            Snackbar.make(binding.root, R.string.ai_analyze_success, Snackbar.LENGTH_SHORT).show()
+            viewModel.consumeAiNotes()
+        }
+
+        viewModel.aiError.observe(viewLifecycleOwner) { err ->
+            if (err == null) return@observe
+            Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()
+            viewModel.consumeAiError()
         }
 
         expandSheetOnFocus(binding.etLabel)
@@ -143,10 +178,7 @@ class AddPointSheet : BottomSheetDialogFragment() {
             binding.progressBar.isVisible = saving
         }
 
-        viewModel.error.observe(viewLifecycleOwner) { error ->
-            binding.tvError.isVisible = error != null
-            binding.tvError.text = error
-        }
+        bindErrorText(viewModel.error, binding.tvError)
 
         viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
             if (success) dismiss()

@@ -1,5 +1,6 @@
 package com.field.survey.ui.editpoint
 
+import android.content.ActivityNotFoundException
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -7,6 +8,7 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
@@ -14,9 +16,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.field.survey.R
 import com.field.survey.databinding.FragmentEditPointBinding
+import com.field.survey.ui.util.bindErrorText
 import com.field.survey.domain.model.DpType
 import com.google.android.material.chip.Chip
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
@@ -82,7 +87,11 @@ class EditPointFragment : Fragment() {
                     file,
                 )
             viewModel.setPhotoPath(file.absolutePath)
-            takePictureLauncher.launch(photoUri!!)
+            try {
+                takePictureLauncher.launch(photoUri!!)
+            } catch (_: ActivityNotFoundException) {
+                Toast.makeText(requireContext(), R.string.camera_unavailable, Toast.LENGTH_SHORT).show()
+            }
         }
 
         binding.btnGallery.setOnClickListener {
@@ -93,6 +102,35 @@ class EditPointFragment : Fragment() {
             val label = binding.etLabel.text.toString()
             val notes = binding.etNotes.text.toString()
             viewModel.save(label, notes, selectedType)
+        }
+
+        binding.btnAnalyzeAi.setOnClickListener {
+            viewModel.analyzePhoto()
+        }
+
+        viewModel.photoPath.observe(viewLifecycleOwner) { path ->
+            if (viewModel.isAnalyzing.value != true) {
+                binding.btnAnalyzeAi.isEnabled = !path.isNullOrBlank()
+            }
+        }
+
+        viewModel.isAnalyzing.observe(viewLifecycleOwner) { analyzing ->
+            binding.btnAnalyzeAi.isEnabled = analyzing == false && !viewModel.photoPath.value.isNullOrBlank()
+            binding.btnAnalyzeAi.text =
+                if (analyzing == true) getString(R.string.ai_analyze_loading) else getString(R.string.ai_analyze_button)
+        }
+
+        viewModel.aiNotes.observe(viewLifecycleOwner) { notes ->
+            if (notes.isNullOrBlank()) return@observe
+            binding.etNotes.setText(notes)
+            Snackbar.make(binding.root, R.string.ai_analyze_success, Snackbar.LENGTH_SHORT).show()
+            viewModel.consumeAiNotes()
+        }
+
+        viewModel.aiError.observe(viewLifecycleOwner) { err ->
+            if (err == null) return@observe
+            Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()
+            viewModel.consumeAiError()
         }
 
         viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
@@ -123,10 +161,7 @@ class EditPointFragment : Fragment() {
             binding.progressBar.isVisible = saving
         }
 
-        viewModel.error.observe(viewLifecycleOwner) { error ->
-            binding.tvError.isVisible = error != null
-            binding.tvError.text = error
-        }
+        bindErrorText(viewModel.error, binding.tvError)
 
         viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {

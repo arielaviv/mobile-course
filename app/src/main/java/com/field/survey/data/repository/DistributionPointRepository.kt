@@ -1,5 +1,9 @@
 package com.field.survey.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.field.survey.data.local.dao.DistributionPointDao
 import com.field.survey.data.local.entity.DistributionPointEntity
 import com.field.survey.domain.model.DistributionPoint
@@ -24,6 +28,12 @@ class DistributionPointRepository
         private val collection = firestore.collection("distribution_points")
 
         fun observeAll(): Flow<List<DistributionPoint>> = dao.observeAll().map { entities -> entities.map { it.toDomain() } }
+
+        fun pagedPosts(): Flow<PagingData<DistributionPoint>> =
+            Pager(
+                config = PagingConfig(pageSize = 10, enablePlaceholders = false, initialLoadSize = 15),
+                pagingSourceFactory = { dao.pagedAll() },
+            ).flow.map { pagingData -> pagingData.map { it.toDomain() } }
 
         fun observeByUser(userId: String): Flow<List<DistributionPoint>> = dao.observeByUser(userId).map { entities -> entities.map { it.toDomain() } }
 
@@ -62,7 +72,7 @@ class DistributionPointRepository
                         }
                     }
                 dao.deleteAll()
-                dps.forEach { dao.insert(it) }
+                dao.insertAll(dps)
             } catch (_: Exception) {
                 // Offline — rely on Room cache
             }

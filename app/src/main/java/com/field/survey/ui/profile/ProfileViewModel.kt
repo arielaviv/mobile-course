@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.field.survey.R
 import com.field.survey.data.repository.AuthRepository
 import com.field.survey.data.repository.UserProfile
 import com.field.survey.ui.util.ImageCompression
@@ -18,6 +19,11 @@ class ProfileViewModel
         private val authRepository: AuthRepository,
     ) : ViewModel() {
 
+        sealed class SaveResult {
+            data class Success(val stringRes: Int) : SaveResult()
+            data class Error(val stringRes: Int) : SaveResult()
+        }
+
         private val _profile = MutableLiveData<UserProfile?>()
         val profile: LiveData<UserProfile?> = _profile
 
@@ -27,8 +33,8 @@ class ProfileViewModel
         private val _isSaving = MutableLiveData(false)
         val isSaving: LiveData<Boolean> = _isSaving
 
-        private val _saveResult = MutableLiveData<String?>()
-        val saveResult: LiveData<String?> = _saveResult
+        private val _saveResult = MutableLiveData<SaveResult?>()
+        val saveResult: LiveData<SaveResult?> = _saveResult
 
         private var newPhotoBase64: String? = null
 
@@ -52,7 +58,7 @@ class ProfileViewModel
 
         fun save(name: String) {
             if (name.isBlank()) {
-                _saveResult.value = "Name cannot be empty"
+                _saveResult.value = SaveResult.Error(R.string.profile_name_empty)
                 return
             }
             viewModelScope.launch {
@@ -61,12 +67,12 @@ class ProfileViewModel
                 result.fold(
                     onSuccess = {
                         _isSaving.value = false
-                        _saveResult.value = "Profile updated"
+                        _saveResult.value = SaveResult.Success(R.string.profile_updated)
                         loadProfile()
                     },
-                    onFailure = { e ->
+                    onFailure = {
                         _isSaving.value = false
-                        _saveResult.value = e.message ?: "Failed to save"
+                        _saveResult.value = SaveResult.Error(R.string.error_generic)
                     },
                 )
             }

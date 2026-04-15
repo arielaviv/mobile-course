@@ -5,9 +5,9 @@ import android.util.Base64
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.field.survey.R
 import com.field.survey.databinding.ItemPostBinding
 import com.field.survey.domain.model.DistributionPoint
 
@@ -15,7 +15,7 @@ class PostAdapter(
     private val onClick: (DistributionPoint) -> Unit,
     private val onEdit: ((DistributionPoint) -> Unit)? = null,
     private val onDelete: ((DistributionPoint) -> Unit)? = null,
-) : ListAdapter<DistributionPoint, PostAdapter.PostViewHolder>(DiffCallback) {
+) : ListAdapter<DistributionPoint, PostAdapter.PostViewHolder>(DistributionPointDiffCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -42,10 +42,11 @@ class PostAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(point: DistributionPoint) {
+            val ctx = itemView.context
             binding.tvLabel.text = point.label
-            binding.tvType.text = itemView.context.getString(point.type.labelRes)
-            binding.tvNotes.text = point.notes.ifBlank { "No description" }
-            binding.tvAuthor.text = point.createdByName.ifBlank { "Unknown" }
+            binding.tvType.text = ctx.getString(point.type.labelRes)
+            binding.tvNotes.text = point.notes.ifBlank { ctx.getString(R.string.point_no_description) }
+            binding.tvAuthor.text = point.createdByName.ifBlank { ctx.getString(R.string.point_author_unknown) }
 
             if (!point.imageBase64.isNullOrBlank()) {
                 try {
@@ -69,15 +70,4 @@ class PostAdapter(
         }
     }
 
-    companion object DiffCallback : DiffUtil.ItemCallback<DistributionPoint>() {
-        override fun areItemsTheSame(
-            old: DistributionPoint,
-            new: DistributionPoint,
-        ) = old.id == new.id
-
-        override fun areContentsTheSame(
-            old: DistributionPoint,
-            new: DistributionPoint,
-        ) = old == new
-    }
 }

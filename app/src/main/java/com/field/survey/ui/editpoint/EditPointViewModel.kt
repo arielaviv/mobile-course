@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.field.survey.R
 import com.field.survey.data.repository.DistributionPointRepository
+import com.field.survey.data.repository.PhotoAnalysisRepository
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.DpType
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,6 +19,7 @@ class EditPointViewModel
     @Inject
     constructor(
         private val repository: DistributionPointRepository,
+        private val photoAnalysisRepository: PhotoAnalysisRepository,
         savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
 
@@ -31,13 +34,23 @@ class EditPointViewModel
         private val _saveSuccess = MutableLiveData(false)
         val saveSuccess: LiveData<Boolean> = _saveSuccess
 
-        private val _error = MutableLiveData<String?>(null)
-        val error: LiveData<String?> = _error
+        private val _error = MutableLiveData<Int?>(null)
+        val error: LiveData<Int?> = _error
 
         private val _isLoading = MutableLiveData(true)
         val isLoading: LiveData<Boolean> = _isLoading
 
-        private var photoPath: String? = null
+        private val _photoPath = MutableLiveData<String?>(null)
+        val photoPath: LiveData<String?> = _photoPath
+
+        private val _isAnalyzing = MutableLiveData(false)
+        val isAnalyzing: LiveData<Boolean> = _isAnalyzing
+
+        private val _aiNotes = MutableLiveData<String?>(null)
+        val aiNotes: LiveData<String?> = _aiNotes
+
+        private val _aiError = MutableLiveData<Int?>(null)
+        val aiError: LiveData<Int?> = _aiError
 
         init {
             loadPoint()
@@ -52,7 +65,34 @@ class EditPointViewModel
         }
 
         fun setPhotoPath(path: String?) {
-            photoPath = path
+            _photoPath.value = path
+        }
+
+        fun analyzePhoto() {
+            val path = _photoPath.value
+            if (path.isNullOrBlank()) {
+                _aiError.value = R.string.ai_analyze_no_photo
+                return
+            }
+            if (_isAnalyzing.value == true) return
+
+            _isAnalyzing.value = true
+            _aiError.value = null
+            viewModelScope.launch {
+                val result = photoAnalysisRepository.analyzePhoto(path)
+                _isAnalyzing.value = false
+                result
+                    .onSuccess { _aiNotes.value = it }
+                    .onFailure { _aiError.value = R.string.ai_analyze_error }
+            }
+        }
+
+        fun consumeAiNotes() {
+            _aiNotes.value = null
+        }
+
+        fun consumeAiError() {
+            _aiError.value = null
         }
 
         fun save(
@@ -63,7 +103,7 @@ class EditPointViewModel
             val current = _point.value ?: return
 
             if (label.isBlank()) {
-                _error.value = "Label is required"
+                _error.value = R.string.point_label_required
                 return
             }
 
@@ -77,12 +117,12 @@ class EditPointViewModel
                             label = label.trim(),
                             notes = notes.trim(),
                             type = type,
-                            photoPath = photoPath ?: current.photoPath,
+                            photoPath = _photoPath.value ?: current.photoPath,
                         )
                     repository.update(updated)
                     _saveSuccess.value = true
-                } catch (e: Exception) {
-                    _error.value = e.message ?: "Failed to save changes"
+                } catch (_: Exception) {
+                    _error.value = R.string.error_generic
                 } finally {
                     _isSaving.value = false
                 }

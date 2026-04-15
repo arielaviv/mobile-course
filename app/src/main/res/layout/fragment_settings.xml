@@ -12,46 +12,166 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/bg_top"
         app:navigationIcon="@android:drawable/ic_menu_revert"
-        app:title="Settings"
+        app:title="@string/settings_title"
         app:titleTextColor="@color/zinc_100"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tvVersionLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="24dp"
-        android:text="App Version"
-        android:textColor="@color/zinc_400"
-        android:textSize="14sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
-
-    <TextView
-        android:id="@+id/tvVersion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginStart="24dp"
-        android:textColor="@color/zinc_100"
-        android:textSize="16sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvVersionLabel" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogout"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scroll"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="32dp"
-        android:text="Log Out"
-        android:textColor="@color/zinc_100"
-        app:backgroundTint="@color/error"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvVersionLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="24dp"
+                android:text="@string/settings_app_version"
+                android:textColor="@color/zinc_400"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvVersion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="24dp"
+                android:textColor="@color/zinc_100"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvLightingLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:layout_marginStart="24dp"
+                android:text="@string/settings_map_lighting"
+                android:textColor="@color/zinc_400"
+                android:textSize="14sp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupLighting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="24dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipPresetDawn"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_preset_dawn" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipPresetDay"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_preset_day" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipPresetDusk"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_preset_dusk" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipPresetNight"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/map_preset_night" />
+            </com.google.android.material.chip.ChipGroup>
+
+            <TextView
+                android:id="@+id/tvDisplayLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="24dp"
+                android:text="@string/settings_map_display"
+                android:textColor="@color/zinc_400"
+                android:textSize="14sp" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchRoadLabels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="24dp"
+                android:text="@string/settings_road_labels"
+                android:textColor="@color/zinc_100" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchPoiLabels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginHorizontal="24dp"
+                android:text="@string/settings_poi_labels"
+                android:textColor="@color/zinc_100" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switchPlaceLabels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginHorizontal="24dp"
+                android:text="@string/settings_place_labels"
+                android:textColor="@color/zinc_100" />
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/switch3dObjects"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginHorizontal="24dp"
+                android:text="@string/settings_3d_objects"
+                android:textColor="@color/zinc_100" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnViewStats"
+                style="@style/Widget.Material3.Button.TonalButton.Icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="32dp"
+                android:text="@string/settings_view_stats"
+                android:textColor="@color/m3_on_secondary_container"
+                app:backgroundTint="@color/m3_secondary_container"
+                app:icon="@drawable/ic_stats"
+                app:iconGravity="textStart"
+                app:iconTint="@color/m3_on_secondary_container" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="12dp"
+                android:text="@string/settings_logout"
+                android:textColor="@color/zinc_100"
+                app:backgroundTint="@color/error" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

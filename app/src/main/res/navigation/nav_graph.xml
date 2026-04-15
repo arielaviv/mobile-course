@@ -60,6 +60,10 @@
         <action
             android:id="@+id/action_feed_to_settings"
             app:destination="@id/settingsFragment" />
+
+        <action
+            android:id="@+id/action_feed_to_stats"
+            app:destination="@id/statsFragment" />
     </fragment>
 
     <fragment
@@ -127,6 +131,16 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/action_settings_to_stats"
+            app:destination="@id/statsFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="com.field.survey.ui.stats.StatsFragment"
+        android:label="Statistics"
+        tools:layout="@layout/fragment_stats" />
 
 </navigation>
