@@ -76,4 +76,10 @@
         <item name="cornerSizeBottomLeft">0dp</item>
         <item name="cornerSizeBottomRight">0dp</item>
     </style>
+
+    <style name="Theme.FieldSurvey.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/m3_primary_container</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
+        <item name="postSplashScreenTheme">@style/Theme.FieldSurvey</item>
+    </style>
 </resources>
