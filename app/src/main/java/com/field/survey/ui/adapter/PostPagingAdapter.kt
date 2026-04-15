@@ -4,18 +4,15 @@ import android.graphics.BitmapFactory
 import android.util.Base64
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.ListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.field.survey.R
 import com.field.survey.databinding.ItemPostBinding
 import com.field.survey.domain.model.DistributionPoint
 
-class PostAdapter(
+class PostPagingAdapter(
     private val onClick: (DistributionPoint) -> Unit,
-    private val onEdit: ((DistributionPoint) -> Unit)? = null,
-    private val onDelete: ((DistributionPoint) -> Unit)? = null,
-) : ListAdapter<DistributionPoint, PostAdapter.PostViewHolder>(DistributionPointDiffCallback) {
+) : PagingDataAdapter<DistributionPoint, PostPagingAdapter.PostViewHolder>(DistributionPointDiffCallback) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -34,7 +31,7 @@ class PostAdapter(
         holder: PostViewHolder,
         position: Int,
     ) {
-        holder.bind(getItem(position))
+        getItem(position)?.let { holder.bind(it) }
     }
 
     inner class PostViewHolder(
@@ -61,13 +58,6 @@ class PostAdapter(
             }
 
             binding.root.setOnClickListener { onClick(point) }
-
-            binding.btnEdit.isVisible = onEdit != null
-            binding.btnDelete.isVisible = onDelete != null
-
-            binding.btnEdit.setOnClickListener { onEdit?.invoke(point) }
-            binding.btnDelete.setOnClickListener { onDelete?.invoke(point) }
         }
     }
-
 }
