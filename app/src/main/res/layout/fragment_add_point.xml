@@ -72,6 +72,23 @@
                     android:textColor="@color/zinc_100" />
             </LinearLayout>
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAnalyzeAi"
+                style="@style/Widget.Material3.Button.TonalButton.Icon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:enabled="false"
+                android:text="@string/ai_analyze_button"
+                android:textColor="@color/m3_on_primary_container"
+                app:backgroundTint="@color/m3_primary_container"
+                app:icon="@drawable/ic_ai_sparkle"
+                app:iconGravity="textStart"
+                app:iconTint="@color/m3_on_primary_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/photoButtons" />
+
             <!-- Type label -->
             <TextView
                 android:id="@+id/tvTypeLabel"
@@ -84,7 +101,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/photoButtons" />
+                app:layout_constraintTop_toBottomOf="@id/btnAnalyzeAi" />
 
             <!-- Type chips -->
             <com.google.android.material.chip.ChipGroup
