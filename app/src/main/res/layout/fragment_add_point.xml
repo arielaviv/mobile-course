@@ -78,6 +78,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:alpha="0.4"
                 android:enabled="false"
                 android:text="@string/ai_analyze_button"
                 android:textColor="@color/m3_on_primary_container"

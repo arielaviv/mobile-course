@@ -16,6 +16,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.field.survey.R
+import com.field.survey.data.repository.MapSettingsRepository
 import com.field.survey.databinding.FragmentAddPointBinding
 import com.field.survey.domain.model.DpType
 import com.field.survey.ui.util.bindErrorText
@@ -26,6 +27,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddPointSheet : BottomSheetDialogFragment() {
@@ -34,13 +36,14 @@ class AddPointSheet : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
     private val viewModel: AddPointViewModel by viewModels()
 
+    @Inject lateinit var mapSettings: MapSettingsRepository
+
     private var photoUri: Uri? = null
 
     private val takePictureLauncher =
         registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success && photoUri != null) {
                 binding.ivPhoto.setImageURI(photoUri)
-                viewModel.setPhotoPath(photoUri?.path)
             }
         }
 
@@ -143,14 +146,14 @@ class AddPointSheet : BottomSheetDialogFragment() {
             viewModel.analyzePhoto()
         }
 
-        viewModel.photoPath.observe(viewLifecycleOwner) { path ->
-            binding.btnAnalyzeAi.isEnabled = !path.isNullOrBlank() && viewModel.isAnalyzing.value != true
+        viewModel.photoPath.observe(viewLifecycleOwner) {
+            updateAnalyzeButtonState()
         }
 
         viewModel.isAnalyzing.observe(viewLifecycleOwner) { analyzing ->
-            binding.btnAnalyzeAi.isEnabled = analyzing == false && !viewModel.photoPath.value.isNullOrBlank()
             binding.btnAnalyzeAi.text =
                 if (analyzing == true) getString(R.string.ai_analyze_loading) else getString(R.string.ai_analyze_button)
+            updateAnalyzeButtonState()
         }
 
         viewModel.aiNotes.observe(viewLifecycleOwner) { notes ->
@@ -183,6 +186,14 @@ class AddPointSheet : BottomSheetDialogFragment() {
         viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
             if (success) dismiss()
         }
+    }
+
+    private fun updateAnalyzeButtonState() {
+        val hasPhoto = !viewModel.photoPath.value.isNullOrBlank()
+        val analyzing = viewModel.isAnalyzing.value == true
+        val enabled = hasPhoto && !analyzing
+        binding.btnAnalyzeAi.isEnabled = enabled
+        binding.btnAnalyzeAi.alpha = if (enabled || analyzing) 1f else 0.4f
     }
 
     private fun expandSheetOnFocus(view: View) {
@@ -235,7 +246,10 @@ class AddPointSheet : BottomSheetDialogFragment() {
                 accuracy <= 8f -> android.graphics.Color.parseColor("#F59E0B")
                 else -> android.graphics.Color.parseColor("#EF4444")
             }
-        binding.chipAccuracy.text = "±%.0fm".format(accuracy)
+        val imperial = mapSettings.isImperial()
+        val accuracyDisplay = if (imperial) accuracy * 3.28084f else accuracy
+        val accuracyRes = if (imperial) R.string.location_accuracy_imperial else R.string.location_accuracy_metric
+        binding.chipAccuracy.text = getString(accuracyRes, accuracyDisplay)
         binding.chipAccuracy.setTextColor(bandColor)
         binding.chipAccuracy.chipStrokeColor = android.content.res.ColorStateList.valueOf(bandColor)
         binding.chipAccuracy.isVisible = true
