@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.field.survey.R
 import com.field.survey.databinding.FragmentLoginBinding
+import com.field.survey.ui.util.bindErrorText
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -50,10 +51,7 @@ class LoginFragment : Fragment() {
             binding.btnLogin.text = if (loading) "" else getString(R.string.login_button)
         }
 
-        viewModel.error.observe(viewLifecycleOwner) { err ->
-            binding.tvError.isVisible = err != null
-            binding.tvError.text = err
-        }
+        bindErrorText(viewModel.error, binding.tvError)
 
         viewModel.loginSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
