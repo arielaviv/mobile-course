@@ -12,7 +12,12 @@
           "package_name": "com.field.survey"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "677713296045-6h86qca0ora6054ql19p2hrbhqifp5mk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDeFa4LaG5bIBiCWQE5wkUmHF9TJwGhIos"
@@ -20,7 +25,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "677713296045-6h86qca0ora6054ql19p2hrbhqifp5mk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
