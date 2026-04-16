@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.field.survey.R
 import com.field.survey.databinding.ItemCommentBinding
 import com.field.survey.domain.model.Comment
 import java.text.SimpleDateFormat
@@ -40,7 +41,9 @@ class CommentAdapter : ListAdapter<Comment, CommentAdapter.CommentViewHolder>(Di
         private val dateFormat = SimpleDateFormat("MMM d, HH:mm", Locale.getDefault())
 
         fun bind(comment: Comment) {
-            binding.tvUserName.text = comment.userName.ifBlank { "Anonymous" }
+            binding.tvUserName.text = comment.userName.ifBlank {
+                binding.root.context.getString(R.string.comment_author_anonymous)
+            }
             binding.tvText.text = comment.text
             binding.tvDate.text = dateFormat.format(Date(comment.createdAt))
         }

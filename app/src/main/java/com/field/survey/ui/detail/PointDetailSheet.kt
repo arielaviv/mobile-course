@@ -19,6 +19,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.field.survey.R
+import com.field.survey.data.repository.MapSettingsRepository
 import com.field.survey.databinding.FragmentPointDetailSheetBinding
 import com.field.survey.domain.model.DpType
 import com.field.survey.domain.model.PathCoordinates
@@ -34,6 +35,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class PointDetailSheet : BottomSheetDialogFragment() {
@@ -42,6 +44,8 @@ class PointDetailSheet : BottomSheetDialogFragment() {
     private val binding get() = _binding!!
     private val viewModel: DetailViewModel by viewModels()
     private lateinit var commentAdapter: CommentAdapter
+
+    @Inject lateinit var mapSettings: MapSettingsRepository
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
@@ -112,7 +116,7 @@ class PointDetailSheet : BottomSheetDialogFragment() {
                 if (point.type.isLine) {
                     val verts = PathCoordinates.decode(point.pathCoordinates)
                     val lengthM = GeoMath.polylineMeters(verts)
-                    "$author · ${verts.size} vertices · ${GeoMath.formatDistance(lengthM)} · $dateStr"
+                    "$author · ${verts.size} vertices · ${GeoMath.formatDistance(lengthM, mapSettings.isImperial())} · $dateStr"
                 } else {
                     "$author · %.5f, %.5f · $dateStr".format(point.latitude, point.longitude)
                 }

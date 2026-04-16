@@ -10,6 +10,8 @@ import javax.inject.Inject
 
 data class SettingsState(
     val lightPreset: String,
+    val language: String,
+    val distanceUnits: String,
     val roadLabels: Boolean,
     val poiLabels: Boolean,
     val placeLabels: Boolean,
@@ -27,6 +29,8 @@ class SettingsViewModel
         private val initial =
             SettingsState(
                 lightPreset = mapSettings.getLightPreset(),
+                language = mapSettings.getLanguage(),
+                distanceUnits = mapSettings.getDistanceUnits(),
                 roadLabels = mapSettings.getBool(
                     MapSettingsRepository.KEY_ROAD_LABELS,
                     MapSettingsRepository.DEFAULT_ROAD_LABELS,
@@ -51,6 +55,16 @@ class SettingsViewModel
         fun setLightPreset(preset: String) {
             mapSettings.setLightPreset(preset)
             update { it.copy(lightPreset = preset) }
+        }
+
+        fun setLanguage(language: String) {
+            mapSettings.setLanguage(language)
+            update { it.copy(language = language) }
+        }
+
+        fun setDistanceUnits(units: String) {
+            mapSettings.setDistanceUnits(units)
+            update { it.copy(distanceUnits = units) }
         }
 
         fun setRoadLabels(v: Boolean) = persistBool(MapSettingsRepository.KEY_ROAD_LABELS, v) {

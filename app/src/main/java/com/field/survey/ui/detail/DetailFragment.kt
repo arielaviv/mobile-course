@@ -12,6 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.field.survey.R
 import com.field.survey.databinding.FragmentDetailBinding
 import com.field.survey.ui.adapter.CommentAdapter
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,8 +70,9 @@ class DetailFragment : Fragment() {
 
             binding.tvLabel.text = point.label
             binding.tvType.text = getString(point.type.labelRes)
-            binding.tvNotes.text = point.notes.ifBlank { "No description" }
-            binding.tvAuthor.text = "By ${point.createdByName.ifBlank { "Unknown" }}"
+            binding.tvNotes.text = point.notes.ifBlank { getString(R.string.point_no_description) }
+            val author = point.createdByName.ifBlank { getString(R.string.point_author_unknown) }
+            binding.tvAuthor.text = getString(R.string.detail_author, author)
 
             val dateStr =
                 SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
@@ -94,7 +96,12 @@ class DetailFragment : Fragment() {
         viewModel.comments.observe(viewLifecycleOwner) { comments ->
             commentAdapter.submitList(comments)
             binding.tvNoComments.isVisible = comments.isEmpty()
-            binding.tvCommentsHeader.text = if (comments.isEmpty()) "Comments" else "Comments (${comments.size})"
+            binding.tvCommentsHeader.text =
+                if (comments.isEmpty()) {
+                    getString(R.string.comments_header)
+                } else {
+                    getString(R.string.comments_header_count, comments.size)
+                }
         }
     }
 

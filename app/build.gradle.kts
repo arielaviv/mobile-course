@@ -31,7 +31,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        resourceConfigurations += listOf("en")
+        resourceConfigurations += listOf("en", "he")
 
         buildConfigField(
             "String",
