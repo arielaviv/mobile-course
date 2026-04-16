@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.field.survey.R
 import com.field.survey.databinding.ItemRecentActivityBinding
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.ui.util.TimeAgo
@@ -36,13 +37,16 @@ class RecentActivityAdapter(
 
         fun bind(point: DistributionPoint) {
             val ctx = itemView.context
-            binding.tvLabel.text = point.label.ifBlank { "Untitled" }
+            binding.tvLabel.text = point.label.ifBlank { ctx.getString(R.string.point_untitled) }
             binding.tvType.text = ctx.getString(point.type.labelRes)
             binding.typeDot.setBackgroundColor(ContextCompat.getColor(ctx, point.type.colorRes()))
             val ts = point.updatedAt ?: point.createdAt
-            val who = point.updatedBy?.takeIf { it.isNotBlank() } ?: point.createdByName.ifBlank { "Unknown" }
-            val verb = if (point.updatedAt != null) "edited" else "added"
-            binding.tvMeta.text = "$verb ${TimeAgo.format(ts)} · $who"
+            val who = point.updatedBy?.takeIf { it.isNotBlank() }
+                ?: point.createdByName.ifBlank { ctx.getString(R.string.point_author_unknown) }
+            val verb = ctx.getString(
+                if (point.updatedAt != null) R.string.feed_activity_edited else R.string.feed_activity_added,
+            )
+            binding.tvMeta.text = ctx.getString(R.string.feed_activity_meta, verb, TimeAgo.format(ctx, ts), who)
             binding.root.setOnClickListener { onClick(point) }
         }
     }

@@ -33,6 +33,7 @@ object NetworkModule {
             ignoreUnknownKeys = true
             coerceInputValues = true
             isLenient = true
+            encodeDefaults = true
             classDiscriminator = "type"
         }
 

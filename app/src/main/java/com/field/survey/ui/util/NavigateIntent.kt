@@ -3,6 +3,7 @@ package com.field.survey.ui.util
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.field.survey.R
 
 object NavigateIntent {
 
@@ -16,12 +17,12 @@ object NavigateIntent {
         longitude: Double,
         label: String,
     ) {
-        val encoded = Uri.encode(label.ifBlank { "Destination" })
+        val encoded = Uri.encode(label.ifBlank { context.getString(R.string.navigate_destination_fallback) })
         val geoUri = Uri.parse("geo:0,0?q=$latitude,$longitude($encoded)")
         val intent = Intent(Intent.ACTION_VIEW, geoUri)
         val resolved = intent.resolveActivity(context.packageManager) != null
         if (resolved) {
-            context.startActivity(Intent.createChooser(intent, "Navigate with…"))
+            context.startActivity(Intent.createChooser(intent, context.getString(R.string.navigate_chooser)))
         } else {
             val web = Uri.parse("https://www.google.com/maps/search/?api=1&query=$latitude,$longitude")
             context.startActivity(Intent(Intent.ACTION_VIEW, web))
@@ -47,6 +48,6 @@ object NavigateIntent {
                 type = "text/plain"
                 putExtra(Intent.EXTRA_TEXT, text)
             }
-        context.startActivity(Intent.createChooser(intent, "Share location"))
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_location_chooser)))
     }
 }

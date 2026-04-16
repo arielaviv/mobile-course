@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Field Survey</string>
+
+    <!-- Login -->
+    <string name="login_subtitle">אפליקציה לסקר שטח</string>
+    <string name="login_email_label">אימייל</string>
+    <string name="login_email_placeholder">you@example.com</string>
+    <string name="login_password_label">סיסמה</string>
+    <string name="login_password_placeholder">הזן סיסמה</string>
+    <string name="login_button">התחבר</string>
+    <string name="login_create_account">אין לך חשבון? צור חשבון</string>
+
+    <!-- Registration -->
+    <string name="register_title">יצירת חשבון</string>
+    <string name="register_subtitle">בואו נתחיל</string>
+    <string name="register_name_label">שם מלא</string>
+    <string name="register_name_placeholder">הזן את שמך</string>
+    <string name="register_button">צור חשבון</string>
+
+    <!-- Map -->
+    <string name="map_refresh">רענן</string>
+    <string name="map_my_location">המיקום שלי</string>
+
+    <!-- Settings -->
+    <string name="settings_title">הגדרות</string>
+    <string name="settings_map_style">סגנון מפה</string>
+    <string name="settings_logout">התנתק</string>
+    <string name="settings_map_default">ברירת מחדל</string>
+    <string name="settings_map_dark">כהה</string>
+
+    <!-- Add Distribution Point -->
+    <string name="add_dp_title">הוסף סימון</string>
+    <string name="add_dp_fetching_location">מאתר מיקום…</string>
+    <string name="add_dp_photo">תמונת סימון</string>
+    <string name="add_dp_take_photo">צלם</string>
+    <string name="add_dp_retake_photo">צלם מחדש</string>
+    <string name="add_dp_type_label">סוג</string>
+    <string name="add_dp_label_field">תווית</string>
+    <string name="add_dp_label_placeholder">לדוגמה: MH-14, POLE-7</string>
+    <string name="add_dp_notes_field">הערות</string>
+    <string name="add_dp_notes_placeholder">הערות אופציונליות על הסימון</string>
+    <string name="add_dp_gallery">גלריה</string>
+    <string name="add_dp_save">שמור</string>
+
+    <!-- Location -->
+    <string name="point_near_address">ליד: %1$s</string>
+    <string name="coords_copied">הקואורדינטות הועתקו</string>
+
+    <!-- My Distribution Points -->
+    <string name="my_dps_title">הסימונים שלי</string>
+    <string name="my_dps_empty_title">אין סימונים עדיין</string>
+    <string name="my_dps_empty_subtitle">סימונים שתיצור יופיעו כאן</string>
+    <string name="my_dps_edit">ערוך</string>
+    <string name="my_dps_delete">מחק</string>
+    <string name="my_dps_delete_title">מחיקת סימון</string>
+    <string name="my_dps_delete_message">האם אתה בטוח שברצונך למחוק את \"%1$s\"?</string>
+    <string name="my_dps_delete_confirm">מחק</string>
+    <string name="my_dps_delete_cancel">ביטול</string>
+
+    <!-- Edit Distribution Point -->
+    <string name="edit_dp_title">עריכת סימון</string>
+    <string name="edit_dp_save">שמור שינויים</string>
+
+    <!-- DP Types -->
+    <string name="dp_type_underground_path">תוואי תת-קרקעי</string>
+    <string name="dp_type_aerial_span">קו עילי</string>
+    <string name="dp_type_poles">עמוד תקשורת</string>
+    <string name="dp_type_central_offices">מרכז תקשורת</string>
+
+    <!-- Map drawing -->
+    <string name="map_add_feature">הוסף סימון</string>
+    <string name="map_tap_to_place">לחץ על המפה כדי למקם %1$s</string>
+    <string name="map_tap_to_draw">לחץ על המפה להוספת נקודות, ואז לחץ סיום</string>
+    <string name="map_finish_drawing">סיום</string>
+
+    <!-- Line features -->
+    <string name="add_dp_line_vertices">%1$s — %2$d קודקודים</string>
+    <string name="add_dp_line_length">%1$.1f מ\'</string>
+
+    <!-- General -->
+    <string name="back">חזור</string>
+    <string name="error_generic">משהו השתבש</string>
+    <string name="loading">טוען…</string>
+    <string name="camera_unavailable">אין אפליקציית מצלמה זמינה במכשיר</string>
+
+    <!-- Feed -->
+    <string name="feed_latest_changes">עדכונים אחרונים</string>
+    <string name="feed_empty">אין פוסטים עדיין</string>
+
+    <!-- Comments -->
+    <string name="comments_header">תגובות</string>
+    <string name="comments_empty">אין תגובות עדיין</string>
+    <string name="comments_view_all">הצג את כל התגובות ←</string>
+
+    <!-- Point detail actions -->
+    <string name="point_action_navigate">נווט</string>
+    <string name="point_action_edit">ערוך</string>
+    <string name="point_action_share">שתף</string>
+    <string name="point_untitled">ללא שם</string>
+    <string name="point_author_unknown">לא ידוע</string>
+    <string name="point_no_description">אין תיאור</string>
+
+    <!-- Profile -->
+    <string name="profile_title">פרופיל</string>
+    <string name="profile_change_photo">שנה תמונה</string>
+    <string name="profile_save">שמור</string>
+    <string name="profile_name">שם</string>
+
+    <!-- Details -->
+    <string name="detail_title">פרטים</string>
+    <string name="comment_hint">הוסף תגובה…</string>
+
+    <!-- Settings misc -->
+    <string name="settings_app_version">גרסת אפליקציה</string>
+
+    <!-- Layers -->
+    <string name="layers_title">שכבות</string>
+    <string name="layers_subtitle">הצג או הסתר סוגי סימונים</string>
+
+    <!-- Bottom nav -->
+    <string name="nav_feed">עדכונים</string>
+    <string name="nav_map">מפה</string>
+
+    <!-- Map toolbar actions -->
+    <string name="map_measure">מדידה</string>
+    <string name="map_satellite">לוויין</string>
+    <string name="map_street">רחוב</string>
+    <string name="map_flat_view">תצוגה שטוחה</string>
+    <string name="map_3d_view">תצוגה תלת-ממדית</string>
+    <string name="map_flat">שטוח</string>
+    <string name="map_3d_terrain">שטח תלת-ממדי</string>
+    <string name="map_stop_measuring_first">עצור את המדידה קודם</string>
+    <string name="map_finish_feature_first">סיים קודם את הסימון</string>
+    <string name="map_tap_to_measure">לחץ על המפה למדידה</string>
+    <string name="map_tap_second_point">לחץ על נקודה שנייה</string>
+
+    <!-- Validation -->
+    <string name="register_all_fields_required">כל השדות נדרשים</string>
+    <string name="register_password_too_short">הסיסמה חייבת להיות באורך 6 תווים לפחות</string>
+    <string name="login_credentials_required">אימייל וסיסמה נדרשים</string>
+    <string name="point_label_required">תווית נדרשת</string>
+    <string name="point_line_needs_two">קו דורש לפחות 2 נקודות</string>
+    <string name="profile_name_empty">השם לא יכול להיות ריק</string>
+    <string name="profile_updated">הפרופיל עודכן</string>
+
+    <!-- AI photo analysis -->
+    <string name="ai_analyze_button">נתח עם AI</string>
+    <string name="ai_analyze_loading">מנתח…</string>
+    <string name="ai_analyze_success">ההערות עודכנו על ידי AI</string>
+    <string name="ai_analyze_error">לא ניתן היה לנתח את התמונה</string>
+    <string name="ai_analyze_no_photo">צלם תמונה קודם</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">סטטיסטיקה</string>
+    <string name="stats_total_points">סה\"כ סימונים</string>
+    <string name="stats_total_caption">ב-%1$d סוגים · %2$d תורמים</string>
+    <string name="stats_by_type">לפי סוג</string>
+    <string name="stats_top_contributors">תורמים מובילים</string>
+    <string name="stats_this_week">השבוע</string>
+    <string name="stats_no_data">אין סימונים עדיין — צור כמה כדי לראות סטטיסטיקה</string>
+    <string name="stats_refresh">רענן</string>
+    <string name="settings_view_stats">הצג סטטיסטיקה</string>
+
+    <!-- CSV export -->
+    <string name="stats_export_csv">ייצא הכל ל-CSV</string>
+    <string name="stats_export_chooser">שתף CSV</string>
+    <string name="stats_export_success">יוצאו %1$d סימונים</string>
+    <string name="stats_export_error">הייצוא נכשל</string>
+
+    <!-- Map lighting -->
+    <string name="settings_map_lighting">תאורת מפה</string>
+    <string name="map_preset_dawn">שחר</string>
+    <string name="map_preset_day">יום</string>
+    <string name="map_preset_dusk">דמדומים</string>
+    <string name="map_preset_night">לילה</string>
+
+    <!-- Map toggles -->
+    <string name="settings_map_display">תצוגת מפה</string>
+    <string name="settings_road_labels">שמות כבישים</string>
+    <string name="settings_poi_labels">נקודות עניין</string>
+    <string name="settings_place_labels">שמות מקומות</string>
+    <string name="settings_3d_objects">בנייני תלת-ממד</string>
+
+    <!-- Language -->
+    <string name="settings_language">שפה</string>
+    <string name="lang_english">English</string>
+    <string name="lang_hebrew">עברית</string>
+
+    <!-- Distance units -->
+    <string name="settings_distance_units">יחידות מרחק</string>
+    <string name="units_metric">מטרי (מ\', ק\"מ)</string>
+    <string name="units_imperial">אימפריאלי (רגל, מייל)</string>
+
+    <!-- Measure tool -->
+    <string name="map_measure_total">סה\"כ: %1$s</string>
+
+    <!-- GPS accuracy -->
+    <string name="location_accuracy_metric">±%1$.0f מ\'</string>
+    <string name="location_accuracy_imperial">±%1$.0f רגל</string>
+
+    <!-- Comments -->
+    <string name="comment_author_anonymous">אנונימי</string>
+    <string name="comments_header_count">תגובות (%1$d)</string>
+
+    <!-- Navigate / share -->
+    <string name="navigate_destination_fallback">יעד</string>
+    <string name="navigate_chooser">נווט באמצעות…</string>
+    <string name="share_location_chooser">שתף מיקום</string>
+
+    <!-- Detail -->
+    <string name="detail_author">מאת %1$s</string>
+
+    <!-- Activity feed -->
+    <string name="feed_activity_added">נוסף</string>
+    <string name="feed_activity_edited">עודכן</string>
+    <string name="feed_activity_meta">%1$s %2$s · %3$s</string>
+
+    <!-- Time ago -->
+    <string name="time_just_now">כרגע</string>
+    <string name="time_minutes_ago">לפני %1$d דק׳</string>
+    <string name="time_hours_ago">לפני %1$d שע׳</string>
+    <string name="time_days_ago">לפני %1$d ימים</string>
+    <string name="time_weeks_ago">לפני %1$d שבועות</string>
+    <string name="time_months_ago">לפני %1$d חודשים</string>
+    <string name="time_years_ago">לפני %1$d שנים</string>
+
+</resources>

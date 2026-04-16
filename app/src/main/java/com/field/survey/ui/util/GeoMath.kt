@@ -26,10 +26,21 @@ object GeoMath {
         return EARTH_RADIUS_M * c
     }
 
-    fun formatDistance(meters: Double): String {
+    fun formatDistance(
+        meters: Double,
+        imperial: Boolean = false,
+    ): String {
+        if (imperial) {
+            val feet = meters * METERS_TO_FEET
+            if (feet < 1_000.0) return "%.0f ft".format(feet)
+            return "%.1f mi".format(meters * METERS_TO_MILES)
+        }
         if (meters < 1_000.0) return "%.0f m".format(meters)
         return "%.1f km".format(meters / 1_000.0)
     }
+
+    private const val METERS_TO_FEET = 3.28084
+    private const val METERS_TO_MILES = 0.000621371
 
     fun polylineMeters(verts: List<Pair<Double, Double>>): Double {
         if (verts.size < 2) return 0.0

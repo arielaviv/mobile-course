@@ -73,9 +73,9 @@ class MapFragment : Fragment() {
 
     @Inject lateinit var mapSettings: MapSettingsRepository
 
-    private var isSatellite = false
-    private var terrainEnabled = false
-    private var pitch3D = true
+    private var isSatellite = MapSettingsRepository.DEFAULT_SATELLITE
+    private var terrainEnabled = MapSettingsRepository.DEFAULT_TERRAIN
+    private var pitch3D = MapSettingsRepository.DEFAULT_PITCH_3D
 
     private var pendingType: DpType? = null
     private val drawnPoints = mutableListOf<Point>()
@@ -106,6 +106,10 @@ class MapFragment : Fragment() {
 
         markers = MarkerBitmaps.build(requireContext())
 
+        isSatellite = mapSettings.getBool(MapSettingsRepository.KEY_SATELLITE, MapSettingsRepository.DEFAULT_SATELLITE)
+        pitch3D = mapSettings.getBool(MapSettingsRepository.KEY_PITCH_3D, MapSettingsRepository.DEFAULT_PITCH_3D)
+        terrainEnabled = mapSettings.getBool(MapSettingsRepository.KEY_TERRAIN, MapSettingsRepository.DEFAULT_TERRAIN)
+
         val mapView = binding.mapView
 
         mapView.scalebar.enabled = false
@@ -118,15 +122,17 @@ class MapFragment : Fragment() {
             CameraOptions.Builder()
                 .center(Point.fromLngLat(34.7725, 32.0750))
                 .zoom(15.0)
-                .pitch(INITIAL_PITCH)
+                .pitch(if (pitch3D) INITIAL_PITCH else 0.0)
                 .build(),
         )
 
-        mapView.mapboxMap.loadStyle(Style.STANDARD) { style ->
-            applyLightPreset(style)
+        val initialStyle = if (isSatellite) Style.SATELLITE_STREETS else Style.STANDARD
+        mapView.mapboxMap.loadStyle(initialStyle) { style ->
+            if (!isSatellite) applyLightPreset(style)
             setupImages(style)
             setupSources(style)
             setupLayers(style)
+            if (terrainEnabled) enableTerrain(style)
             enableLocationPuck()
             observePoints()
         }
@@ -171,6 +177,8 @@ class MapFragment : Fragment() {
             binding.progressBar.isVisible = loading
         }
 
+        syncToolbarTitles()
+
         binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_layers -> {
@@ -183,6 +191,7 @@ class MapFragment : Fragment() {
                 }
                 R.id.action_satellite -> {
                     isSatellite = !isSatellite
+                    mapSettings.setBool(MapSettingsRepository.KEY_SATELLITE, isSatellite)
                     item.title = getString(if (isSatellite) R.string.map_street else R.string.map_satellite)
                     val newStyle = if (isSatellite) Style.SATELLITE_STREETS else Style.STANDARD
                     mapView.mapboxMap.loadStyle(newStyle) { style ->
@@ -197,6 +206,7 @@ class MapFragment : Fragment() {
                 }
                 R.id.action_pitch -> {
                     pitch3D = !pitch3D
+                    mapSettings.setBool(MapSettingsRepository.KEY_PITCH_3D, pitch3D)
                     item.title = getString(if (pitch3D) R.string.map_flat_view else R.string.map_3d_view)
                     mapView.mapboxMap.flyTo(
                         CameraOptions.Builder().pitch(if (pitch3D) INITIAL_PITCH else 0.0).build(),
@@ -206,6 +216,7 @@ class MapFragment : Fragment() {
                 }
                 R.id.action_terrain -> {
                     terrainEnabled = !terrainEnabled
+                    mapSettings.setBool(MapSettingsRepository.KEY_TERRAIN, terrainEnabled)
                     item.title = getString(if (terrainEnabled) R.string.map_flat else R.string.map_3d_terrain)
                     mapView.mapboxMap.style?.let { style ->
                         if (terrainEnabled) enableTerrain(style) else disableTerrain(style)
@@ -565,7 +576,7 @@ class MapFragment : Fragment() {
                     Feature.fromGeometry(Point.fromLngLat(midLng, midLat)).apply {
                         addStringProperty("id", dp.id)
                         addStringProperty("type", dp.type.name)
-                        addStringProperty("length", GeoMath.formatDistance(lengthM))
+                        addStringProperty("length", GeoMath.formatDistance(lengthM, mapSettings.isImperial()))
                     }
                 lineFeature
             }
@@ -686,7 +697,8 @@ class MapFragment : Fragment() {
             return
         }
         val total = GeoMath.polylineMeters(measurePoints.map { it.longitude() to it.latitude() })
-        binding.tvMeasurePill.text = "Total: ${GeoMath.formatDistance(total)}"
+        binding.tvMeasurePill.text =
+            getString(R.string.map_measure_total, GeoMath.formatDistance(total, mapSettings.isImperial()))
     }
 
     override fun onStart() {
@@ -697,7 +709,7 @@ class MapFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         _binding?.mapView?.mapboxMap?.getStyle { style ->
-            if (!isSatellite) applyLightPreset(style)
+            if (isSatellite) applyMapLanguage(style) else applyLightPreset(style)
         }
     }
 
@@ -721,7 +733,17 @@ class MapFragment : Fragment() {
     }
 
     private fun applyMapLanguage(style: Style) {
-        style.setStyleImportConfigProperty("basemap", "language", Value("en"))
+        style.setStyleImportConfigProperty("basemap", "language", Value(mapSettings.getLanguage()))
+    }
+
+    private fun syncToolbarTitles() {
+        val menu = binding.toolbar.menu
+        menu.findItem(R.id.action_satellite)?.title =
+            getString(if (isSatellite) R.string.map_street else R.string.map_satellite)
+        menu.findItem(R.id.action_pitch)?.title =
+            getString(if (pitch3D) R.string.map_flat_view else R.string.map_3d_view)
+        menu.findItem(R.id.action_terrain)?.title =
+            getString(if (terrainEnabled) R.string.map_flat else R.string.map_3d_terrain)
     }
 
     override fun onStop() {

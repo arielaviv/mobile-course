@@ -182,4 +182,47 @@
     <string name="settings_place_labels">Place names</string>
     <string name="settings_3d_objects">3D buildings</string>
 
+    <!-- Language -->
+    <string name="settings_language">Language</string>
+    <string name="lang_english">English</string>
+    <string name="lang_hebrew">עברית</string>
+
+    <!-- Distance units -->
+    <string name="settings_distance_units">Distance Units</string>
+    <string name="units_metric">Metric (m, km)</string>
+    <string name="units_imperial">Imperial (ft, mi)</string>
+
+    <!-- Measure tool -->
+    <string name="map_measure_total">Total: %1$s</string>
+
+    <!-- GPS accuracy -->
+    <string name="location_accuracy_metric">±%1$.0f m</string>
+    <string name="location_accuracy_imperial">±%1$.0f ft</string>
+
+    <!-- Comments -->
+    <string name="comment_author_anonymous">Anonymous</string>
+    <string name="comments_header_count">Comments (%1$d)</string>
+
+    <!-- Navigate / share -->
+    <string name="navigate_destination_fallback">Destination</string>
+    <string name="navigate_chooser">Navigate with…</string>
+    <string name="share_location_chooser">Share location</string>
+
+    <!-- Detail -->
+    <string name="detail_author">By %1$s</string>
+
+    <!-- Activity feed -->
+    <string name="feed_activity_added">added</string>
+    <string name="feed_activity_edited">edited</string>
+    <string name="feed_activity_meta">%1$s %2$s · %3$s</string>
+
+    <!-- Time ago -->
+    <string name="time_just_now">just now</string>
+    <string name="time_minutes_ago">%1$dm ago</string>
+    <string name="time_hours_ago">%1$dh ago</string>
+    <string name="time_days_ago">%1$dd ago</string>
+    <string name="time_weeks_ago">%1$dw ago</string>
+    <string name="time_months_ago">%1$dmo ago</string>
+    <string name="time_years_ago">%1$dy ago</string>
+
 </resources>

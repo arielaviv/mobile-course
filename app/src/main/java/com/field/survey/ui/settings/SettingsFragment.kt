@@ -5,10 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.field.survey.BuildConfig
 import com.field.survey.R
 import com.field.survey.data.repository.MapSettingsRepository
 import com.field.survey.databinding.FragmentSettingsBinding
@@ -40,15 +41,11 @@ class SettingsFragment : Fragment() {
             findNavController().popBackStack()
         }
 
-        binding.tvVersion.text = BuildConfig.VERSION_NAME
-
         bindInitialState()
+        wireLanguageChips()
+        wireUnitsChips()
         wireLightingChips()
         wireDisplaySwitches()
-
-        binding.btnViewStats.setOnClickListener {
-            findNavController().navigate(R.id.action_settings_to_stats)
-        }
 
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
@@ -66,10 +63,43 @@ class SettingsFragment : Fragment() {
                 else -> R.id.chipPresetDay
             },
         )
+        binding.chipGroupLanguage.check(R.id.chipLangEn)
+        binding.chipGroupUnits.check(
+            if (s.distanceUnits == MapSettingsRepository.UNITS_IMPERIAL) {
+                R.id.chipUnitsImperial
+            } else {
+                R.id.chipUnitsMetric
+            },
+        )
         binding.switchRoadLabels.isChecked = s.roadLabels
         binding.switchPoiLabels.isChecked = s.poiLabels
         binding.switchPlaceLabels.isChecked = s.placeLabels
         binding.switch3dObjects.isChecked = s.objects3d
+    }
+
+    private fun wireLanguageChips() {
+        binding.chipGroupLanguage.setOnCheckedStateChangeListener { _, checkedIds ->
+            val language =
+                when (checkedIds.firstOrNull()) {
+                    R.id.chipLangEn -> MapSettingsRepository.LANGUAGE_EN
+                    else -> return@setOnCheckedStateChangeListener
+                }
+            if (language == viewModel.state.value?.language) return@setOnCheckedStateChangeListener
+            viewModel.setLanguage(language)
+            AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(language))
+        }
+    }
+
+    private fun wireUnitsChips() {
+        binding.chipGroupUnits.setOnCheckedStateChangeListener { _, checkedIds ->
+            val units =
+                when (checkedIds.firstOrNull()) {
+                    R.id.chipUnitsImperial -> MapSettingsRepository.UNITS_IMPERIAL
+                    R.id.chipUnitsMetric -> MapSettingsRepository.UNITS_METRIC
+                    else -> return@setOnCheckedStateChangeListener
+                }
+            viewModel.setDistanceUnits(units)
+        }
     }
 
     private fun wireLightingChips() {
