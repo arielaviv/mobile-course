@@ -27,7 +27,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/bottomActions">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -35,23 +35,65 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/tvVersionLabel"
+                android:id="@+id/tvLanguageLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:layout_marginStart="24dp"
-                android:text="@string/settings_app_version"
+                android:text="@string/settings_language"
                 android:textColor="@color/zinc_400"
                 android:textSize="14sp" />
 
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupLanguage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="24dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipLangEn"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/lang_english" />
+            </com.google.android.material.chip.ChipGroup>
+
             <TextView
-                android:id="@+id/tvVersion"
+                android:id="@+id/tvUnitsLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="28dp"
                 android:layout_marginStart="24dp"
-                android:textColor="@color/zinc_100"
-                android:textSize="16sp" />
+                android:text="@string/settings_distance_units"
+                android:textColor="@color/zinc_400"
+                android:textSize="14sp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupUnits"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginHorizontal="24dp"
+                app:selectionRequired="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipUnitsMetric"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/units_metric" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipUnitsImperial"
+                    style="@style/Widget.Material3.Chip.Filter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/units_imperial" />
+            </com.google.android.material.chip.ChipGroup>
 
             <TextView
                 android:id="@+id/tvLightingLabel"
@@ -147,31 +189,30 @@
                 android:text="@string/settings_3d_objects"
                 android:textColor="@color/zinc_100" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnViewStats"
-                style="@style/Widget.Material3.Button.TonalButton.Icon"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="32dp"
-                android:text="@string/settings_view_stats"
-                android:textColor="@color/m3_on_secondary_container"
-                app:backgroundTint="@color/m3_secondary_container"
-                app:icon="@drawable/ic_stats"
-                app:iconGravity="textStart"
-                app:iconTint="@color/m3_on_secondary_container" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="12dp"
-                android:text="@string/settings_logout"
-                android:textColor="@color/zinc_100"
-                app:backgroundTint="@color/error" />
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/bottomActions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/bg_mid"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/settings_logout"
+            android:textColor="@color/zinc_100"
+            app:backgroundTint="@color/error" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
