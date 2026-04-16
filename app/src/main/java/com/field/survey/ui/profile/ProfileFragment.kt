@@ -108,18 +108,21 @@ class ProfileFragment : Fragment() {
             binding.btnSave.isEnabled = !saving
         }
 
-        viewModel.saveResult.observe(viewLifecycleOwner) { msg ->
-            if (msg != null) {
-                binding.tvStatus.text = msg
-                binding.tvStatus.isVisible = true
-                binding.tvStatus.setTextColor(
-                    if (msg.contains("updated")) {
-                        resources.getColor(com.field.survey.R.color.zinc_400, null)
-                    } else {
-                        resources.getColor(com.field.survey.R.color.error, null)
-                    },
-                )
-            }
+        viewModel.saveResult.observe(viewLifecycleOwner) { result ->
+            if (result == null) return@observe
+            val (stringRes, isSuccess) =
+                when (result) {
+                    is ProfileViewModel.SaveResult.Success -> result.stringRes to true
+                    is ProfileViewModel.SaveResult.Error -> result.stringRes to false
+                }
+            binding.tvStatus.text = getString(stringRes)
+            binding.tvStatus.isVisible = true
+            binding.tvStatus.setTextColor(
+                resources.getColor(
+                    if (isSuccess) com.field.survey.R.color.zinc_400 else com.field.survey.R.color.error,
+                    null,
+                ),
+            )
         }
     }
 
