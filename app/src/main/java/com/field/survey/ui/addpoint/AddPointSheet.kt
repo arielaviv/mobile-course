@@ -66,6 +66,22 @@ class AddPointSheet : BottomSheetDialogFragment() {
             }
         }
 
+    private val cameraPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) launchCamera() else Toast.makeText(requireContext(), R.string.camera_permission_denied, Toast.LENGTH_SHORT).show()
+        }
+
+    private fun launchCamera() {
+        val file = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
+        photoUri = FileProvider.getUriForFile(requireContext(), "${requireContext().packageName}.fileprovider", file)
+        viewModel.setPhotoPath(file.absolutePath)
+        try {
+            takePictureLauncher.launch(photoUri!!)
+        } catch (_: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), R.string.camera_unavailable, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
         dialog.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
@@ -117,18 +133,11 @@ class AddPointSheet : BottomSheetDialogFragment() {
         }
 
         binding.btnTakePhoto.setOnClickListener {
-            val file = File(requireContext().cacheDir, "photo_${System.currentTimeMillis()}.jpg")
-            photoUri =
-                FileProvider.getUriForFile(
-                    requireContext(),
-                    "${requireContext().packageName}.fileprovider",
-                    file,
-                )
-            viewModel.setPhotoPath(file.absolutePath)
-            try {
-                takePictureLauncher.launch(photoUri!!)
-            } catch (_: ActivityNotFoundException) {
-                Toast.makeText(requireContext(), R.string.camera_unavailable, Toast.LENGTH_SHORT).show()
+            val permission = Manifest.permission.CAMERA
+            if (requireContext().checkSelfPermission(permission) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                launchCamera()
+            } else {
+                cameraPermissionLauncher.launch(permission)
             }
         }
 

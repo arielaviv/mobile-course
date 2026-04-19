@@ -83,6 +83,7 @@
     <string name="error_generic">Something went wrong</string>
     <string name="loading">Loading…</string>
     <string name="camera_unavailable">No camera app available on this device</string>
+    <string name="camera_permission_denied">Camera permission is required to take photos</string>
 
     <!-- Feed -->
     <string name="feed_latest_changes">Latest changes</string>
