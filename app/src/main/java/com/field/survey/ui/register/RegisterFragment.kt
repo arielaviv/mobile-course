@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.field.survey.R
 import com.field.survey.databinding.FragmentRegisterBinding
-import com.field.survey.ui.util.bindErrorText
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -52,7 +52,9 @@ class RegisterFragment : Fragment() {
             binding.btnRegister.text = if (loading) "" else getString(R.string.register_button)
         }
 
-        bindErrorText(viewModel.error, binding.tvError)
+        viewModel.error.observe(viewLifecycleOwner) { res ->
+            if (res != null) Snackbar.make(binding.root, getString(res), Snackbar.LENGTH_LONG).show()
+        }
 
         viewModel.registerSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {

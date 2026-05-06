@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.field.survey.R
 import com.field.survey.databinding.FragmentLoginBinding
-import com.field.survey.ui.util.bindErrorText
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,7 +51,9 @@ class LoginFragment : Fragment() {
             binding.btnLogin.text = if (loading) "" else getString(R.string.login_button)
         }
 
-        bindErrorText(viewModel.error, binding.tvError)
+        viewModel.error.observe(viewLifecycleOwner) { res ->
+            if (res != null) Snackbar.make(binding.root, getString(res), Snackbar.LENGTH_LONG).show()
+        }
 
         viewModel.loginSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
