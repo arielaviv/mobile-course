@@ -128,8 +128,9 @@ class FeedFragment : Fragment() {
                         shimmerRunning = false
                     }
 
-                    binding.tvEmpty.isVisible =
-                        loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0
+                    val isEmpty = loadStates.refresh is LoadState.NotLoading && adapter.itemCount == 0
+                    binding.tvEmpty.isVisible = isEmpty
+                    binding.ivEmpty.isVisible = isEmpty
                 }
             }
         }

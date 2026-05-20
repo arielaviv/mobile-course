@@ -89,10 +89,24 @@
         </LinearLayout>
     </com.facebook.shimmer.ShimmerFrameLayout>
 
+    <ImageView
+        android:id="@+id/ivEmpty"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/ic_empty_state"
+        android:visibility="gone"
+        android:contentDescription="@null"
+        app:layout_constraintBottom_toTopOf="@id/tvEmpty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintVertical_chainStyle="packed" />
+
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="@string/feed_empty"
         android:textColor="@color/zinc_400"
         android:textSize="16sp"
@@ -100,7 +114,7 @@
         app:layout_constraintBottom_toTopOf="@id/bottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/ivEmpty" />
 
     <ProgressBar
         android:id="@+id/progressBar"
