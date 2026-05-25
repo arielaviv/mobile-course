@@ -23,9 +23,8 @@ local.properties
 # Local config
 .claude/
 
-# Firebase config - each dev keeps their own locally
-# Copy google-services.nir.json or google-services.arielaviv.json to google-services.json
-app/google-services.json
+# Firebase config - nir local override only
+app/google-services.nir.json
 nul
 hs_err_*
 replay_*

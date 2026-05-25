@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "677713296045",
+    "project_id": "mobile-app-course-b30cf",
+    "storage_bucket": "mobile-app-course-b30cf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:677713296045:android:f786b5b497d23d4fd06424",
+        "android_client_info": {
+          "package_name": "com.field.survey"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "677713296045-6h86qca0ora6054ql19p2hrbhqifp5mk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeFa4LaG5bIBiCWQE5wkUmHF9TJwGhIos"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "677713296045-6h86qca0ora6054ql19p2hrbhqifp5mk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
