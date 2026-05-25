@@ -23,8 +23,6 @@ local.properties
 # Local config
 .claude/
 
-# Firebase config - nir local override only
-app/google-services.nir.json
 nul
 hs_err_*
 replay_*
