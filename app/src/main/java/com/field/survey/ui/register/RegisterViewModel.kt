@@ -50,6 +50,7 @@ class RegisterViewModel
                     },
                     onFailure = {
                         _isLoading.value = false
+                        android.util.Log.e("RegisterViewModel", "Registration failed", it)
                         _error.value = R.string.error_generic
                     },
                 )
