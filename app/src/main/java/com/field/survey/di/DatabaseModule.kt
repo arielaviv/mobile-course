@@ -10,6 +10,7 @@ import com.field.survey.data.local.MIGRATION_4_5
 import com.field.survey.data.local.MIGRATION_5_6
 import com.field.survey.data.local.MIGRATION_6_7
 import com.field.survey.data.local.MIGRATION_7_8
+import com.field.survey.data.local.MIGRATION_8_9
 import com.field.survey.data.local.dao.CommentDao
 import com.field.survey.data.local.dao.DistributionPointDao
 import dagger.Module
@@ -41,6 +42,7 @@ object DatabaseModule {
                 MIGRATION_5_6,
                 MIGRATION_6_7,
                 MIGRATION_7_8,
+                MIGRATION_8_9,
             )
             .build()
     }

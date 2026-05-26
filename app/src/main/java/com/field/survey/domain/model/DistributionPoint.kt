@@ -31,6 +31,7 @@ data class DistributionPoint(
     val pathCoordinates: String?,
     val photoPath: String?,
     val imageBase64: String?,
+    val photoUrl: String?,
     val notes: String,
     val createdAt: Long,
     val createdBy: String,

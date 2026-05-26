@@ -1,7 +1,5 @@
 package com.field.survey.ui.adapter
 
-import android.graphics.BitmapFactory
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.paging.PagingDataAdapter
@@ -9,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.field.survey.R
 import com.field.survey.databinding.ItemPostBinding
 import com.field.survey.domain.model.DistributionPoint
+import com.field.survey.ui.util.loadDpImage
 
 class PostPagingAdapter(
     private val onClick: (DistributionPoint) -> Unit,
@@ -45,17 +44,7 @@ class PostPagingAdapter(
             binding.tvNotes.text = point.notes.ifBlank { ctx.getString(R.string.point_no_description) }
             binding.tvAuthor.text = point.createdByName.ifBlank { ctx.getString(R.string.point_author_unknown) }
 
-            if (!point.imageBase64.isNullOrBlank()) {
-                try {
-                    val bytes = Base64.decode(point.imageBase64, Base64.DEFAULT)
-                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    binding.ivPhoto.setImageBitmap(bmp)
-                } catch (_: Exception) {
-                    binding.ivPhoto.setImageResource(android.R.drawable.ic_menu_gallery)
-                }
-            } else {
-                binding.ivPhoto.setImageResource(android.R.drawable.ic_menu_gallery)
-            }
+            binding.ivPhoto.loadDpImage(point)
 
             binding.root.setOnClickListener { onClick(point) }
         }

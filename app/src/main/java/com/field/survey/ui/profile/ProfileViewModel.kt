@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.field.survey.R
 import com.field.survey.data.repository.AuthRepository
 import com.field.survey.data.repository.UserProfile
-import com.field.survey.ui.util.ImageCompression
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,7 +35,7 @@ class ProfileViewModel
         private val _saveResult = MutableLiveData<SaveResult?>()
         val saveResult: LiveData<SaveResult?> = _saveResult
 
-        private var newPhotoBase64: String? = null
+        private var newPhotoPath: String? = null
 
         init {
             _email.value = authRepository.getUserEmail()
@@ -53,7 +52,7 @@ class ProfileViewModel
         }
 
         fun setPhotoFromPath(path: String) {
-            newPhotoBase64 = ImageCompression.fileToCompressedBase64(path)
+            newPhotoPath = path
         }
 
         fun save(name: String) {
@@ -63,7 +62,7 @@ class ProfileViewModel
             }
             viewModelScope.launch {
                 _isSaving.value = true
-                val result = authRepository.updateProfile(name.trim(), newPhotoBase64)
+                val result = authRepository.updateProfile(name.trim(), newPhotoPath)
                 result.fold(
                     onSuccess = {
                         _isSaving.value = false

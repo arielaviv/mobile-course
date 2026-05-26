@@ -8,10 +8,12 @@ import com.field.survey.data.local.dao.DistributionPointDao
 import com.field.survey.data.local.entity.DistributionPointEntity
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.toDpType
-import com.field.survey.ui.util.ImageCompression
+import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -30,6 +32,7 @@ class DistributionPointRepository
         private val authRepository: AuthRepository,
     ) {
         private val firestore = FirebaseFirestore.getInstance()
+        private val storage = FirebaseStorage.getInstance()
         private val collection = firestore.collection("distribution_points")
         private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         private var listenerRegistration: ListenerRegistration? = null
@@ -51,6 +54,7 @@ class DistributionPointRepository
                                 pathCoordinates = doc.getString("pathCoordinates"),
                                 photoPath = null,
                                 imageBase64 = doc.getString("imageBase64"),
+                                photoUrl = doc.getString("photoUrl"),
                                 notes = doc.getString("notes") ?: "",
                                 createdAt = doc.getLong("createdAt") ?: 0L,
                                 createdBy = doc.getString("createdBy") ?: "",
@@ -107,6 +111,7 @@ class DistributionPointRepository
                                 pathCoordinates = doc.getString("pathCoordinates"),
                                 photoPath = null,
                                 imageBase64 = doc.getString("imageBase64"),
+                                photoUrl = doc.getString("photoUrl"),
                                 notes = doc.getString("notes") ?: "",
                                 createdAt = doc.getLong("createdAt") ?: 0L,
                                 createdBy = doc.getString("createdBy") ?: "",
@@ -126,9 +131,9 @@ class DistributionPointRepository
         }
 
         suspend fun save(dp: DistributionPoint) {
-            val imageBase64 = dp.photoPath?.let { ImageCompression.fileToCompressedBase64(it) }
+            val photoUrl = dp.photoPath?.let { uploadImage(dp.createdBy, dp.id, it) }
 
-            val dpWithImage = dp.copy(imageBase64 = imageBase64)
+            val dpWithImage = dp.copy(photoUrl = photoUrl)
 
             dao.insert(DistributionPointEntity.fromDomain(dpWithImage))
 
@@ -139,7 +144,7 @@ class DistributionPointRepository
                     "latitude" to dpWithImage.latitude,
                     "longitude" to dpWithImage.longitude,
                     "pathCoordinates" to dpWithImage.pathCoordinates,
-                    "imageBase64" to dpWithImage.imageBase64,
+                    "photoUrl" to dpWithImage.photoUrl,
                     "notes" to dpWithImage.notes,
                     "createdAt" to dpWithImage.createdAt,
                     "createdBy" to dpWithImage.createdBy,
@@ -164,14 +169,14 @@ class DistributionPointRepository
         }
 
         suspend fun update(dp: DistributionPoint) {
-            val imageBase64 =
-                dp.photoPath?.let { ImageCompression.fileToCompressedBase64(it) } ?: dp.imageBase64
+            val userId = authRepository.getUserId()
+            val photoUrl = dp.photoPath?.let { uploadImage(userId, dp.id, it) } ?: dp.photoUrl
 
             val updated =
                 dp.copy(
-                    imageBase64 = imageBase64,
+                    photoUrl = photoUrl,
                     updatedAt = System.currentTimeMillis(),
-                    updatedBy = authRepository.getUserName().ifBlank { authRepository.getUserId() },
+                    updatedBy = authRepository.getUserName().ifBlank { userId },
                 )
             dao.insert(DistributionPointEntity.fromDomain(updated))
 
@@ -182,7 +187,7 @@ class DistributionPointRepository
                     "latitude" to updated.latitude,
                     "longitude" to updated.longitude,
                     "pathCoordinates" to updated.pathCoordinates,
-                    "imageBase64" to updated.imageBase64,
+                    "photoUrl" to updated.photoUrl,
                     "notes" to updated.notes,
                     "createdAt" to updated.createdAt,
                     "createdBy" to updated.createdBy,
@@ -194,6 +199,18 @@ class DistributionPointRepository
                 collection.document(updated.id).set(firestoreData).await()
             } catch (_: Exception) {
                 // Offline
+            }
+        }
+
+        private suspend fun uploadImage(userId: String, dpId: String, photoPath: String): String? {
+            return try {
+                val file = File(photoPath)
+                if (!file.exists()) return null
+                val ref = storage.reference.child("dps/$userId/$dpId.jpg")
+                ref.putFile(Uri.fromFile(file)).await()
+                ref.downloadUrl.await().toString()
+            } catch (_: Exception) {
+                null
             }
         }
     }

@@ -126,3 +126,10 @@ val MIGRATION_7_8 =
             db.execSQL("ALTER TABLE `distribution_points` ADD COLUMN `updatedBy` TEXT")
         }
     }
+
+val MIGRATION_8_9 =
+    object : Migration(8, 9) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL("ALTER TABLE `distribution_points` ADD COLUMN `photoUrl` TEXT")
+        }
+    }

@@ -1,8 +1,6 @@
 package com.field.survey.ui.profile
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.field.survey.databinding.FragmentProfileBinding
+import com.field.survey.ui.util.loadProfileImage
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 
@@ -88,15 +87,7 @@ class ProfileFragment : Fragment() {
         viewModel.profile.observe(viewLifecycleOwner) { profile ->
             if (profile == null) return@observe
             binding.etName.setText(profile.name)
-            if (profile.photoBase64.isNotBlank()) {
-                try {
-                    val bytes = Base64.decode(profile.photoBase64, Base64.DEFAULT)
-                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    binding.ivProfilePhoto.setImageBitmap(bmp)
-                } catch (_: Exception) {
-                    // keep default
-                }
-            }
+            binding.ivProfilePhoto.loadProfileImage(profile.photoUrl)
         }
 
         viewModel.email.observe(viewLifecycleOwner) { email ->

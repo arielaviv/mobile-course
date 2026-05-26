@@ -1,9 +1,12 @@
 package com.field.survey.data.repository
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -15,6 +18,7 @@ class AuthRepository
     ) {
         private val auth: FirebaseAuth = FirebaseAuth.getInstance()
         private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+        private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 
         suspend fun login(
             email: String,
@@ -88,7 +92,7 @@ class AuthRepository
                     UserProfile(
                         name = doc.getString("name") ?: getUserName(),
                         email = getUserEmail(),
-                        photoBase64 = doc.getString("photoBase64") ?: "",
+                        photoUrl = doc.getString("profileImageUrl") ?: "",
                     ),
                 )
             } catch (e: Exception) {
@@ -96,7 +100,7 @@ class AuthRepository
                     UserProfile(
                         name = getUserName(),
                         email = getUserEmail(),
-                        photoBase64 = "",
+                        photoUrl = "",
                     ),
                 )
             }
@@ -104,7 +108,7 @@ class AuthRepository
 
         suspend fun updateProfile(
             name: String,
-            photoBase64: String?,
+            photoPath: String?,
         ): Result<Unit> {
             val user = auth.currentUser ?: return Result.failure(Exception("Not logged in"))
             return try {
@@ -114,12 +118,10 @@ class AuthRepository
                         .build(),
                 ).await()
 
-                val updates =
-                    mutableMapOf<String, Any>(
-                        "name" to name,
-                    )
-                if (photoBase64 != null) {
-                    updates["photoBase64"] = photoBase64
+                val updates = mutableMapOf<String, Any>("name" to name)
+                if (photoPath != null) {
+                    val url = uploadProfilePhoto(user.uid, photoPath)
+                    if (url != null) updates["profileImageUrl"] = url
                 }
                 firestore.collection("users").document(user.uid).update(updates).await()
 
@@ -127,6 +129,18 @@ class AuthRepository
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(e)
+            }
+        }
+
+        private suspend fun uploadProfilePhoto(uid: String, photoPath: String): String? {
+            return try {
+                val file = File(photoPath)
+                if (!file.exists()) return null
+                val ref = storage.reference.child("users/$uid/profile.jpg")
+                ref.putFile(Uri.fromFile(file)).await()
+                ref.downloadUrl.await().toString()
+            } catch (_: Exception) {
+                null
             }
         }
 
@@ -139,5 +153,5 @@ class AuthRepository
 data class UserProfile(
     val name: String,
     val email: String,
-    val photoBase64: String,
+    val photoUrl: String,
 )

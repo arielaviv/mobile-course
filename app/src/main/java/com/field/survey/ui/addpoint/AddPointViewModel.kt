@@ -163,6 +163,7 @@ class AddPointViewModel
                             pathCoordinates = if (type.isLine) pathCoordinatesArg.ifBlank { null } else null,
                             photoPath = _photoPath.value,
                             imageBase64 = null,
+                            photoUrl = null,
                             notes = notes.trim(),
                             createdAt = System.currentTimeMillis(),
                             createdBy = authRepository.getUserId(),

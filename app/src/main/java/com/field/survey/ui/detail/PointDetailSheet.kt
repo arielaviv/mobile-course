@@ -4,9 +4,7 @@ import android.app.Dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,11 +25,11 @@ import com.field.survey.ui.adapter.CommentAdapter
 import com.field.survey.ui.util.GeoMath
 import com.field.survey.ui.util.NavigateIntent
 import com.field.survey.ui.util.colorRes
+import com.field.survey.ui.util.loadDpImage
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -139,14 +137,9 @@ class PointDetailSheet : BottomSheetDialogFragment() {
                 ),
             )
 
-            val bitmap =
-                decodeBitmap(point.imageBase64) ?: decodeFile(point.photoPath)
-            if (bitmap != null) {
-                binding.ivPhoto.setImageBitmap(bitmap)
-                binding.photoCard.isVisible = true
-            } else {
-                binding.photoCard.isVisible = false
-            }
+            val hasPhoto = !point.photoUrl.isNullOrBlank() || !point.imageBase64.isNullOrBlank() || !point.photoPath.isNullOrBlank()
+            binding.photoCard.isVisible = hasPhoto
+            if (hasPhoto) binding.ivPhoto.loadDpImage(point)
 
             binding.btnNavigate.setOnClickListener {
                 NavigateIntent.launch(
@@ -200,19 +193,6 @@ class PointDetailSheet : BottomSheetDialogFragment() {
         binding.chipType.chipStrokeColor = tint
         binding.chipType.setTextColor(ContextCompat.getColor(requireContext(), colorRes))
         binding.chipType.chipStrokeWidth = resources.displayMetrics.density * 1.5f
-    }
-
-    private fun decodeBitmap(base64: String?): android.graphics.Bitmap? {
-        if (base64.isNullOrBlank()) return null
-        return runCatching {
-            val bytes = Base64.decode(base64, Base64.DEFAULT)
-            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-        }.getOrNull()
-    }
-
-    private fun decodeFile(path: String?): android.graphics.Bitmap? {
-        if (path.isNullOrBlank()) return null
-        return runCatching { BitmapFactory.decodeFile(File(path).absolutePath) }.getOrNull()
     }
 
     override fun onDestroyView() {

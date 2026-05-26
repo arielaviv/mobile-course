@@ -1,10 +1,8 @@
 package com.field.survey.ui.editpoint
 
 import android.content.ActivityNotFoundException
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +17,7 @@ import androidx.navigation.fragment.navArgs
 import com.field.survey.R
 import com.field.survey.databinding.FragmentEditPointBinding
 import com.field.survey.ui.util.bindErrorText
+import com.field.survey.ui.util.loadDpImage
 import com.field.survey.domain.model.DpType
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
@@ -145,15 +144,7 @@ class EditPointFragment : Fragment() {
             selectedType = point.type
             selectTypeChip(point.type)
 
-            if (!point.imageBase64.isNullOrBlank()) {
-                try {
-                    val bytes = Base64.decode(point.imageBase64, Base64.DEFAULT)
-                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    binding.ivPhoto.setImageBitmap(bmp)
-                } catch (_: Exception) {
-                    binding.ivPhoto.setImageResource(android.R.drawable.ic_menu_gallery)
-                }
-            }
+            binding.ivPhoto.loadDpImage(point)
         }
 
         viewModel.isSaving.observe(viewLifecycleOwner) { saving ->

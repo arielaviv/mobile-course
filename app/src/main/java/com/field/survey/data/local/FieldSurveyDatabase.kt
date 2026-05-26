@@ -12,7 +12,7 @@ import com.field.survey.data.local.entity.DistributionPointEntity
         DistributionPointEntity::class,
         CommentEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = true,
 )
 abstract class FieldSurveyDatabase : RoomDatabase() {

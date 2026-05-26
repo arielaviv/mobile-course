@@ -1,8 +1,6 @@
 package com.field.survey.ui.detail
 
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.field.survey.R
 import com.field.survey.databinding.FragmentDetailBinding
 import com.field.survey.ui.adapter.CommentAdapter
+import com.field.survey.ui.util.loadDpImage
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -82,15 +81,7 @@ class DetailFragment : Fragment() {
                     point.latitude, point.longitude, dateStr,
                 )
 
-            if (!point.imageBase64.isNullOrBlank()) {
-                try {
-                    val bytes = Base64.decode(point.imageBase64, Base64.DEFAULT)
-                    val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-                    binding.ivPhoto.setImageBitmap(bmp)
-                } catch (_: Exception) {
-                    binding.ivPhoto.setImageResource(android.R.drawable.ic_menu_gallery)
-                }
-            }
+            binding.ivPhoto.loadDpImage(point)
         }
 
         viewModel.comments.observe(viewLifecycleOwner) { comments ->
