@@ -104,6 +104,11 @@ class MapFragment : Fragment() {
             findNavController().popBackStack()
         }
 
+        if (com.field.survey.BuildConfig.MAPBOX_PUBLIC_TOKEN.isBlank()) {
+            setupFallbackMap()
+            return
+        }
+
         markers = MarkerBitmaps.build(requireContext())
 
         isSatellite = mapSettings.getBool(MapSettingsRepository.KEY_SATELLITE, MapSettingsRepository.DEFAULT_SATELLITE)
@@ -283,6 +288,55 @@ class MapFragment : Fragment() {
             navigateToAddPoint(type, drawnPoints.toList())
             exitAddMode()
         }
+    }
+
+    @android.annotation.SuppressLint("SetJavaScriptEnabled")
+    private fun setupFallbackMap() {
+        binding.mapView.isVisible = false
+        binding.fabAdd.isVisible = false
+        binding.webViewFallback.isVisible = true
+        binding.tvNoToken.isVisible = true
+
+        binding.webViewFallback.settings.javaScriptEnabled = true
+        binding.webViewFallback.settings.domStorageEnabled = true
+
+        viewModel.posts.observe(viewLifecycleOwner) { points ->
+            loadFallbackHtml(points)
+        }
+    }
+
+    private fun loadFallbackHtml(points: List<DistributionPoint>) {
+        val markersJs = points.joinToString("\n") { dp ->
+            if (!dp.type.isLine) {
+                "L.marker([${dp.latitude}, ${dp.longitude}]).addTo(map).bindPopup(\"${dp.label.replace("\"", "\\\"")}\");"
+            } else {
+                val verts = PathCoordinates.decode(dp.pathCoordinates)
+                if (verts.size >= 2) {
+                    val coords = verts.joinToString(",") { (lng, lat) -> "[$lat,$lng]" }
+                    "L.polyline([$coords], {color:'#3B82F6'}).addTo(map).bindPopup(\"${dp.label.replace("\"", "\\\"")}\");"
+                } else ""
+            }
+        }
+
+        val html = """
+            <!DOCTYPE html><html><head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <style>html,body,#map{margin:0;padding:0;height:100%;width:100%;}</style>
+            </head><body>
+            <div id="map"></div>
+            <script>
+              var map = L.map('map').setView([32.0750, 34.7725], 14);
+              L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors', maxZoom: 19
+              }).addTo(map);
+              $markersJs
+            </script>
+            </body></html>
+        """.trimIndent()
+
+        binding.webViewFallback.loadDataWithBaseURL(null, html, "text/html", "utf-8", null)
     }
 
     private fun showAddMenu() {

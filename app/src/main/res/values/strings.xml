@@ -201,6 +201,7 @@
 
     <!-- Measure tool -->
     <string name="map_measure_total">Total: %1$s</string>
+    <string name="map_no_mapbox_token">Mapbox token missing — showing OpenStreetMap (read-only). Add MAPBOX_PUBLIC_TOKEN to local.properties to enable full map features.</string>
 
     <!-- GPS accuracy -->
     <string name="location_accuracy_metric">±%1$.0f m</string>
