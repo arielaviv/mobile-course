@@ -9,6 +9,7 @@ import com.field.survey.data.local.entity.DistributionPointEntity
 import com.field.survey.domain.model.DistributionPoint
 import com.field.survey.domain.model.toDpType
 import android.net.Uri
+import com.field.survey.ui.util.ImageCompression
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
@@ -132,8 +133,9 @@ class DistributionPointRepository
 
         suspend fun save(dp: DistributionPoint) {
             val photoUrl = dp.photoPath?.let { uploadImage(dp.createdBy, dp.id, it) }
+            val imageBase64 = if (photoUrl == null) dp.photoPath?.let { ImageCompression.fileToCompressedBase64(it) } else null
 
-            val dpWithImage = dp.copy(photoUrl = photoUrl)
+            val dpWithImage = dp.copy(photoUrl = photoUrl, imageBase64 = imageBase64)
 
             dao.insert(DistributionPointEntity.fromDomain(dpWithImage))
 
@@ -145,6 +147,7 @@ class DistributionPointRepository
                     "longitude" to dpWithImage.longitude,
                     "pathCoordinates" to dpWithImage.pathCoordinates,
                     "photoUrl" to dpWithImage.photoUrl,
+                    "imageBase64" to dpWithImage.imageBase64,
                     "notes" to dpWithImage.notes,
                     "createdAt" to dpWithImage.createdAt,
                     "createdBy" to dpWithImage.createdBy,
@@ -171,10 +174,16 @@ class DistributionPointRepository
         suspend fun update(dp: DistributionPoint) {
             val userId = authRepository.getUserId()
             val photoUrl = dp.photoPath?.let { uploadImage(userId, dp.id, it) } ?: dp.photoUrl
+            val imageBase64 = when {
+                photoUrl != null -> null
+                dp.photoPath != null -> ImageCompression.fileToCompressedBase64(dp.photoPath)
+                else -> dp.imageBase64
+            }
 
             val updated =
                 dp.copy(
                     photoUrl = photoUrl,
+                    imageBase64 = imageBase64,
                     updatedAt = System.currentTimeMillis(),
                     updatedBy = authRepository.getUserName().ifBlank { userId },
                 )
@@ -188,6 +197,7 @@ class DistributionPointRepository
                     "longitude" to updated.longitude,
                     "pathCoordinates" to updated.pathCoordinates,
                     "photoUrl" to updated.photoUrl,
+                    "imageBase64" to updated.imageBase64,
                     "notes" to updated.notes,
                     "createdAt" to updated.createdAt,
                     "createdBy" to updated.createdBy,
