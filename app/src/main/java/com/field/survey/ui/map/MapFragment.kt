@@ -90,6 +90,9 @@ class MapFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        if (com.field.survey.BuildConfig.MAPBOX_PUBLIC_TOKEN.isBlank()) {
+            com.mapbox.common.MapboxOptions.accessToken = "pk.no-token"
+        }
         _binding = FragmentMapBinding.inflate(inflater, container, false)
         return binding.root
     }
